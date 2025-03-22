@@ -1,0 +1,161 @@
+<?php
+
+namespace App\Http\Controllers\V1\Carrier;
+
+use App\Http\Controllers\Actions\CarrierActions;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\CarrierResource;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class CarrierController extends Controller
+{
+    public function __construct(private CarrierActions $carrier) {}
+
+    public function all(Request $request)
+    {
+        try {
+            return $this->success(payload: [
+                'carriers' => CarrierResource::collection($this->carrier->all($request)),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+    }
+
+    public function find(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'carrier_id' => ['required', 'exists:carriers,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+        try {
+            $carrier = $this->carrier->find($validator->safe()->input('carrier_id'));
+
+            return $this->success(payload: [
+                'carrier' => CarrierResource::make($carrier),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+    }
+
+    public function get()
+    {
+        try {
+            return $this->success(payload: [
+                'carrier' => CarrierResource::make($this->carrier->get(Auth::id())),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+    }
+
+    public function create(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => ['required', 'string', 'max:20'],
+            'last_name' => ['required', 'string', 'max:20'],
+            'transportaion_id' => ['required', 'exists:transportations,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $carrier = $this->carrier->create(Auth::user(), $validator->safe()->all());
+
+            return $this->success(
+                payload: ['carrier' => CarrierResource::make($carrier)]
+            );
+        } catch (\Throwable $e) {
+            return $this->error(payload: ['errors' => $e->getMessage()]);
+        }
+    }
+
+    public function createDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'carrier_id' => ['required', 'exists:carriers,id'],
+            'plate_number' => ['required', 'numeric', 'unique:carrier_details,plate_number'],
+            'brand' => ['required', 'string'],
+            'model' => ['required', 'string'],
+            'year' => ['required', 'date_format:Y'],
+            'color' => ['required', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $carrier = $this->carrier->find($validator->safe()->input('carrier_id'));
+            $details = $this->carrier->createDetails($carrier, $validator->safe()->except('carrier_id'));
+
+            return $this->success(
+                payload: ['carrier' => CarrierResource::make($carrier)]
+            );
+        } catch (\Throwable $e) {
+            return $this->error(payload: ['errors' => $e->getMessage()]);
+        }
+    }
+
+    public function createDocuments(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'carrier_id' => ['required', 'exists:carriers,id'],
+            'images' => ['required', 'array', 'size:4'],
+            'images.*' => ['required', 'image', 'max:2048'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $carrier = $this->carrier->find($validator->safe()->input('carrier_id'));
+            $this->carrier->createDocuments($carrier, $validator->safe()->input('images'));
+
+            return $this->success(
+                payload: ['carrier' => CarrierResource::make($carrier)]
+            );
+        } catch (\Throwable $e) {
+            return $this->error(payload: ['errors' => $e->getMessage()]);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'brand' => ['required', 'string', 'unique:producers,brand'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => $validator->errors()]);
+        }
+
+        try {
+            $this->carrier->update(Auth::user()->badge, $validator->safe()->only(['brand']));
+
+            return $this->success(msg: 'Carrier Updated');
+        } catch (\Throwable $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+    }
+
+    public function delete(Request $request)
+    {
+        try {
+            $this->carrier->delete(Auth::user()->badge);
+
+            return $this->success(msg: 'Carrier Deleted');
+        } catch (\Throwable $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+    }
+}
