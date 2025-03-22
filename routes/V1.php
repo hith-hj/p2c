@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\v1\auth\JWTAuthController;
+use App\Http\Controllers\V1\Auth\JWTAuthController;
 use App\Http\Controllers\V1\Branch\BranchController;
 use App\Http\Controllers\V1\Carrier\CarrierController;
 use App\Http\Controllers\V1\Producer\ProducerController;
