@@ -186,8 +186,16 @@ class JWTAuthController extends Controller
         $user->sendVerificationCode();
 
         return $this->success(
-		payload: ['code' => $user->verification_code],
-		msg: 'Code is sent'
-	);
+            payload: ['code' => $user->verification_code],
+            msg: 'Code is sent'
+        );
+    }
+
+    public function deleteUser(){
+        $user = auth()->user();
+        JWTAuth::invalidate(JWTAuth::getToken());
+        $user->badge()?->delete();
+        $user->delete();
+        return $this->success(msg: 'user is deleted');
     }
 }
