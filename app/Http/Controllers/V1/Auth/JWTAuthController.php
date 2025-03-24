@@ -185,6 +185,9 @@ class JWTAuthController extends Controller
 
         $user->sendVerificationCode();
 
-        return $this->success(msg: 'Code is sent');
+        return $this->success(
+		payload: ['code' => $user->verification_code],
+		msg: 'Code is sent'
+	);
     }
 }
