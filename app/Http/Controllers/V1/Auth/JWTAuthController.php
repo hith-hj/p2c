@@ -191,6 +191,32 @@ class JWTAuthController extends Controller
         );
     }
 
+    public function changePassword(Request $request){
+        $validator = Validator::make($request->all(), [
+            'old_password' => ['required','string','min:8'],
+            'new_password' => ['required','string','min:8','confirmed','declined_if:old_password,true'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => $validator->errors()]);
+        }
+
+        if($validator->safe()->input('old_password') == $validator->safe()->input('new_password')){
+            return $this->error(msg:'Passwords are equals');
+        }
+
+        $user = auth()->user();
+        if(!Hash::check($validator->safe()->input('old_password'), $user->password)){
+            return $this->error(msg:'Old Password is invalid');
+        }     
+
+        $user->update(['password'=>Hash::make($validator->safe()->input('new_password'))]);
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return $this->success(
+            msg: 'Password is changed'
+        );
+    }
+
     public function deleteUser(){
         $user = auth()->user();
         JWTAuth::invalidate(JWTAuth::getToken());

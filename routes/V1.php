@@ -24,6 +24,7 @@ Route::group(
         Route::post('deleteUser', 'deleteUser')->name('deleteUser');
         Route::get('user', 'getUser')->name('getUser');
         Route::post('logout', 'logout')->name('logout');
+        Route::post('changePassword', 'changePassword')->name('changePassword');
     }
 );
 
