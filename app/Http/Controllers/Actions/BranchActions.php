@@ -45,7 +45,7 @@ class BranchActions
         return $branch;
     }
 
-    public function update(Branch $branch, $data)
+    public function update($branch, $data)
     {
         return $branch->update($data);
     }

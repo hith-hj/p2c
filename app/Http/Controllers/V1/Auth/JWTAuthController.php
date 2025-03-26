@@ -80,7 +80,7 @@ class JWTAuthController extends Controller
             if (! $token = JWTAuth::attempt($credentials)) {
                 return $this->error(msg: 'Invalid credentials');
             }
-            $user = Auth::user();
+            $user = auth()->user();
             if ($user->verified_at === null || $user->verification_code !== null) {
                 return $this->error(msg: 'Unverified',code:401);
             }

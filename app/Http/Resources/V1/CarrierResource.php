@@ -15,9 +15,12 @@ class CarrierResource extends JsonResource
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
+        $collection = $this->documents;
+        $docs = $collection->filter( fn($item) => $item->doc_type === 'document');
+        $profile = $collection->filter( fn($item) => $item->doc_type === 'profile');
         return [
             'id' => $this->id,
-            'name' => $this->first_name.' '.$this->last_name,
+            'name' => "$this->first_name $this->last_name",
             'rate' => $this->rate,
             'is_valid' => $this->is_valid,
             'is_online' => $this->is_online,
@@ -25,7 +28,8 @@ class CarrierResource extends JsonResource
             'created_at' => $this->created_at->diffForHumans(),
             'transportation' => $this->transportation,
             'details' => $this->details,
-            'documents' => $this->documents->pluck('url'),
+            'documents' => $docs->pluck('url'),
+            'profile_image' => $profile->pluck('url'),
         ];
     }
 }

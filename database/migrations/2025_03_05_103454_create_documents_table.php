@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('documented_id');
             $table->string('documented_type');
+            $table->string('doc_type');
             $table->string('url');
             $table->timestamps();
         });

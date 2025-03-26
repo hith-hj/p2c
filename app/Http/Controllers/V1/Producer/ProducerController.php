@@ -28,7 +28,7 @@ class ProducerController extends Controller
     {
         try {
             return $this->success(payload: [
-                'producer' => ProducerResource::make($this->producer->get(Auth::id())),
+                'producer' => ProducerResource::make($this->producer->get(auth()->id())),
             ]);
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
@@ -70,7 +70,7 @@ class ProducerController extends Controller
         }
 
         try {
-            $producer = $this->producer->create(Auth::user(), $validator->safe()->all());
+            $producer = $this->producer->create(auth()->user(), $validator->safe()->all());
 
             return $this->success(
                 payload: ['producer' => ProducerResource::make($producer)]
@@ -91,7 +91,7 @@ class ProducerController extends Controller
         }
 
         try {
-            $this->producer->update(Auth::user()->badge, $validator->safe()->only(['brand']));
+            $this->producer->update(auth()->user()->badge, $validator->safe()->only(['brand']));
 
             return $this->success(msg: 'Producer Updated');
         } catch (\Throwable $e) {
@@ -102,7 +102,7 @@ class ProducerController extends Controller
     public function delete(Request $request)
     {
         try {
-            $this->producer->delete(Auth::user()->badge);
+            $this->producer->delete(auth()->user()->badge);
 
             return $this->success(msg: 'Producer Deleted');
         } catch (\Throwable $e) {

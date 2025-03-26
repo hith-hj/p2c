@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
 {
-    public function __construct(private CarrierActions $carrier) {}
+    public function __construct(private CarrierActions $carrier)
+    {
+    }
 
     public function all(Request $request)
     {
@@ -48,7 +50,7 @@ class CarrierController extends Controller
     {
         try {
             return $this->success(payload: [
-                'carrier' => CarrierResource::make($this->carrier->get(Auth::id())),
+                'carrier' => CarrierResource::make($this->carrier->get(auth()->id())),
             ]);
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
@@ -68,7 +70,7 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->create(Auth::user(), $validator->safe()->all());
+            $carrier = $this->carrier->create(auth()->user(), $validator->safe()->all());
 
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier)]
@@ -81,7 +83,6 @@ class CarrierController extends Controller
     public function createDetails(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'carrier_id' => ['required', 'exists:carriers,id'],
             'plate_number' => ['required', 'numeric', 'unique:carrier_details,plate_number'],
             'brand' => ['required', 'string'],
             'model' => ['required', 'string'],
@@ -94,11 +95,10 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->find($validator->safe()->input('carrier_id'));
-            $details = $this->carrier->createDetails($carrier, $validator->safe()->except('carrier_id'));
-
+            $carrier = $this->carrier->find(auth()->user()->badge->id);
+            $details = $this->carrier->createDetails($carrier, $validator->safe()->all());
             return $this->success(
-                payload: ['carrier' => CarrierResource::make($carrier)]
+                payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
         } catch (\Throwable $e) {
             return $this->error(payload: ['errors' => $e->getMessage()]);
@@ -108,8 +108,7 @@ class CarrierController extends Controller
     public function createDocuments(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'carrier_id' => ['required', 'exists:carriers,id'],
-            'images' => ['required', 'array', 'size:4'],
+            'images' => ['required', 'array', 'size:5'],
             'images.*' => ['required', 'image', 'max:2048'],
         ]);
 
@@ -118,11 +117,10 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->find($validator->safe()->input('carrier_id'));
+            $carrier = $this->carrier->find(auth()->user()->badge->id);
             $this->carrier->createDocuments($carrier, $validator->safe()->input('images'));
-
             return $this->success(
-                payload: ['carrier' => CarrierResource::make($carrier)]
+                payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
         } catch (\Throwable $e) {
             return $this->error(payload: ['errors' => $e->getMessage()]);
@@ -140,7 +138,7 @@ class CarrierController extends Controller
         }
 
         try {
-            $this->carrier->update(Auth::user()->badge, $validator->safe()->only(['brand']));
+            $this->carrier->update(auth()->user()->badge, $validator->safe()->only(['brand']));
 
             return $this->success(msg: 'Carrier Updated');
         } catch (\Throwable $e) {
@@ -151,7 +149,7 @@ class CarrierController extends Controller
     public function delete(Request $request)
     {
         try {
-            $this->carrier->delete(Auth::user()->badge);
+            $this->carrier->delete(auth()->user()->badge);
 
             return $this->success(msg: 'Carrier Deleted');
         } catch (\Throwable $e) {
