@@ -109,4 +109,12 @@ class User extends Authenticatable implements JWTSubject
 
         return $this;
     }
+
+    public function orders(){
+        return match($this->role){
+            UserRoles::Producer->value => $this->hasMany(Order::class,'producer_id'),
+            UserRoles::Carrier->value => $this->hasMany(Order::class,'carrier_id'),
+            default => throw new \Exception("Error User role is not defiend"),
+        };
+    }
 }

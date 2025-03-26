@@ -13,7 +13,6 @@ class OrderController extends Controller
     public function __construct(private OrderActions $order) {}
 
     public function all(Request $request)  {
-        dd('here');
         try {
             return $this->success(payload: [
                 'orders' => OrderResource::collection($this->order->all(auth()->id())),
