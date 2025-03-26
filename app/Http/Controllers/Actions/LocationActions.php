@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Actions;
 
+use App\ExceptionHandler;
 class LocationActions
 {
+    use ExceptionHandler;
     public function create($locatable, $data)
     {
-        $this->assertArgs($locatable, $data);
+        $this->Required($locatable,'Location');
+        $this->Required($data,'Location Data');
 
         return $locatable->location()->create([
             'locatable_type' => get_class($locatable),
@@ -17,7 +20,8 @@ class LocationActions
 
     public function edit($locatable, $data)
     {
-        $this->assertArgs($locatable, $data);
+        $this->Required($locatable,'Location');
+        $this->Required($data,'Location Data');
 
         return $locatable->location()->update([
             'long' => $data['coords']['long'],
@@ -25,10 +29,4 @@ class LocationActions
         ]);
     }
 
-    private function assertArgs($locatable, $data)
-    {
-        if (! $locatable || ! $data) {
-            throw new \Exception('Invalid Location Arguments');
-        }
-    }
 }

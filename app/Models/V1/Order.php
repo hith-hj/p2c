@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Enums\UserRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,8 +23,16 @@ class Order extends Model
         return $this->belongsTo(User::class, 'carrier_id');
     }
 
+    public function user($role) {
+        return match ($role) {
+            UserRoles::Producer->value => $this->belongsTo(User::class,'producer_id'),
+            UserRoles::Carrier->value => $this->belongsTo(User::class,'carrier_id'),
+            default => throw new \Exception("Error Order User is not defiend", 1),
+        };
+    }
+
     public function attributes()
     {
-        return $this->belongsToMany(Attribute::class)->withTimestamps();
+        return $this->belongsToMany(Attr::class)->withTimestamps();
     }
 }

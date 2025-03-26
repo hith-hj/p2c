@@ -3,6 +3,7 @@
 use App\Http\Controllers\V1\Auth\JWTAuthController;
 use App\Http\Controllers\V1\Branch\BranchController;
 use App\Http\Controllers\V1\Carrier\CarrierController;
+use App\Http\Controllers\V1\Order\OrderController;
 use App\Http\Controllers\V1\Producer\ProducerController;
 use App\Http\Controllers\V1\Transportation\TransportationController;
 use App\Http\Middleware\RoleMiddleware;
@@ -78,6 +79,21 @@ Route::group(
 
 Route::group(
     ['prefix' => 'transportation', 'controller' => TransportationController::class],
+    function () {
+        // Route::middleware([RoleMiddleware::class . ':carrier'])->group(function () {
+        //     Route::get('/', 'get');
+        //     Route::post('create', 'create');
+        //     Route::patch('update', 'update');
+        //     Route::delete('delete', 'delete');
+        // });
+
+        Route::get('all', 'all');
+        Route::get('find', 'find');
+    }
+);
+
+Route::group(
+    ['prefix' => 'order', 'controller' => OrderController::class],
     function () {
         // Route::middleware([RoleMiddleware::class . ':carrier'])->group(function () {
         //     Route::get('/', 'get');
