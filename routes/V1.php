@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Middleware\RoleMiddleware;
-use App\Http\Middleware\V1\Auth\JwtMiddleware;
 use App\Http\Controllers\V1\Auth\JWTAuthController;
 use App\Http\Controllers\V1\Branch\BranchController;
 use App\Http\Controllers\V1\Carrier\CarrierController;
 use App\Http\Controllers\V1\Producer\ProducerController;
 use App\Http\Controllers\V1\Transportation\TransportationController;
+use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\V1\Auth\JwtMiddleware;
 
 Route::group(
     ['prefix' => 'auth', 'controller' => JWTAuthController::class],
@@ -20,7 +20,7 @@ Route::group(
             Route::post('resendCode', 'resendCode')->name('resendCode');
             Route::get('refreshToken', 'refreshToken')->name('refreshToken');
         });
-        
+
         Route::post('deleteUser', 'deleteUser')->name('deleteUser');
         Route::get('user', 'getUser')->name('getUser');
         Route::post('logout', 'logout')->name('logout');

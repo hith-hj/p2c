@@ -81,7 +81,9 @@ class JWTAuthController extends Controller
                 return $this->error(msg: 'Invalid credentials');
             }
             $user = Auth::user();
-            // if the user is not verified what to do
+            if ($user->verified_at === null || $user->verification_code !== null) {
+                return $this->success(msg: 'Unverified');
+            }
             $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
             $user = UserResource::make($user);
 
@@ -191,37 +193,40 @@ class JWTAuthController extends Controller
         );
     }
 
-    public function changePassword(Request $request){
+    public function changePassword(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'old_password' => ['required','string','min:8'],
-            'new_password' => ['required','string','min:8','confirmed','declined_if:old_password,true'],
+            'old_password' => ['required', 'string', 'min:8'],
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         if ($validator->fails()) {
             return $this->error(payload: ['errors' => $validator->errors()]);
         }
 
-        if($validator->safe()->input('old_password') == $validator->safe()->input('new_password')){
-            return $this->error(msg:'Passwords are equals');
+        if ($validator->safe()->input('old_password') == $validator->safe()->input('new_password')) {
+            return $this->error(msg: 'Passwords are equals');
         }
 
         $user = auth()->user();
-        if(!Hash::check($validator->safe()->input('old_password'), $user->password)){
-            return $this->error(msg:'Old Password is invalid');
-        }     
+        if (! Hash::check($validator->safe()->input('old_password'), $user->password)) {
+            return $this->error(msg: 'Old Password is invalid');
+        }
 
-        $user->update(['password'=>Hash::make($validator->safe()->input('new_password'))]);
-        JWTAuth::invalidate(JWTAuth::getToken());
+        $user->update(['password' => Hash::make($validator->safe()->input('new_password'))]);
+
         return $this->success(
             msg: 'Password is changed'
         );
     }
 
-    public function deleteUser(){
+    public function deleteUser()
+    {
         $user = auth()->user();
         JWTAuth::invalidate(JWTAuth::getToken());
         $user->badge()?->delete();
         $user->delete();
+
         return $this->success(msg: 'user is deleted');
     }
 }
