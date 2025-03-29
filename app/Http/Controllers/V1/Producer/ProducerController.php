@@ -6,7 +6,6 @@ use App\Http\Controllers\Actions\ProducerActions;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ProducerResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProducerController extends Controller
@@ -59,7 +58,7 @@ class ProducerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'brand' => ['required', 'string', 'max:20', 'unique:producers,brand'],
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
+            'phone' => ['sometimes', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
             'coords' => ['required', 'array', 'size:2'],
             'coords.long' => ['required', 'numeric', 'between:-180,180', 'required_with:latitude'],
             'coords.lat' => ['required', 'numeric', 'between:-90,90', 'required_with:longitude'],
