@@ -97,7 +97,7 @@ class CarrierActions
         $this->Required($carrier, 'Carrier');
         $carrier->details()->delete();
         $carrier->documents()->delete();
-        // $carrier->orders()->delete();
+        $carrier->profileImage()->delete();
         $carrier->delete();
 
         return true;

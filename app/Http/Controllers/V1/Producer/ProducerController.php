@@ -6,7 +6,6 @@ use App\Http\Controllers\Actions\ProducerActions;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ProducerResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProducerController extends Controller
@@ -28,7 +27,7 @@ class ProducerController extends Controller
     {
         try {
             return $this->success(payload: [
-                'producer' => ProducerResource::make($this->producer->get(Auth::id())),
+                'producer' => ProducerResource::make($this->producer->get(auth()->id())),
             ]);
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
@@ -59,7 +58,7 @@ class ProducerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'brand' => ['required', 'string', 'max:20', 'unique:producers,brand'],
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
+            'phone' => ['sometimes', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
             'coords' => ['required', 'array', 'size:2'],
             'coords.long' => ['required', 'numeric', 'between:-180,180', 'required_with:latitude'],
             'coords.lat' => ['required', 'numeric', 'between:-90,90', 'required_with:longitude'],
@@ -70,7 +69,7 @@ class ProducerController extends Controller
         }
 
         try {
-            $producer = $this->producer->create(Auth::user(), $validator->safe()->all());
+            $producer = $this->producer->create(auth()->user(), $validator->safe()->all());
 
             return $this->success(
                 payload: ['producer' => ProducerResource::make($producer)]
@@ -91,7 +90,7 @@ class ProducerController extends Controller
         }
 
         try {
-            $this->producer->update(Auth::user()->badge, $validator->safe()->only(['brand']));
+            $this->producer->update(auth()->user()->badge, $validator->safe()->only(['brand']));
 
             return $this->success(msg: 'Producer Updated');
         } catch (\Throwable $e) {
@@ -102,7 +101,7 @@ class ProducerController extends Controller
     public function delete(Request $request)
     {
         try {
-            $this->producer->delete(Auth::user()->badge);
+            $this->producer->delete(auth()->user()->badge);
 
             return $this->success(msg: 'Producer Deleted');
         } catch (\Throwable $e) {

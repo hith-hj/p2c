@@ -23,7 +23,7 @@ class BranchController extends Controller
         try {
             return $this->success(payload: [
                 'branches' => BranchResource::collection(
-                    $this->branch->get(Auth::user()->badge?->id)
+                    $this->branch->get(auth()->user()->badge?->id)
                 ),
             ]);
         } catch (\Throwable $e) {
@@ -71,7 +71,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branch->create(Auth::user()->badge, $validator->safe()->all());
+            $branch = $this->branch->create(auth()->user()->badge, $validator->safe()->all());
 
             return $this->success(payload: [
                 'branch' => BranchResource::make($branch),
@@ -97,7 +97,7 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
-            if ($branch->producer_id != Auth::user()->badge->id) {
+            if ($branch->producer_id != auth()->user()->badge->id) {
                 return $this->error(msg: 'Un Authorized', code: 403);
             }
             $this->branch->update($branch, $validator->safe()->except(['branch_id']));
@@ -122,7 +122,7 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
-            if ($branch->producer_id != Auth::user()->badge->id) {
+            if ($branch->producer_id != auth()->user()->badge->id) {
                 return $this->error(msg: 'Un Authorized', code: 403);
             }
             $this->branch->delete($branch);
@@ -147,7 +147,7 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
-            if ($branch->producer_id != Auth::user()->badge->id) {
+            if ($branch->producer_id != auth()->user()->badge->id) {
                 return $this->error(msg: 'Un Authorized', code: 403);
             }
             $this->branch->setBranchAsDefault($branch);

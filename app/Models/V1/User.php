@@ -85,7 +85,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function sendVerificationCode($by = 'phone')
     {
-        $code = rand(00000, 99999);
+        $code = mt_rand(10000, 99999);
         $this->update([
             'verified_at' => null,
             'verification_code' => $code,

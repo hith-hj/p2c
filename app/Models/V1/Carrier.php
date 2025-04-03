@@ -49,6 +49,13 @@ class Carrier extends Model
     {
         return $this->hasMany(Document::class, 'documented_id')
             ->where('documented_type', class_basename($this))
-            ->select(['url']);
+            ->select(['url','doc_type']);
+    }
+    
+    public function profileImage()
+    {
+        return $this->hasOne(Document::class, 'documented_id')
+            ->where([['documented_type', class_basename($this)],['doc_type','profile']])
+            ->select(['url','doc_type']);
     }
 }
