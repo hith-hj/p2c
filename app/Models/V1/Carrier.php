@@ -49,13 +49,20 @@ class Carrier extends Model
     {
         return $this->hasMany(Document::class, 'documented_id')
             ->where('documented_type', class_basename($this))
-            ->select(['url','doc_type']);
+            ->select(['url', 'doc_type']);
     }
-    
+
     public function profileImage()
     {
         return $this->hasOne(Document::class, 'documented_id')
-            ->where([['documented_type', class_basename($this)],['doc_type','profile']])
-            ->select(['url','doc_type']);
+            ->where([['documented_type', class_basename($this)], ['doc_type', 'profile']])
+            ->select(['url', 'doc_type']);
+    }
+
+    public function validate(bool $state)
+    {
+        if (isset($state) && is_bool($state)) {
+            return $this->update(['is_valid' => $state]);
+        }
     }
 }

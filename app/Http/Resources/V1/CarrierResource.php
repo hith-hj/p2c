@@ -16,20 +16,22 @@ class CarrierResource extends JsonResource
     {
         // return parent::toArray($request);
         $collection = $this->documents;
-        $docs = $collection->filter( fn($item) => $item->doc_type === 'document');
-        $profile = $collection->filter( fn($item) => $item->doc_type === 'profile');
+        $docs = $collection->filter(fn ($item) => $item->doc_type === 'document');
+        $profile = $collection->filter(fn ($item) => $item->doc_type === 'profile');
+
         return [
             'id' => $this->id,
             'name' => "$this->first_name $this->last_name",
             'rate' => $this->rate,
-            'is_valid' => $this->is_valid,
-            'is_online' => $this->is_online,
-            'is_available' => $this->is_available,
+            'is_valid' => (int) $this->is_valid,
+            'is_online' => (int) $this->is_online,
+            'is_available' => (int) $this->is_available,
             'created_at' => $this->created_at->diffForHumans(),
             'transportation' => $this->transportation,
             'details' => $this->details,
             'documents' => $docs->pluck('url'),
             'profile_image' => $profile->pluck('url'),
+            'is_filled' => ($this->details()->exists() && $this->documents()->exists() && $this->transportation()->exists()),
         ];
     }
 }
