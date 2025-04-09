@@ -9,10 +9,13 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    
-    public function __construct(private OrderActions $order) {}
 
-    public function all(Request $request)  {
+    public function __construct(private OrderActions $order)
+    {
+    }
+
+    public function all(Request $request)
+    {
         try {
             return $this->success(payload: [
                 'orders' => OrderResource::collection($this->order->all(auth()->id())),
@@ -20,5 +23,25 @@ class OrderController extends Controller
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
         }
+    }
+
+    public function create(Request $request)
+    {
+    }
+    public function update(Request $request)
+    {
+    }
+    public function delete(Request $request)
+    {
+    }
+
+    public function accept(Request $request)
+    {
+    }
+    public function reject(Request $request)
+    {
+    }
+    public function cancel(Request $request)
+    {
     }
 }
