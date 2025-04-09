@@ -90,9 +90,10 @@ class ProducerController extends Controller
         }
 
         try {
-            $this->producer->update(auth()->user()->badge, $validator->safe()->only(['brand']));
+            $producer = auth()->user()->badge;
+            $this->producer->update($producer, $validator->safe()->only(['brand']));
 
-            return $this->success(msg: 'Producer Updated');
+            return $this->success(msg: __('main.updated'), payload: ['producer' => ProducerResource::make($producer->fresh())]);
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
         }
@@ -103,7 +104,7 @@ class ProducerController extends Controller
         try {
             $this->producer->delete(auth()->user()->badge);
 
-            return $this->success(msg: 'Producer Deleted');
+            return $this->success(msg: __('main.deleted'));
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
         }

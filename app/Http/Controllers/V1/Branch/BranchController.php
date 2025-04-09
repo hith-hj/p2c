@@ -14,7 +14,7 @@ class BranchController extends Controller
 
     public function all()
     {
-        return $this->error(msg: 'Not done yet');
+        return $this->error(msg: __('main.coming soon'));
     }
 
     public function get(Request $request)
@@ -97,11 +97,11 @@ class BranchController extends Controller
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
             if ($branch->producer_id != auth()->user()->badge->id) {
-                return $this->error(msg: 'Un Authorized', code: 403);
+                return $this->error(msg: __('main.unauthorized'), code: 403);
             }
             $this->branch->update($branch, $validator->safe()->except(['branch_id']));
 
-            return $this->success(msg: 'Branch Updated');
+            return $this->success(msg: __('main.updated'));
         } catch (\Throwable $e) {
             $code = $e->getCode() == 0 ? 400 : $e->getCode();
 
@@ -122,11 +122,11 @@ class BranchController extends Controller
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
             if ($branch->producer_id != auth()->user()->badge->id) {
-                return $this->error(msg: 'Un Authorized', code: 403);
+                return $this->error(msg: __('main.unauthorized'), code: 403);
             }
             $this->branch->delete($branch);
 
-            return $this->success(msg: 'Branch Deleted');
+            return $this->success(msg: __('main.deleted'));
         } catch (\Throwable $e) {
             $code = $e->getCode() == 0 ? 400 : $e->getCode();
 
@@ -147,11 +147,11 @@ class BranchController extends Controller
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
             if ($branch->producer_id != auth()->user()->badge->id) {
-                return $this->error(msg: 'Un Authorized', code: 403);
+                return $this->error(msg: __('main.unauthorized'), code: 403);
             }
             $this->branch->setBranchAsDefault($branch);
 
-            return $this->success(msg: 'Branch is default');
+            return $this->success(msg: __('main.is default'));
         } catch (\Throwable $e) {
             $code = $e->getCode() == 0 ? 400 : $e->getCode();
 

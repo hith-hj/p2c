@@ -15,25 +15,25 @@ class TransportationActions
             $perPage = $request->perPage;
         }
         $transportaions = Transportation::paginate($perPage);
-        $this->NotFound($transportaions->all(), 'Transportations');
+        $this->NotFound($transportaions->all(), __('main.transportations'));
 
         return $transportaions;
     }
 
     public function find(?int $id = null)
     {
-        $this->Required($id, 'Carrier ID');
+        $this->Required($id, __('main.carrier').' ID');
         $transportaion = Transportation::find($id);
-        $this->NotFound($transportaion, 'Transportation');
+        $this->NotFound($transportaion, __('main.transportation'));
 
         return $transportaion;
     }
 
     public function create($user, $data)
     {
-        $this->Required($user, 'User');
-        $this->Exists($user->badge, 'Carrier');
-        $this->NotFound($data, 'Carrier data');
+        $this->Required($user, __('main.user'));
+        $this->Exists($user->badge, __('main.carrier'));
+        $this->NotFound($data, __('main.data'));
         $transportaion = $user->badge()->create([
             'brand' => $data['brand'],
             'is_valid' => true,
@@ -48,15 +48,15 @@ class TransportationActions
 
     public function update($transportaion, $data)
     {
-        $this->Required($transportaion, 'Carrier');
-        $this->Required($data, 'data');
+        $this->Required($transportaion, __('main.carrier'));
+        $this->Required($data, __('main.data'));
 
         return $transportaion->update($data);
     }
 
     public function delete($transportaion)
     {
-        $this->Required($transportaion, 'Carrier');
+        $this->Required($transportaion, __('main.carrier'));
         $transportaion->delete();
 
         return true;

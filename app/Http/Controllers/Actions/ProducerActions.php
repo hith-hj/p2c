@@ -16,35 +16,35 @@ class ProducerActions
             $perPage = $request->perPage;
         }
         $producers = Producer::paginate($perPage);
-        $this->NotFound($producers->all(), 'Producers');
+        $this->NotFound($producers->all(), __('main.producers'));
 
         return $producers;
     }
 
     public function get(?int $id = null)
     {
-        $this->Required($id, 'User ID');
+        $this->Required($id, __('main.user').' ID');
         $user = User::find($id);
-        $this->NotFound($user, 'User');
-        $this->NotFound($user->badge, 'Producer');
+        $this->NotFound($user, __('main.user'));
+        $this->NotFound($user->badge, __('main.Producer'));
 
         return $user->badge;
     }
 
     public function find(?int $id = null)
     {
-        $this->Required($id, 'Producer ID');
+        $this->Required($id, __('main.producer').' ID');
         $producer = Producer::find($id);
-        $this->NotFound($producer, 'Producer');
+        $this->NotFound($producer, __('main.producer'));
 
         return $producer;
     }
 
     public function create($user, $data)
     {
-        $this->Required($user, 'User');
-        $this->Exists($user->badge, 'Producer');
-        $this->NotFound($data, 'Producer data');
+        $this->Required($user, __('main.user'));
+        $this->Exists($user->badge, __('main.producer'));
+        $this->NotFound($data, __('main.data'));
         $producer = $user->badge()->create([
             'brand' => $data['brand'],
             'is_valid' => true,
@@ -64,15 +64,15 @@ class ProducerActions
 
     public function update($producer, $data)
     {
-        $this->Required($producer, 'producer');
-        $this->Required($data, 'data');
+        $this->Required($producer, __('main.producer'));
+        $this->Required($data, __('main.data'));
 
         return $producer->update($data);
     }
 
     public function delete($producer)
     {
-        $this->Required($producer, 'Producer');
+        $this->Required($producer, __('main.Producer'));
         $producer->branches()->delete();
         // $producer->orders()->delete();
         $producer->delete();

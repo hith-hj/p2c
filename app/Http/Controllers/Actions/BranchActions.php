@@ -14,27 +14,27 @@ class BranchActions
 
     public function find(?int $id = null)
     {
-        $this->Required($id, 'Branch ID');
+        $this->Required($id, __('main.branch').' ID');
         $branch = Branch::find($id);
-        $this->NotFound($branch, 'Branch');
+        $this->NotFound($branch, __('main.branch'));
 
         return $branch;
     }
 
     public function get(?int $id = null)
     {
-        $this->Required($id, 'Producer ID');
+        $this->Required($id, __('main.producer').' ID');
         $producer = Producer::find($id);
-        $this->NotFound($producer, 'Producer');
-        $this->NotFound($producer->branches, 'Branches');
+        $this->NotFound($producer, __('main.producer'));
+        $this->NotFound($producer->branches, __('main.branches'));
 
         return $producer->branches;
     }
 
     public function create(Producer $producer, $data)
     {
-        $this->Required($producer, 'Producer');
-        $this->Required($data, 'Data');
+        $this->Required($producer, __('main.producer'));
+        $this->Required($data, __('main.data'));
         $branch = $producer->branches()->create([
             'name' => $data['name'] ?? 'Main',
             'phone' => $data['phone'],
@@ -52,7 +52,7 @@ class BranchActions
 
     public function delete($branch)
     {
-        $this->Exists($branch->is_default, 'Is Default');
+        $this->Exists($branch->is_default, __('main.is default'));
         $branch->location()->delete();
 
         return $branch->delete();
