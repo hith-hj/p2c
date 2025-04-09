@@ -14,12 +14,11 @@ class ProducerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // return parent::toArray($request);
         return [
             'id' => $this->id,
             'brand' => $this->brand,
-            'is_valid' => $this->is_valid,
-            'rate' => $this->rate,
+            'is_valid' => (int) $this->is_valid,
+            'rate' => (int) $this->rate,
             'created_at' => $this->created_at->diffForHumans(),
             // 'branches'=>BranchResource::collection($this->branches),
         ];
