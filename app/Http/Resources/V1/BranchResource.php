@@ -14,12 +14,11 @@ class BranchResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // return parent::toArray($request);
         return [
             'id' => $this->id,
             'name' => $this->name,
             'phone' => $this->phone,
-            'is_default' => $this->is_default,
+            'is_default' => (int) $this->is_default,
             'created_at' => $this->created_at->diffForHumans(),
             'location' => LocationResource::make($this->location),
         ];
