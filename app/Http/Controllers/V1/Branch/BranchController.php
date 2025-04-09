@@ -6,7 +6,6 @@ use App\Http\Controllers\Actions\BranchActions;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\BranchResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class BranchController extends Controller

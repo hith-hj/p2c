@@ -4,6 +4,7 @@ use App\Http\Controllers\V1\Auth\JWTAuthController;
 use App\Http\Controllers\V1\Branch\BranchController;
 use App\Http\Controllers\V1\Carrier\CarrierController;
 use App\Http\Controllers\V1\Order\OrderController;
+use App\Http\Controllers\V1\Label\LabelController;
 use App\Http\Controllers\V1\Producer\ProducerController;
 use App\Http\Controllers\V1\Transportation\TransportationController;
 use App\Http\Middleware\RoleMiddleware;
@@ -28,6 +29,16 @@ Route::group(
         Route::post('changePassword', 'changePassword')->name('changePassword');
     }
 );
+
+Route::withoutMiddleware(JwtMiddleware::class)->group(function () {
+    Route::group(
+        ['prefix' => 'label', 'controller' => LabelController::class],
+        function () {
+            Route::get('carBrands', 'carBrands');
+            Route::get('carColors', 'carColors');
+        }
+    );
+});
 
 Route::group(
     ['prefix' => 'producer', 'controller' => ProducerController::class],

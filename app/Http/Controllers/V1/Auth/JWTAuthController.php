@@ -82,7 +82,7 @@ class JWTAuthController extends Controller
             }
             $user = auth()->user();
             if ($user->verified_at === null || $user->verification_code !== null) {
-                return $this->error(msg: 'Unverified',code:401);
+                return $this->error(msg: 'Unverified', code: 401);
             }
             $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
             $user = UserResource::make($user);

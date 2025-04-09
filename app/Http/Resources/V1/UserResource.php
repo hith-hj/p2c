@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'role' => $this->role,
             'created_at' => $this->created_at->diffForHumans(),
             'is_verified' => $this->verified_at?->format('Y-m-d'),
-            'is_filled' => (bool) $this->badge,
+            'is_filled' => $this->badge()->exists(),
         ];
     }
 }

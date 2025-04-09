@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\V1\Transportation;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Actions\TransportationActions;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\TransportationResource;
-use App\Http\Controllers\Actions\TransportationActions;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TransportationController extends Controller
 {

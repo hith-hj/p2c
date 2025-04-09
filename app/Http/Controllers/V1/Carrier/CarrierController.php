@@ -6,14 +6,11 @@ use App\Http\Controllers\Actions\CarrierActions;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\CarrierResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
 {
-    public function __construct(private CarrierActions $carrier)
-    {
-    }
+    public function __construct(private CarrierActions $carrier) {}
 
     public function all(Request $request)
     {
@@ -97,6 +94,7 @@ class CarrierController extends Controller
         try {
             $carrier = $this->carrier->find(auth()->user()->badge->id);
             $details = $this->carrier->createDetails($carrier, $validator->safe()->all());
+
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
@@ -119,6 +117,7 @@ class CarrierController extends Controller
         try {
             $carrier = $this->carrier->find(auth()->user()->badge->id);
             $this->carrier->createDocuments($carrier, $validator->safe()->input('images'));
+
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
@@ -130,19 +129,30 @@ class CarrierController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'brand' => ['required', 'string', 'unique:producers,brand'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
+            'transportation_id' => ['sometimes', 'exists:transportations,id'],
         ]);
 
         if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
         }
 
         try {
-            $this->carrier->update(auth()->user()->badge, $validator->safe()->only(['brand']));
+            $carrier = $this->carrier->find(auth()->user()->badge->id);
+            if ($validator->safe()->exists('transportation_id')) {
+                if ($carrier->details()->count() > 0) {
+                    $carrier->details()->delete();
+                }
+                $carrier->validate(false);
+            }
+            $this->carrier->update($carrier, $validator->safe()->all());
 
-            return $this->success(msg: 'Carrier Updated');
+            return $this->success(payload: [
+                'carrier' => CarrierResource::make($carrier->fresh()),
+            ]);
         } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+            return $this->error(payload: ['errors' => $e->getMessage()]);
         }
     }
 

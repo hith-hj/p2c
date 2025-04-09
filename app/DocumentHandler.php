@@ -9,8 +9,7 @@ trait DocumentHandler
     public function upload($file, $documented_id, $documented_type, $doc_type = 'document')
     {
         if (! isset($documented_id,$documented_type)) {
-            throw new \Exception("Image upload missing information ", 1);
-            ;
+            throw new \Exception('Image upload missing information ', 1);
         }
         $path = "uploads/$doc_type/$documented_type/$documented_id";
         $fileName = time().'_'.$file->hashName();
@@ -20,7 +19,7 @@ trait DocumentHandler
             'documented_id' => $documented_id,
             'documented_type' => $documented_type,
             'url' => $filePath,
-            'doc_type' => $doc_type
+            'doc_type' => $doc_type,
         ]);
     }
 
@@ -29,8 +28,8 @@ trait DocumentHandler
         if (gettype($input) === 'string') {
             $input = request($input);
         }
-        foreach ($input as $key=> $file) {
-            if($key === 'profile'){
+        foreach ($input as $key => $file) {
+            if ($key === 'profile') {
                 $doc_type = $key;
             }
             $this->upload($file, $documented_id, $documented_type, $doc_type);
