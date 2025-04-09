@@ -42,7 +42,7 @@ class JWTAuthController extends Controller
 
         return $this->success(
             payload: ['code' => $user->verification_code],
-            msg: 'User Registerd',
+            msg: __('main.registerd'),
             code: 201
         );
     }
@@ -62,7 +62,7 @@ class JWTAuthController extends Controller
 
         $user->verify();
 
-        return $this->success(msg: 'User Verified');
+        return $this->success(msg: __('main.verified'));
     }
 
     public function login(Request $request)
@@ -78,18 +78,18 @@ class JWTAuthController extends Controller
         $credentials = $request->only('phone', 'password');
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
-                return $this->error(msg: 'Invalid credentials');
+                return $this->error(msg: __('main.invalid credentials'));
             }
             $user = auth()->user();
             if ($user->verified_at === null || $user->verification_code !== null) {
-                return $this->error(msg: 'Unverified', code: 401);
+                return $this->error(msg: __('main.unverified'), code: 401);
             }
             $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
             $user = UserResource::make($user);
 
             return $this->success(payload: compact('user', 'token'));
         } catch (JWTException $e) {
-            return $this->error(msg: 'Could not create token ', code: 500);
+            return $this->error(msg: __('main.token error 1'), code: 500);
         }
     }
 
@@ -111,7 +111,7 @@ class JWTAuthController extends Controller
                 return $this->error(msg: 'User not found', code: 404);
             }
         } catch (JWTException $e) {
-            return $this->error(msg: 'Invalid token', code: 400);
+            return $this->error(msg: __('main.invalid token'), code: 400);
         }
 
         return $this->success(payload: ['user' => UserResource::make($user)]);
@@ -121,7 +121,7 @@ class JWTAuthController extends Controller
     {
         JWTAuth::invalidate(JWTAuth::getToken());
 
-        return $this->success(msg: 'Logged out');
+        return $this->success(msg: __('main.logout'));
     }
 
     public function forgetPassword(Request $request)
@@ -142,7 +142,7 @@ class JWTAuthController extends Controller
 
         return $this->success(
             payload: ['code' => $user->verification_code],
-            msg: 'Code is send',
+            msg: __('main.code sent'),
             code: 201
         );
     }
@@ -161,12 +161,12 @@ class JWTAuthController extends Controller
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         if (is_null($user->verified_at)) {
-            return $this->error(msg: 'Verify your account', code: 401);
+            return $this->error(msg: __('main.verify account'), code: 401);
         }
 
         $user->update(['password' => Hash::make($validator->safe()->input('password'))]);
 
-        return $this->success(msg: 'Password updated');
+        return $this->success(msg: __('main.updated'));
     }
 
     public function resendCode(Request $request)
@@ -182,14 +182,14 @@ class JWTAuthController extends Controller
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         if (is_null($user->verification_code)) {
-            return $this->error(msg: 'invalid operation', code: 403);
+            return $this->error(msg: __('main.invalid operation'), code: 403);
         }
 
         $user->sendVerificationCode();
 
         return $this->success(
             payload: ['code' => $user->verification_code],
-            msg: 'Code is sent'
+            msg: __('main.code sent')
         );
     }
 
@@ -204,20 +204,18 @@ class JWTAuthController extends Controller
             return $this->error(payload: ['errors' => $validator->errors()]);
         }
 
-        if ($validator->safe()->input('old_password') == $validator->safe()->input('new_password')) {
-            return $this->error(msg: 'Passwords are equals');
-        }
-
         $user = auth()->user();
         if (! Hash::check($validator->safe()->input('old_password'), $user->password)) {
-            return $this->error(msg: 'Old Password is invalid');
+            return $this->error(msg: __('main.invalid password'));
+        }
+
+        if ($user->password == Hash::make($validator->safe()->input('new_password'))) {
+            return $this->error(msg: __('main.passwords are equals'));
         }
 
         $user->update(['password' => Hash::make($validator->safe()->input('new_password'))]);
 
-        return $this->success(
-            msg: 'Password is changed'
-        );
+        return $this->success(msg: __('main.updated'));
     }
 
     public function deleteUser()
@@ -227,6 +225,6 @@ class JWTAuthController extends Controller
         $user->badge()?->delete();
         $user->delete();
 
-        return $this->success(msg: 'user is deleted');
+        return $this->success(msg: __('main.deleted'));
     }
 }

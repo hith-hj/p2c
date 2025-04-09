@@ -16,7 +16,7 @@ trait ExceptionHandler
     private function Exists($argument, $name = '')
     {
         if ($argument) {
-            throw new Exception("$name Exists", 400);
+            throw new Exception("$name ".__('main.exists'), 400);
         }
     }
 
@@ -29,7 +29,7 @@ trait ExceptionHandler
      */
     private function NotFound($argument, $name = '')
     {
-        return $this->empty($argument, $name, 'Not Found');
+        return $this->empty($argument, $name, __('main.not found'));
     }
 
     /**
@@ -41,12 +41,12 @@ trait ExceptionHandler
      */
     private function Required($argument, $name = '')
     {
-        return $this->empty($argument, $name, 'Is Required');
+        return $this->empty($argument, $name, __('main.is required'));
     }
 
     private function empty($argument, $name = '', $msg = 'Error')
     {
-        if (! $argument || is_null($argument) || empty($argument)) {
+        if (! $argument || $argument === null || empty($argument)) {
             throw new Exception("$name $msg");
         }
     }

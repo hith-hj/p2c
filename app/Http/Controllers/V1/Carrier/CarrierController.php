@@ -148,7 +148,7 @@ class CarrierController extends Controller
             }
             $this->carrier->update($carrier, $validator->safe()->all());
 
-            return $this->success(payload: [
+            return $this->success(msg: __('main.updated'), payload: [
                 'carrier' => CarrierResource::make($carrier->fresh()),
             ]);
         } catch (\Throwable $e) {
@@ -161,7 +161,7 @@ class CarrierController extends Controller
         try {
             $this->carrier->delete(auth()->user()->badge);
 
-            return $this->success(msg: 'Carrier Deleted');
+            return $this->success(msg: __('main.deleted'));
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
         }
