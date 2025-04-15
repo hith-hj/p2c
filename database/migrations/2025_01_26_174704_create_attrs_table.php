@@ -34,6 +34,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('attrs');
-        Schema::dropIfExists('attr_order');
+        Schema::dropIfExists('attribute_order');
     }
 };

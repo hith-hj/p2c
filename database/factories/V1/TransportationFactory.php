@@ -21,6 +21,7 @@ class TransportationFactory extends Factory
             'capacity' => fake()->numberBetween(30, 5000),
             'cost_per_km' => fake()->numberBetween(10, 20),
             'cost_per_kg' => fake()->numberBetween(1, 10),
+            'initial_cost' => fake()->numberBetween(1, 10),
             'category' => fake()->randomElement(['bicycle', 'motorcycle', 'car', 'bickup', 'truck']),
         ];
     }
