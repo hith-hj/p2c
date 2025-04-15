@@ -12,11 +12,24 @@ class CarrierController extends Controller
 {
     public function __construct(private CarrierActions $carrier) {}
 
-    public function all(Request $request)
+    public function all()
     {
         try {
             return $this->success(payload: [
-                'carriers' => CarrierResource::collection($this->carrier->all($request)),
+                'carriers' => CarrierResource::collection($this->carrier->all()),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+    }
+
+    public function paginate(Request $request)
+    {
+        try {
+            return $this->success(payload: [
+                'carriers' => CarrierResource::collection(
+                    $this->carrier->paginate($request)
+                ),
             ]);
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());

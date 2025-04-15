@@ -9,7 +9,15 @@ class TransportationActions
 {
     use ExceptionHandler;
 
-    public function all($request, $perPage = 4)
+    public function all()
+    {
+        $transportaions = Transportation::all();
+        $this->NotFound($transportaions, __('main.transportations'));
+
+        return $transportaions;
+    }
+
+    public function paginate($request, $perPage = 4)
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;

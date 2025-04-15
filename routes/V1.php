@@ -107,13 +107,12 @@ Route::group(
     ['prefix' => 'order', 'controller' => OrderController::class],
     function () {
         Route::middleware([RoleMiddleware::class . ':producer'])->group(function () {
+            Route::post('checkCost', 'checkCost');
             Route::post('create', 'create');
-            Route::patch('update', 'update');
             Route::delete('delete', 'delete');
         });
         Route::middleware([RoleMiddleware::class . ':carrier'])->group(function () {
             Route::post('accept', 'accept');
-            Route::post('reject', 'reject');
             Route::post('cancel', 'cancel');
         });
         

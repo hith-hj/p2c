@@ -10,7 +10,15 @@ class ProducerActions
 {
     use ExceptionHandler;
 
-    public function all($request, $perPage = 4)
+    public function all()
+    {
+        $producers = Producer::all();
+        $this->NotFound($producers->all(), __('main.producers'));
+
+        return $producers;
+    }
+
+    public function paginate($request, $perPage = 4)
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;

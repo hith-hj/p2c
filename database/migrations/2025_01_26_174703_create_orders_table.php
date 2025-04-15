@@ -19,14 +19,15 @@ return new class extends Migration
             $table->foreignIdFor(Branch::class, 'branch_id');
             $table->foreignIdFor(User::class, 'carrier_id');
             $table->string('customer_name')->default('customer');
+            $table->string('delivery_type');
             $table->float('src_long');
             $table->float('src_lat');
             $table->float('dist_long');
             $table->float('dist_lat');
             $table->integer('distance');
-            $table->string('delivery_type');
             $table->integer('weight');
             $table->integer('cost');
+            $table->integer('goods_price');
             $table->smallInteger('status')->default(0);
             $table->timestamps();
             $table->timestamp('picked_at')->nullable();

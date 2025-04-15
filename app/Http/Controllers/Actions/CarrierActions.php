@@ -11,7 +11,15 @@ class CarrierActions
 {
     use DocumentHandler, ExceptionHandler;
 
-    public function all($request, $perPage = 4)
+    public function all()
+    {
+        $carriers = Carrier::all();
+        $this->NotFound($carriers, __('main.carrier'));
+
+        return $carriers;
+    }
+
+    public function paginate($request, $perPage = 4)
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;

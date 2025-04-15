@@ -13,10 +13,10 @@ class OrderActions
 
     public function all(?int $id = null)
     {
-        $this->Required($id, 'User ID');
+        $this->Required($id, __('main.user').' ID' );
         $user = User::find($id);
-        $this->NotFound($user, 'User');
-        $this->NotFound($user->orders, 'Orders');
+        $this->NotFound($user, __('main.user') );
+        $this->NotFound($user->orders, __('main.orders') );
 
         return $user->orders;
     }

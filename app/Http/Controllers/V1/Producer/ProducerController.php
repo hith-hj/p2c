@@ -12,11 +12,24 @@ class ProducerController extends Controller
 {
     public function __construct(private ProducerActions $producer) {}
 
-    public function all(Request $request)
+    public function all()
     {
         try {
             return $this->success(payload: [
-                'producers' => ProducerResource::collection($this->producer->all($request)),
+                'producers' => ProducerResource::collection($this->producer->all()),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+    }
+
+    public function paginate(Request $request)
+    {
+        try {
+            return $this->success(payload: [
+                'producers' => ProducerResource::collection(
+                    $this->producer->paginate($request)
+                ),
             ]);
         } catch (\Throwable $e) {
             return $this->error(msg: $e->getMessage());
