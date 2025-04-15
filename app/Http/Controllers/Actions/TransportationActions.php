@@ -69,4 +69,16 @@ class TransportationActions
 
         return true;
     }
+
+    public function getMatchedTransportation($weight){
+        $maxCapacity = Transportation::max('capacity');
+
+        if ($weight > $maxCapacity) {
+            throw new \Exception("Max Capacity Currently is $maxCapacity");
+        } else {
+            return Transportation::orderBy('capacity')
+                ->where('capacity', '>=', $weight)
+                ->first();
+        }
+    }
 }
