@@ -49,7 +49,7 @@ class CarrierActions
         $carrier = $user->badge()->create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
-            'transportation_id' => $data['transportaion_id'],
+            'transportation_id' => $data['transportation_id'],
             'is_valid' => false,
             'is_online' => false,
             'is_available' => false,

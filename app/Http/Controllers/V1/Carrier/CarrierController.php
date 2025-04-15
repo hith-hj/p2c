@@ -59,7 +59,7 @@ class CarrierController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => ['required', 'string', 'max:20'],
             'last_name' => ['required', 'string', 'max:20'],
-            'transportaion_id' => ['required', 'exists:transportations,id'],
+            'transportation_id' => ['required', 'exists:transportations,id'],
         ]);
 
         if ($validator->fails()) {
@@ -79,6 +79,9 @@ class CarrierController extends Controller
 
     public function createDetails(Request $request)
     {
+        if(auth()->user()->badge === null){
+            return $this->error(msg:__('main.carrier').' '.__('main.not found'));
+        }
         $validator = Validator::make($request->all(), [
             'plate_number' => ['required', 'numeric', 'unique:carrier_details,plate_number'],
             'brand' => ['required', 'string'],
@@ -105,6 +108,9 @@ class CarrierController extends Controller
 
     public function createDocuments(Request $request)
     {
+        if(auth()->user()->badge === null){
+            return $this->error(msg:__('main.carrier').' '.__('main.not found'));
+        }
         $validator = Validator::make($request->all(), [
             'images' => ['required', 'array', 'size:5'],
             'images.*' => ['required', 'image', 'max:2048'],
