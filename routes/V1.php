@@ -36,6 +36,8 @@ Route::withoutMiddleware(JwtMiddleware::class)->group(function () {
         function () {
             Route::get('carBrands', 'carBrands');
             Route::get('carColors', 'carColors');
+            Route::get('items', 'items');
+            Route::get('attrs', 'attrs');
         }
     );
 });
