@@ -28,8 +28,19 @@ class OrderController extends Controller
 
     public function checkCost(Request $request){
         $validator = Validator::make($request->all(), [
-            'distance' => ['required', 'numeric', 'min:200'],
+            "delivery_type" => ['required','string','in:normal,urrgent'],
             'weight' => ['required', 'numeric', 'min:1'],
+
+            'coords' => ['required', 'array', 'size:2'],
+            'coords.src' => ['required','array','size:2'],
+
+            'coords.src.long' => ['required', 'numeric', 'between:-180,180', 'required_with:src.lat'],
+            'coords.src.lat' => ['required', 'numeric', 'between:-90,90', 'required_with:src.long'],
+
+            'coords.dest' => ['required','array','size:2'],
+            'coords.dest.long' => ['required', 'numeric', 'between:-180,180', 'required_with:dest.lat'],
+            'coords.dest.lat' => ['required', 'numeric', 'between:-90,90', 'required_with:dest.long'],
+
             'attrs' => ['sometimes', 'array'],
             'attrs.*' => ['required', 'exists:attrs,id'],
         ]);
@@ -41,7 +52,7 @@ class OrderController extends Controller
         try {
             return $this->success(
                 payload: ['cost' => $this->order->calcCost(
-                    $validator->safe()->input('distance'),
+                    $validator->safe()->input('coords'),
                     $validator->safe()->input('weight'),
                     $validator->safe()->input('attrs'),
                 )]
