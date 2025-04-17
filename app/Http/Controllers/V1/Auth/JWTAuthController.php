@@ -115,7 +115,7 @@ class JWTAuthController extends Controller
             if (! $user = JWTAuth::parseToken()->authenticate()) {
                 return $this->error(msg: 'User not found', code: 404);
             }
-        } catch (JWTException $e) {
+        } catch (JWTException) {
             return $this->error(msg: __('main.invalid token'), code: 400);
         }
 

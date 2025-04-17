@@ -12,7 +12,7 @@ trait ApiRes
             'success' => true,
             'message' => $msg,
         ];
-        if (! empty($payload)) {
+        if ($payload !== []) {
             $response['payload'] = $payload;
         }
 
@@ -25,7 +25,7 @@ trait ApiRes
             'error' => true,
             'message' => $msg,
         ];
-        if (! empty($payload)) {
+        if ($payload !== []) {
             $response['payload'] = $payload;
         }
 
