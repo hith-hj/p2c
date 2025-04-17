@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\V1\Carrier;
 
 use App\Http\Controllers\Actions\CarrierActions;
@@ -10,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
 {
-    public function __construct(private CarrierActions $carrier) {}
+    public function __construct(private readonly CarrierActions $carrier) {}
 
     public function all()
     {
@@ -18,8 +20,8 @@ class CarrierController extends Controller
             return $this->success(payload: [
                 'carriers' => CarrierResource::collection($this->carrier->all()),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -31,8 +33,8 @@ class CarrierController extends Controller
                     $this->carrier->paginate($request)
                 ),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -45,14 +47,15 @@ class CarrierController extends Controller
         if ($validator->fails()) {
             return $this->error(payload: ['errors' => [$validator->errors()]]);
         }
+
         try {
             $carrier = $this->carrier->find($validator->safe()->input('carrier_id'));
 
             return $this->success(payload: [
                 'carrier' => CarrierResource::make($carrier),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -62,8 +65,8 @@ class CarrierController extends Controller
             return $this->success(payload: [
                 'carrier' => CarrierResource::make($this->carrier->get(auth()->id())),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -85,16 +88,17 @@ class CarrierController extends Controller
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier)]
             );
-        } catch (\Throwable $e) {
-            return $this->error(payload: ['errors' => $e->getMessage()]);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
     public function createDetails(Request $request)
     {
-        if(auth()->user()->badge === null){
-            return $this->error(msg:__('main.carrier').' '.__('main.not found'));
+        if (auth()->user()->badge === null) {
+            return $this->error(msg: __('main.carrier').' '.__('main.not found'));
         }
+
         $validator = Validator::make($request->all(), [
             'plate_number' => ['required', 'numeric', 'unique:carrier_details,plate_number'],
             'brand' => ['required', 'string'],
@@ -114,16 +118,17 @@ class CarrierController extends Controller
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
-        } catch (\Throwable $e) {
-            return $this->error(payload: ['errors' => $e->getMessage()]);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
     public function createDocuments(Request $request)
     {
-        if(auth()->user()->badge === null){
-            return $this->error(msg:__('main.carrier').' '.__('main.not found'));
+        if (auth()->user()->badge === null) {
+            return $this->error(msg: __('main.carrier').' '.__('main.not found'));
         }
+
         $validator = Validator::make($request->all(), [
             'images' => ['required', 'array', 'size:5'],
             'images.*' => ['required', 'image', 'max:2048'],
@@ -140,8 +145,8 @@ class CarrierController extends Controller
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
-        } catch (\Throwable $e) {
-            return $this->error(payload: ['errors' => $e->getMessage()]);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -163,15 +168,17 @@ class CarrierController extends Controller
                 if ($carrier->details()->count() > 0) {
                     $carrier->details()->delete();
                 }
+
                 $carrier->validate(false);
             }
+
             $this->carrier->update($carrier, $validator->safe()->all());
 
             return $this->success(msg: __('main.updated'), payload: [
                 'carrier' => CarrierResource::make($carrier->fresh()),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(payload: ['errors' => $e->getMessage()]);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -181,8 +188,8 @@ class CarrierController extends Controller
             $this->carrier->delete(auth()->user()->badge);
 
             return $this->success(msg: __('main.deleted'));
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 }

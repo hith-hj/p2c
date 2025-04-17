@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\V1\Branch;
 
 use App\Http\Controllers\Actions\BranchActions;
@@ -25,10 +27,8 @@ class BranchController extends Controller
                     $this->branch->get(auth()->user()->badge?->id)
                 ),
             ]);
-        } catch (\Throwable $e) {
-            $code = $e->getCode() === 0 ? 400 : $e->getCode();
-
-            return $this->error(msg: $e->getMessage(), code: $code);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -48,10 +48,8 @@ class BranchController extends Controller
             return $this->success(payload: [
                 'branche' => BranchResource::make($branch),
             ]);
-        } catch (\Throwable $e) {
-            $code = $e->getCode() === 0 ? 400 : $e->getCode();
-
-            return $this->error(msg: $e->getMessage(), code: $code);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -75,10 +73,8 @@ class BranchController extends Controller
             return $this->success(payload: [
                 'branch' => BranchResource::make($branch),
             ]);
-        } catch (\Throwable $e) {
-            $code = $e->getCode() === 0 ? 400 : $e->getCode();
-
-            return $this->error(msg: $e->getMessage(), code: $e->getCode());
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -96,16 +92,15 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
-            if ($branch->producer_id != auth()->user()->badge->id) {
+            if ($branch->producer_id !== auth()->user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
+
             $this->branch->update($branch, $validator->safe()->except(['branch_id']));
 
             return $this->success(msg: __('main.updated'));
-        } catch (\Throwable $e) {
-            $code = $e->getCode() == 0 ? 400 : $e->getCode();
-
-            return $this->error(msg: $e->getMessage(), code: $code);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -121,16 +116,15 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
-            if ($branch->producer_id != auth()->user()->badge->id) {
+            if ($branch->producer_id !== auth()->user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
+
             $this->branch->delete($branch);
 
             return $this->success(msg: __('main.deleted'));
-        } catch (\Throwable $e) {
-            $code = $e->getCode() == 0 ? 400 : $e->getCode();
-
-            return $this->error(msg: $e->getMessage(), code: $code);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -146,16 +140,15 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->input('branch_id'));
-            if ($branch->producer_id != auth()->user()->badge->id) {
+            if ($branch->producer_id !== auth()->user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
+
             $this->branch->setBranchAsDefault($branch);
 
             return $this->success(msg: __('main.is default'));
-        } catch (\Throwable $e) {
-            $code = $e->getCode() == 0 ? 400 : $e->getCode();
-
-            return $this->error(msg: $e->getMessage(), code: $code);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware\V1\Auth;
 
 use Closure;
@@ -19,7 +21,7 @@ class JwtMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-        } catch (JWTException $e) {
+        } catch (JWTException) {
             return response()->json(['error' => 'Token not valid'], 401);
         }
 

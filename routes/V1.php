@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\V1\Auth\JWTAuthController;
 use App\Http\Controllers\V1\Branch\BranchController;
 use App\Http\Controllers\V1\Carrier\CarrierController;
-use App\Http\Controllers\V1\Order\OrderController;
 use App\Http\Controllers\V1\Label\LabelController;
+use App\Http\Controllers\V1\Order\OrderController;
 use App\Http\Controllers\V1\Producer\ProducerController;
 use App\Http\Controllers\V1\Transportation\TransportationController;
 use App\Http\Middleware\RoleMiddleware;
@@ -12,8 +14,8 @@ use App\Http\Middleware\V1\Auth\JwtMiddleware;
 
 Route::group(
     ['prefix' => 'auth', 'controller' => JWTAuthController::class],
-    function () {
-        Route::withoutMiddleware([JwtMiddleware::class])->group(function () {
+    function (): void {
+        Route::withoutMiddleware([JwtMiddleware::class])->group(function (): void {
             Route::post('register', 'register')->name('register');
             Route::post('verify', 'verify')->name('verify');
             Route::post('login', 'login')->name('login');
@@ -30,10 +32,10 @@ Route::group(
     }
 );
 
-Route::withoutMiddleware(JwtMiddleware::class)->group(function () {
+Route::withoutMiddleware(JwtMiddleware::class)->group(function (): void {
     Route::group(
         ['prefix' => 'label', 'controller' => LabelController::class],
-        function () {
+        function (): void {
             Route::get('carBrands', 'carBrands');
             Route::get('carColors', 'carColors');
             Route::get('items', 'items');
@@ -44,8 +46,8 @@ Route::withoutMiddleware(JwtMiddleware::class)->group(function () {
 
 Route::group(
     ['prefix' => 'producer', 'controller' => ProducerController::class],
-    function () {
-        Route::middleware([RoleMiddleware::class.':producer'])->group(function () {
+    function (): void {
+        Route::middleware([RoleMiddleware::class.':producer'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::patch('update', 'update');
@@ -59,8 +61,8 @@ Route::group(
 
 Route::group(
     ['prefix' => 'branch', 'controller' => BranchController::class],
-    function () {
-        Route::middleware([RoleMiddleware::class.':producer'])->group(function () {
+    function (): void {
+        Route::middleware([RoleMiddleware::class.':producer'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::patch('update', 'update');
@@ -75,8 +77,8 @@ Route::group(
 
 Route::group(
     ['prefix' => 'carrier', 'controller' => CarrierController::class],
-    function () {
-        Route::middleware([RoleMiddleware::class.':carrier'])->group(function () {
+    function (): void {
+        Route::middleware([RoleMiddleware::class.':carrier'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::post('createDetails', 'createDetails');
@@ -92,7 +94,7 @@ Route::group(
 
 Route::group(
     ['prefix' => 'transportation', 'controller' => TransportationController::class],
-    function () {
+    function (): void {
         // Route::middleware([RoleMiddleware::class . ':carrier'])->group(function () {
         //     Route::get('/', 'get');
         //     Route::post('create', 'create');
@@ -107,17 +109,17 @@ Route::group(
 
 Route::group(
     ['prefix' => 'order', 'controller' => OrderController::class],
-    function () {
-        Route::middleware([RoleMiddleware::class . ':producer'])->group(function () {
+    function (): void {
+        Route::middleware([RoleMiddleware::class.':producer'])->group(function (): void {
             Route::post('checkCost', 'checkCost');
             Route::post('create', 'create');
             Route::delete('delete', 'delete');
         });
-        Route::middleware([RoleMiddleware::class . ':carrier'])->group(function () {
+        Route::middleware([RoleMiddleware::class.':carrier'])->group(function (): void {
             Route::post('accept', 'accept');
             Route::post('cancel', 'cancel');
         });
-        
+
         Route::get('/', 'get');
         Route::get('all', 'all');
         Route::get('find', 'find');

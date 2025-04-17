@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -28,9 +30,11 @@ class Localization
 
             $local = $defaultLocale;
         }
+
         if (! in_array($local, ['en', 'ar'])) {
             $local = $defaultLocale;
         }
+
         app()->setLocale($local);
 
         return $next($request);

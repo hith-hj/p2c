@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Actions;
 
 use App\ExceptionHandler;
@@ -10,9 +12,7 @@ class BranchActions
 {
     use ExceptionHandler;
 
-    public function __construct() {}
-
-    public function find(?int $id = null)
+    public function find($id)
     {
         $this->Required($id, __('main.branch').' ID');
         $branch = Branch::find($id);
@@ -21,7 +21,7 @@ class BranchActions
         return $branch;
     }
 
-    public function get(?int $id = null)
+    public function get($id)
     {
         $this->Required($id, __('main.producer').' ID');
         $producer = Producer::find($id);
@@ -31,7 +31,7 @@ class BranchActions
         return $producer->branches;
     }
 
-    public function create(Producer $producer, $data)
+    public function create(object $producer, array $data)
     {
         $this->Required($producer, __('main.producer'));
         $this->Required($data, __('main.data'));
@@ -40,17 +40,17 @@ class BranchActions
             'phone' => $data['phone'],
         ]);
 
-        (new LocationActions)->create($branch, $data);
+        (new LocationActions())->create($branch, $data);
 
         return $branch;
     }
 
-    public function update($branch, $data)
+    public function update(object $branch, array $data)
     {
         return $branch->update($data);
     }
 
-    public function delete($branch)
+    public function delete(object $branch)
     {
         $this->Exists($branch->is_default, __('main.is default'));
         $branch->location()->delete();
@@ -58,7 +58,7 @@ class BranchActions
         return $branch->delete();
     }
 
-    public function setBranchAsDefault($branch)
+    public function setBranchAsDefault(object $branch): bool
     {
         $default = Branch::where([
             ['producer_id', $branch->producer_id],
@@ -67,6 +67,7 @@ class BranchActions
         if ($default) {
             $default->update(['is_default' => false]);
         }
+
         $branch->update(['is_default' => true]);
 
         return true;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,26 +9,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Carrier extends Model
 {
-    /** @use HasFactory<\Database\Factories\CarrierFactory> */
     use HasFactory;
+
+    protected $hidden = ['created_at','updated_at'];
 
     protected $guarded = [];
 
     public function transportation()
     {
-        return $this->belongsTo(Transportation::class)->select([
-            'name',
-            'capacity',
-            'cost_per_km',
-            'cost_per_kg',
-            'category',
-        ]);
+        return $this->belongsTo(Transportation::class);
     }
 
     public function location()
     {
         return $this->hasOne(Location::class, 'locatable_id')
-            ->where('locatable_type', get_class($this));
+            ->where('locatable_type', static::class);
     }
 
     public function user()
@@ -36,13 +33,7 @@ class Carrier extends Model
 
     public function details()
     {
-        return $this->hasOne(CarrierDetails::class)->select([
-            'plate_number',
-            'brand',
-            'model',
-            'color',
-            'year',
-        ]);
+        return $this->hasOne(CarrierDetails::class);
     }
 
     public function documents()
@@ -61,8 +52,7 @@ class Carrier extends Model
 
     public function validate(bool $state)
     {
-        if (isset($state) && is_bool($state)) {
-            return $this->update(['is_valid' => $state]);
-        }
+        return $this->update(['is_valid' => $state]);
+
     }
 }

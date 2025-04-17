@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use App\Models\V1\Document;
@@ -11,7 +13,8 @@ trait DocumentHandler
         if (! isset($documented_id,$documented_type)) {
             throw new \Exception('Image upload missing information ', 1);
         }
-        $path = "uploads/$doc_type/$documented_type/$documented_id";
+
+        $path = sprintf('uploads/%s/%s/%s', $doc_type, $documented_type, $documented_id);
         $fileName = time().'_'.$file->hashName();
         $filePath = $file->storeAs($path, $fileName, 'public');
 
@@ -23,15 +26,17 @@ trait DocumentHandler
         ]);
     }
 
-    public function multible($input, $documented_id, $documented_type, $doc_type = 'document')
+    public function multible($input, $documented_id, $documented_type, $doc_type = 'document'): bool
     {
         if (gettype($input) === 'string') {
             $input = request($input);
         }
+
         foreach ($input as $key => $file) {
             if ($key === 'profile') {
                 $doc_type = $key;
             }
+
             $this->upload($file, $documented_id, $documented_type, $doc_type);
         }
 

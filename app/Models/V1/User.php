@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\V1;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -12,8 +14,8 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use FirebaseNotification, HasFactory;
+    use FirebaseNotification;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -39,6 +41,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'updated_at'
     ];
 
     /**
@@ -83,7 +86,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Notification::class, 'notifiable_id');
     }
 
-    public function sendVerificationCode($by = 'phone')
+    public function sendVerificationCode($by = 'phone'): static
     {
         $code = mt_rand(10000, 99999);
         $this->update([
@@ -91,7 +94,7 @@ class User extends Authenticatable implements JWTSubject
             'verification_code' => $code,
             'verified_by' => $by,
         ]);
-        if ($by == 'phone') {
+        if ($by === 'phone') {
             $this->notifyFCM($this);
         } else {
             $this->notifyEmail($this);
@@ -100,7 +103,7 @@ class User extends Authenticatable implements JWTSubject
         return $this;
     }
 
-    public function verify()
+    public function verify(): static
     {
         $this->update([
             'verification_code' => null,
@@ -110,11 +113,12 @@ class User extends Authenticatable implements JWTSubject
         return $this;
     }
 
-    public function orders(){
-        return match($this->role){
-            UserRoles::Producer->value => $this->hasMany(Order::class,'producer_id'),
-            UserRoles::Carrier->value => $this->hasMany(Order::class,'carrier_id'),
-            default => throw new \Exception("Error User role is not defiend"),
+    public function orders()
+    {
+        return match ($this->role) {
+            UserRoles::Producer->value => $this->hasMany(Order::class, 'producer_id'),
+            UserRoles::Carrier->value => $this->hasMany(Order::class, 'carrier_id'),
+            default => throw new \Exception('Error User role is not defiend'),
         };
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Actions;
 
 use App\ExceptionHandler;
@@ -17,18 +19,19 @@ class TransportationActions
         return $transportaions;
     }
 
-    public function paginate($request, $perPage = 4)
+    public function paginate(object $request, int $perPage = 4)
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;
         }
+
         $transportaions = Transportation::paginate($perPage);
         $this->NotFound($transportaions->all(), __('main.transportations'));
 
         return $transportaions;
     }
 
-    public function find(?int $id = null)
+    public function find(int $id)
     {
         $this->Required($id, __('main.carrier').' ID');
         $transportaion = Transportation::find($id);
@@ -37,7 +40,7 @@ class TransportationActions
         return $transportaion;
     }
 
-    public function create($user, $data)
+    public function create(object $user, array $data)
     {
         $this->Required($user, __('main.user'));
         $this->Exists($user->badge, __('main.carrier'));
@@ -54,7 +57,7 @@ class TransportationActions
         return $transportaion;
     }
 
-    public function update($transportaion, $data)
+    public function update(object $transportaion, array $data)
     {
         $this->Required($transportaion, __('main.carrier'));
         $this->Required($data, __('main.data'));
@@ -62,7 +65,7 @@ class TransportationActions
         return $transportaion->update($data);
     }
 
-    public function delete($transportaion)
+    public function delete(object $transportaion): bool
     {
         $this->Required($transportaion, __('main.carrier'));
         $transportaion->delete();
@@ -70,15 +73,17 @@ class TransportationActions
         return true;
     }
 
-    public function getMatchedTransportation($weight){
+    public function getMatchedTransportation(int $weight)
+    {
         $maxCapacity = Transportation::max('capacity');
 
         if ($weight > $maxCapacity) {
-            throw new \Exception("Max Capacity Currently is $maxCapacity");
-        } else {
-            return Transportation::orderBy('capacity')
-                ->where('capacity', '>=', $weight)
-                ->first();
+            throw new \Exception('Max Capacity Currently is '.$maxCapacity);
         }
+
+        return Transportation::orderBy('capacity')
+            ->where('capacity', '>=', $weight)
+            ->first();
+
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\V1;
 
 use App\Enums\UserRoles;
@@ -8,10 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrderFactory> */
     use HasFactory;
 
     protected $guarded = [];
+
+    // protected $with = ['attrs','items'];
 
     public function producer()
     {
@@ -23,16 +26,22 @@ class Order extends Model
         return $this->belongsTo(User::class, 'carrier_id');
     }
 
-    public function user($role) {
+    public function user($role)
+    {
         return match ($role) {
-            UserRoles::Producer->value => $this->belongsTo(User::class,'producer_id'),
-            UserRoles::Carrier->value => $this->belongsTo(User::class,'carrier_id'),
-            default => throw new \Exception("Error Order User is not defiend", 1),
+            UserRoles::Producer->value => $this->belongsTo(User::class, 'producer_id'),
+            UserRoles::Carrier->value => $this->belongsTo(User::class, 'carrier_id'),
+            default => throw new \Exception('Error Order User is not defiend', 1),
         };
     }
 
-    public function attributes()
+    public function attrs()
     {
         return $this->belongsToMany(Attr::class)->withTimestamps();
+    }
+
+    public function items()
+    {
+        return $this->belongsToMany(Item::class)->withTimestamps();
     }
 }

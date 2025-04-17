@@ -16,12 +16,14 @@ class TransportationFactory extends Factory
      */
     public function definition(): array
     {
+        $number = fake()->numberBetween(10, 20);
         return [
             'name' => fake()->firstNameFemale(),
             'capacity' => fake()->numberBetween(30, 5000),
-            'cost_per_km' => fake()->numberBetween(10, 20),
-            'cost_per_kg' => fake()->numberBetween(1, 10),
-            'initial_cost' => fake()->numberBetween(1, 10),
+            'cost_per_kg' => $number,
+            'cost_per_km' => $number * 4,
+            'initial_cost' => $number * 1.5,
+            'cancel_cost' => $number * 3,
             'category' => fake()->randomElement(['bicycle', 'motorcycle', 'car', 'bickup', 'truck']),
         ];
     }

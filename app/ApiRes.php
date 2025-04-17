@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 trait ApiRes
 {
-    public function success($payload = [], $msg = 'Success', $code = 200)
+    public function success(array $payload = [], string $msg = 'Success', int $code = 200)
     {
         $response = [
             'success' => true,
@@ -17,7 +19,7 @@ trait ApiRes
         return response()->json($response, $code);
     }
 
-    public function error($payload = [], $msg = 'Error', $code = 400)
+    public function error(array $payload = [], string $msg = 'Error', int $code = 400)
     {
         $response = [
             'error' => true,

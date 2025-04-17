@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\V1\Auth;
 
 use App\Http\Controllers\Controller;
@@ -75,20 +77,23 @@ class JWTAuthController extends Controller
         if ($validator->fails()) {
             return $this->error(payload: ['errors' => $validator->errors()]);
         }
+
         $credentials = $request->only('phone', 'password');
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
                 return $this->error(msg: __('main.invalid credentials'));
             }
+
             $user = auth()->user();
             if ($user->verified_at === null || $user->verification_code !== null) {
                 return $this->error(msg: __('main.unverified'), code: 401);
             }
+
             $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
             $user = UserResource::make($user);
 
-            return $this->success(payload: compact('user', 'token'));
-        } catch (JWTException $e) {
+            return $this->success(payload: ['user' => $user, 'token' => $token]);
+        } catch (JWTException) {
             return $this->error(msg: __('main.token error 1'), code: 500);
         }
     }
@@ -99,8 +104,8 @@ class JWTAuthController extends Controller
             JWTAuth::invalidate(JWTAuth::getToken());
 
             return $this->success(payload: ['token' => Auth::refresh()]);
-        } catch (\Exception $e) {
-            return $this->error(payload: ['errors' => $e->getMessage().' Login again']);
+        } catch (\Exception $exception) {
+            return $this->error(payload: ['errors' => $exception->getMessage().' Login again']);
         }
     }
 
@@ -209,7 +214,7 @@ class JWTAuthController extends Controller
             return $this->error(msg: __('main.invalid password'));
         }
 
-        if ($user->password == Hash::make($validator->safe()->input('new_password'))) {
+        if ($user->password === Hash::make($validator->safe()->input('new_password'))) {
             return $this->error(msg: __('main.passwords are equals'));
         }
 

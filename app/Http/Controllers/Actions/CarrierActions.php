@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Actions;
 
 use App\DocumentHandler;
@@ -9,7 +11,8 @@ use App\Models\V1\User;
 
 class CarrierActions
 {
-    use DocumentHandler, ExceptionHandler;
+    use DocumentHandler;
+    use ExceptionHandler;
 
     public function all()
     {
@@ -19,18 +22,19 @@ class CarrierActions
         return $carriers;
     }
 
-    public function paginate($request, $perPage = 4)
+    public function paginate(object $request, int $perPage = 4)
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;
         }
+
         $carriers = Carrier::paginate($perPage);
         $this->NotFound($carriers->all(), __('main.carrier'));
 
         return $carriers;
     }
 
-    public function get(?int $id = null)
+    public function get(int $id)
     {
         $this->Required($id, __('main.user').' ID');
         $user = User::find($id);
@@ -40,7 +44,7 @@ class CarrierActions
         return $user->badge;
     }
 
-    public function find(?int $id = null)
+    public function find(int $id)
     {
         $this->Required($id, __('main.carrier').' ID');
         $carrier = Carrier::find($id);
@@ -49,12 +53,13 @@ class CarrierActions
         return $carrier;
     }
 
-    public function create($user, $data)
+    public function create(object $user, array $data)
     {
         $this->Required($user, __('main.user'));
         $this->Exists($user->badge, __('main.carrier'));
         $this->NotFound($data, __('main.data'));
-        $carrier = $user->badge()->create([
+
+        return $user->badge()->create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'transportation_id' => $data['transportation_id'],
@@ -63,11 +68,9 @@ class CarrierActions
             'is_available' => false,
             'rate' => 0,
         ]);
-
-        return $carrier;
     }
 
-    public function createDetails($carrier, $data)
+    public function createDetails(object $carrier, array $data)
     {
         $this->Required($carrier, __('main.carrier'));
         $this->Exists($carrier->details, __('main.carrier').' '.__('main.details'));
@@ -82,17 +85,17 @@ class CarrierActions
         ]);
     }
 
-    public function createDocuments($carrier, $data)
+    public function createDocuments(object $carrier, array $data): bool
     {
         $this->Required($carrier, __('main.carrier'));
         $this->Exists($carrier->documents()->count() > 0, __('main.carrier').' '.__('main.documents'));
         $this->Required($data, __('main.documents'));
-        $res = $this->multible($data, $carrier->id, class_basename($carrier));
+        $this->multible($data, $carrier->id, class_basename($carrier));
 
         return true;
     }
 
-    public function update($carrier, $data)
+    public function update(object $carrier, array $data)
     {
         $this->Required($carrier, __('main.carrier'));
         $this->Required($data, __('main.data'));
@@ -100,7 +103,7 @@ class CarrierActions
         return $carrier->update($data);
     }
 
-    public function delete($carrier)
+    public function delete(object $carrier): bool
     {
         $this->Required($carrier, __('main.carrier'));
         $carrier->details()->delete();

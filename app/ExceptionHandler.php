@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use Exception;
@@ -13,10 +15,10 @@ trait ExceptionHandler
      * @param  mixed  $argument
      * @param  mixed  $name
      */
-    private function Exists($argument, $name = '')
+    private function Exists($argument, string $name = ''): void
     {
         if ($argument) {
-            throw new Exception("$name ".__('main.exists'), 400);
+            throw new Exception($name.' '.__('main.exists'), 400);
         }
     }
 
@@ -44,10 +46,10 @@ trait ExceptionHandler
         return $this->empty($argument, $name, __('main.is required'));
     }
 
-    private function empty($argument, $name = '', $msg = 'Error')
+    private function empty($argument, $name = '', $msg = 'Error'): void
     {
         if (! $argument || $argument === null || empty($argument)) {
-            throw new Exception("$name $msg");
+            throw new Exception(sprintf('%s %s', $name, $msg));
         }
     }
 }

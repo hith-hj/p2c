@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\V1\Transportation;
 
 use App\Http\Controllers\Actions\TransportationActions;
@@ -10,16 +12,16 @@ use Illuminate\Support\Facades\Validator;
 
 class TransportationController extends Controller
 {
-    public function __construct(private TransportationActions $trans) {}
+    public function __construct(private readonly TransportationActions $trans) {}
 
     public function all(Request $request)
     {
         try {
             return $this->success(payload: [
-                'Transportaions' => TransportationResource::collection($this->trans->all($request)),
+                'Transportaions' => TransportationResource::collection($this->trans->all()),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -32,12 +34,13 @@ class TransportationController extends Controller
         if ($validator->fails()) {
             return $this->error(payload: ['errors' => [$validator->errors()]]);
         }
+
         try {
             return $this->success(payload: [
                 'Transportaions' => TransportationResource::make($this->trans->find($validator->safe()->input('transportation_id'))),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 }

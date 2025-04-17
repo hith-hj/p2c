@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\V1\Producer;
 
 use App\Http\Controllers\Actions\ProducerActions;
@@ -10,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ProducerController extends Controller
 {
-    public function __construct(private ProducerActions $producer) {}
+    public function __construct(private readonly ProducerActions $producer) {}
 
     public function all()
     {
@@ -18,8 +20,8 @@ class ProducerController extends Controller
             return $this->success(payload: [
                 'producers' => ProducerResource::collection($this->producer->all()),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -31,8 +33,8 @@ class ProducerController extends Controller
                     $this->producer->paginate($request)
                 ),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -42,8 +44,8 @@ class ProducerController extends Controller
             return $this->success(payload: [
                 'producer' => ProducerResource::make($this->producer->get(auth()->id())),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -56,14 +58,15 @@ class ProducerController extends Controller
         if ($validator->fails()) {
             return $this->error(payload: ['errors' => [$validator->errors()]]);
         }
+
         try {
             $producer = $this->producer->find($validator->safe()->input('producer_id'));
 
             return $this->success(payload: [
                 'producer' => ProducerResource::make($producer),
             ]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -87,8 +90,8 @@ class ProducerController extends Controller
             return $this->success(
                 payload: ['producer' => ProducerResource::make($producer)]
             );
-        } catch (\Throwable $e) {
-            return $this->error(payload: ['errors' => $e->getMessage()]);
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
         }
     }
 
@@ -107,8 +110,8 @@ class ProducerController extends Controller
             $this->producer->update($producer, $validator->safe()->only(['brand']));
 
             return $this->success(msg: __('main.updated'), payload: ['producer' => ProducerResource::make($producer->fresh())]);
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -118,8 +121,8 @@ class ProducerController extends Controller
             $this->producer->delete(auth()->user()->badge);
 
             return $this->success(msg: __('main.deleted'));
-        } catch (\Throwable $e) {
-            return $this->error(msg: $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
         }
     }
 }

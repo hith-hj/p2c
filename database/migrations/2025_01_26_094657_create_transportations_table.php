@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('capacity');
             $table->integer('initial_cost');
+            $table->integer('cancel_cost');
             $table->integer('cost_per_km');
             $table->integer('cost_per_kg');
             $table->string('category');

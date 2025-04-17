@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\V1;
 
 use Illuminate\Http\Request;
@@ -16,12 +18,12 @@ class CarrierResource extends JsonResource
     {
         // return parent::toArray($request);
         $collection = $this->documents;
-        $docs = $collection->filter(fn ($item) => $item->doc_type === 'document');
-        $profile = $collection->filter(fn ($item) => $item->doc_type === 'profile');
+        $docs = $collection->filter(fn ($item): bool => $item->doc_type === 'document');
+        $profile = $collection->filter(fn ($item): bool => $item->doc_type === 'profile');
 
         return [
             'id' => $this->id,
-            'name' => "$this->first_name $this->last_name",
+            'name' => sprintf('%s %s', $this->first_name, $this->last_name),
             'rate' => $this->rate,
             'is_valid' => (int) $this->is_valid,
             'is_online' => (int) $this->is_online,

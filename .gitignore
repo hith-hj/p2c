@@ -16,6 +16,9 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+rector.php
+pint.json
+phpstan.neon
 /auth.json
 /.fleet
 /.idea

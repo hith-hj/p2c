@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Branch extends Model
 {
-    /** @use HasFactory<\Database\Factories\BranchFactory> */
     use HasFactory;
 
     protected $guarded = [];
@@ -22,6 +23,6 @@ class Branch extends Model
     public function location()
     {
         return $this->hasOne(Location::class, 'locatable_id')
-            ->where('locatable_type', get_class($this));
+            ->where('locatable_type', static::class);
     }
 }

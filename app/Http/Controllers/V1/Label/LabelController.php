@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\V1\Label;
 
 use App\Http\Controllers\Controller;
@@ -22,11 +24,13 @@ class LabelController extends Controller
         ]);
     }
 
-    public function items(){
-        return $this->success(payload:['items'=>Item::all()]);
+    public function items()
+    {
+        return $this->success(payload: ['items' => Item::all()]);
     }
 
-    public function attrs(){
-        return $this->success(payload:['attrs'=>Attr::all()]);
+    public function attrs()
+    {
+        return $this->success(payload: ['attrs' => Attr::all()]);
     }
 }

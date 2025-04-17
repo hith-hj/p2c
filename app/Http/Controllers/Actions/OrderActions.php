@@ -1,23 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Actions;
 
 use App\ExceptionHandler;
-use App\Models\V1\Attr;
-use App\Models\V1\Producer;
 use App\Models\V1\User;
+use App\OrderServices;
 
 class OrderActions
 {
     use ExceptionHandler;
+    use OrderServices;
 
-    public function __construct()
+    public function all(int $id)
     {
-    }
-
-    public function all(?int $id = null)
-    {
-        $this->Required($id, __('main.user') . ' ID');
+        $this->Required($id, __('main.user').' ID');
         $user = User::find($id);
         $this->NotFound($user, __('main.user'));
         $this->NotFound($user->orders, __('main.orders'));
@@ -25,101 +23,74 @@ class OrderActions
         return $user->orders;
     }
 
-    public function create(array $data)
+    public function create(object $user, array $data)
     {
+        $this->Required($user, __('main.user'));
         $this->Required($data, __('main.data'));
-        $producer = Producer::findOrFail($data['producer_id']);
-        $producer->orders->create([
-            "producer_id" => $data[''],
-            "branch_id" => $data[''],
-            "customer_name" => $data[''],
-            "delivery_type" => $data[''],
-            "goods_price" => $data[''],
-            "src_long" => $data[''],
-            "src_lat" => $data[''],
-            "dist_long" => $data[''],
-            "dist_lat" => $data[''],
-            "distance" => $data[''],
-            "weight" => $data[''],
-            "cost" => $data['']
+        $producer = $user->badge;
+        $this->Required($producer, __('main.producer'));
+        $branch = $producer->branches()->find($data['branch_id']);
+        $this->Required($branch, __('main.branch'));
+        $this->Required($branch->location, __('main.branch location'));
+        if ($data['delivery_type'] === 'urgent') {
+            $data['cost'] = $this->addPercent($data['cost'], 15);
+        }
+
+        $order = $user->orders()->create([
+            'branch_id' => $branch->id,
+            'customer_name' => $data['customer_name'],
+            'delivery_type' => $data['delivery_type'],
+            'goods_price' => $data['goods_price'],
+            'src_long' => $branch->location->long,
+            'src_lat' => $branch->location->lat,
+            'dest_long' => $data['dest_long'],
+            'dest_lat' => $data['dest_lat'],
+            'distance' => $data['distance'],
+            'weight' => $data['weight'],
+            'cost' => $data['cost'],
         ]);
+
+        if (isset($data['attrs']) && ! empty($data['attrs'])) {
+            $order->attrs()->attach($data['attrs']);
+        }
+
+        if (isset($data['items']) && ! empty($data['items'])) {
+            $order->items()->attach($data['items']);
+        }
+
+        return $order;
     }
 
-    public function calcCost($coords, $weight, $attrs)
+    public function calcCost(int $branch_id, array $dest, int $weight, array $attrs, string $delivery_type): array
     {
+        $this->Required($branch_id, __('main.branch'));
         $this->Required($weight, __('main.weight'));
-        $this->Required($coords, __('main.coords'));
+        $this->Required($dest, __('main.destination coords'));
+        $this->Required($delivery_type, __('main.delivery type'));
+        $weight = (int) round($weight);
+        $trans = (new TransportationActions())->getMatchedTransportation($weight);
 
-        $distance = $this->calcDistance($coords);
-        $trans = (new TransportationActions)->getMatchedTransportation($weight);
+        $branch = (new BranchActions())->find($branch_id);
+        $src = ['lat' => $branch->location->lat, 'long' => $branch->location->long];
+        $distance = $this->calcDistance($src, $dest);
+        if ($distance < 100) {
+            throw new \Exception(__('main.distance must be greater than 100 meter'));
+        }
 
         $init = $this->initalCost($trans, $weight, $distance);
-        $rounded = ceil($init / 10) * 10;
-        $extra = $this->getExtraCostForAttributes($attrs);
-        $final = $this->finalCost($rounded, $extra);
+        $round = (int) round($init);
+        $attrs = $this->AttrsCost($attrs);
+        $delivery = $this->deliveryTypeCost($delivery_type);
+        $final = $this->finalCost($round, $attrs, $delivery);
 
         return [
-            $distance,
-            $init,
-            $rounded,
-            $extra,
-            $final
+            'distance:m' => $distance * 1000,
+            'weight:kg' => $weight,
+            'init' => $init,
+            'round' => $round,
+            'attrs' => $attrs,
+            'delivery' => $delivery,
+            'final' => $final,
         ];
     }
-    private function calcDistance(array $coords)
-    {
-        $src = $coords['src'];
-        $dest = $coords['dest'];
-        $rad = M_PI / 180;
-        return
-            round(
-                acos(
-                    sin($src['lat'] * $rad) * sin($dest['lat'] * $rad) +
-                    cos($src['lat'] * $rad) * cos($dest['lat'] * $rad) *
-                    cos($src['long'] * $rad - $dest['long'] * $rad)
-                ) * 6371
-            ,2);// Kilometers
-    }  
-
-    private function initalCost($trans, $weight, $distance)
-    {
-        return
-            $trans->inital_cost +
-            $weight * $trans->cost_per_kg +
-            $distance * 1000 * $trans->cost_per_km;
-    }
-
-    private function finalCost($cost, $extra)
-    {
-        $final = $cost;
-        if (is_array($extra)) {
-            foreach ($extra as $value) {
-                $final = $this->addPercent($final, $value);
-            }
-        } else {
-            if ($extra !== 0) {
-                $final = $this->addPercent($final, $extra);
-            }
-        }
-        return floor($final);
-    }
-
-    private function getExtraCostForAttributes($attrs, $calcType = 'totla')
-    {
-        if (empty($attrs)) {
-            return 0;
-        }
-        $query = Attr::whereIn('id', $attrs);
-        return match ($calcType) {
-            default => $query->sum('extra_cost_percent'),
-            'total' => $query->sum('extra_cost_percent'),
-            'byone' => $query->pluck('extra_cost_percent')->toArray(),
-        };
-    }
-
-    private function addPercent($number, $percent)
-    {
-        return $number * (1 + $percent / 100);
-    }
-
 }
