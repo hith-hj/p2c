@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('attribute_order', function (Blueprint $table) {
+        Schema::create('attr_order', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Order::class);
             $table->foreignIdFor(Attr::class);
@@ -34,6 +34,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('attrs');
-        Schema::dropIfExists('attribute_order');
+        Schema::dropIfExists('attr_order');
     }
 };

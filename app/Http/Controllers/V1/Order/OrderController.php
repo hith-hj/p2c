@@ -12,13 +12,26 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderActions $order) {}
+    public function __construct(private readonly OrderActions $order)
+    {
+    }
 
     public function all(Request $request)
     {
         try {
             return $this->success(payload: [
-                'orders' => OrderResource::collection($this->order->all(auth()->id())),
+                'orders' => OrderResource::collection($this->order->all()),
+            ]);
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
+        }
+    }
+
+    public function get(Request $request)
+    {
+        try {
+            return $this->success(payload: [
+                'orders' => OrderResource::collection($this->order->get(auth()->id())),
             ]);
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
@@ -31,11 +44,8 @@ class OrderController extends Controller
             'branch_id' => ['required', 'exists:branches,id'],
             'delivery_type' => ['required', 'string', 'in:normal,urgent'],
             'weight' => ['required', 'numeric', 'min:1'],
-
-            'coords' => ['required', 'array', 'size:2'],
-            'coords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
-            'coords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
-
+            'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
+            'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
             'attrs' => ['sometimes', 'array'],
             'attrs.*' => ['required', 'exists:attrs,id'],
         ]);
@@ -48,11 +58,12 @@ class OrderController extends Controller
             return $this->success(
                 payload: [
                     'receipt' => $this->order->calcCost(
-                        $validator->safe()->input('branch_id'),
-                        $validator->safe()->input('coords'),
                         $validator->safe()->input('weight'),
-                        $validator->safe()->input('attrs'),
+                        $validator->safe()->input('branch_id'),
+                        $validator->safe()->input('dest_long'),
+                        $validator->safe()->input('dest_lat'),
                         $validator->safe()->input('delivery_type'),
+                        $validator->safe()->input('attrs'),
                     ),
                 ]
             );
@@ -73,10 +84,8 @@ class OrderController extends Controller
             'weight' => ['required', 'numeric', 'min:1'],
             'distance' => ['required', 'numeric', 'min:200'],
             'cost' => ['required', 'numeric'],
-
             'attrs' => ['sometimes', 'array'],
             'attrs.*' => ['required', 'exists:attrs,id'],
-
             'items' => ['sometimes', 'array'],
             'items.*' => ['required', 'exists:items,id'],
         ]);
@@ -100,9 +109,63 @@ class OrderController extends Controller
         }
     }
 
-    public function delete(Request $request) {}
+    public function cancel(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
 
-    public function accept(Request $request) {}
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
 
-    public function cancel(Request $request) {}
+        try {
+            $this->order->cancel($validator->safe()->integer('order_id'));
+            return $this->success(msg: __('main.canceled'), );
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
+        }
+    }
+
+    public function accept(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $this->order->accept(
+                auth()->user()->badge,
+                $validator->safe()->integer('order_id')
+            );
+            return $this->success(msg: __('main.accepted'), );
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
+        }
+    }
+
+    public function reject(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $this->order->reject(
+                auth()->user()->badge,
+                $validator->safe()->integer('order_id')
+            );
+            return $this->success(msg: __('main.rejected'), );
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
+        }
+    }
 }

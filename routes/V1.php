@@ -113,11 +113,11 @@ Route::group(
         Route::middleware([RoleMiddleware::class.':producer'])->group(function (): void {
             Route::post('checkCost', 'checkCost');
             Route::post('create', 'create');
-            Route::delete('delete', 'delete');
+            Route::post('cancel', 'cancel');
         });
         Route::middleware([RoleMiddleware::class.':carrier'])->group(function (): void {
             Route::post('accept', 'accept');
-            Route::post('cancel', 'cancel');
+            Route::post('reject', 'reject');
         });
 
         Route::get('/', 'get');

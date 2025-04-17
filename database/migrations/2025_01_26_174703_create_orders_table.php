@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\V1\Branch;
+use App\Models\V1\Transportation;
 use App\Models\V1\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -17,13 +18,14 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class, 'producer_id');
             $table->foreignIdFor(Branch::class, 'branch_id');
-            $table->foreignIdFor(User::class, 'carrier_id');
+            $table->foreignIdFor(User::class, 'carrier_id')->nullable();
+            $table->foreignIdFor(Transportation::class, 'transportation_id');
             $table->string('customer_name')->default('customer');
             $table->string('delivery_type');
             $table->float('src_long');
             $table->float('src_lat');
-            $table->float('dist_long');
-            $table->float('dist_lat');
+            $table->float('dest_long');
+            $table->float('dest_lat');
             $table->integer('distance');
             $table->integer('weight');
             $table->integer('cost');

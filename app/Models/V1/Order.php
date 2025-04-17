@@ -14,8 +14,6 @@ class Order extends Model
 
     protected $guarded = [];
 
-    // protected $with = ['attrs','items'];
-
     public function producer()
     {
         return $this->belongsTo(User::class, 'producer_id');
@@ -43,5 +41,9 @@ class Order extends Model
     public function items()
     {
         return $this->belongsToMany(Item::class)->withTimestamps();
+    }
+
+    public function transportation(){
+        return $this->belongsTo(Transportation::class);
     }
 }

@@ -19,7 +19,7 @@ class ProducerFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'brand' => fake()->company(),
+            'brand' => fake()->colorName(),
             'rate' => fake()->numberBetween(1, 10),
             'is_valid' => fake()->randomElement([true, false]),
         ];

@@ -21,12 +21,12 @@ trait OrderServices
             ) * 6371, 2); // km
     }
 
-    private function initalCost($trans, int $weight, int $distance): int
+    private function initalCost(object $transportation, int $weight, int $distance): int
     {
         return (int) round(
-                $trans->inital_cost +
-                $weight * $trans->cost_per_kg +
-                $distance * $trans->cost_per_km
+                $transportation->inital_cost +
+                $weight * $transportation->cost_per_kg +
+                $distance * $transportation->cost_per_km
             );
     }
 
