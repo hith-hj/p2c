@@ -22,7 +22,7 @@ trait ApiRes
     public function error(array $payload = [], string $msg = 'Error', int $code = 400)
     {
         $response = [
-            'error' => true,
+            'success' => false,
             'message' => $msg,
         ];
         if ($payload !== []) {

@@ -38,6 +38,27 @@ class OrderController extends Controller
         }
     }
 
+    public function find(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $order = $this->order->find($validator->safe()->integer('order_id'));
+
+            return $this->success(payload: [
+                'order' => OrderResource::make($order),
+            ]);
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
+        }
+    }
+
     public function checkCost(Request $request)
     {
         $validator = Validator::make($request->all(), [
