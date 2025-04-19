@@ -23,6 +23,7 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'carrier_id');
     }
+    
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id');
