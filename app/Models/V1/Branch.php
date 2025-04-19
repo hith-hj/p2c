@@ -25,4 +25,8 @@ class Branch extends Model
         return $this->hasOne(Location::class, 'locatable_id')
             ->where('locatable_type', static::class);
     }
+
+    public function orders(){
+        return $this->hasMany(Order::class,'branch_id');
+    }
 }
