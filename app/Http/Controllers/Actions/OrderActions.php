@@ -45,11 +45,9 @@ class OrderActions
         return $order;
     }
 
-    public function create(object $user, array $data)
+    public function create(object $producer, array $data)
     {
-        $this->Required($user, __('main.user'));
         $this->Required($data, __('main.data'));
-        $producer = $user->badge;
         $this->Required($producer, __('main.producer'));
         $branch = $producer->branches()->find($data['branch_id']);
         $this->Required($branch, __('main.branch'));
@@ -62,7 +60,7 @@ class OrderActions
         }
         $trans = (new TransportationActions())->getMatchedTransportation($data['weight']);
 
-        $order = $user->orders()->create([
+        $order = $producer->orders()->create([
             'branch_id' => $branch->id,
             'transportation_id' => $trans->id,
             'customer_name' => $data['customer_name'],

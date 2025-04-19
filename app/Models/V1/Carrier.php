@@ -55,4 +55,9 @@ class Carrier extends Model
         return $this->update(['is_valid' => $state]);
 
     }
+
+    public function orders()
+    {
+        return  $this->hasMany(Order::class, 'carrier_id');
+    }
 }

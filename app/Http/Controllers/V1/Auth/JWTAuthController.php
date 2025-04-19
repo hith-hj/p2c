@@ -101,8 +101,6 @@ class JWTAuthController extends Controller
     public function refreshToken()
     {
         try {
-            JWTAuth::invalidate(JWTAuth::getToken());
-
             return $this->success(payload: ['token' => Auth::refresh()]);
         } catch (\Exception $exception) {
             return $this->error(payload: ['errors' => $exception->getMessage().' Login again']);
