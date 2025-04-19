@@ -4,17 +4,16 @@ namespace App\Filament\Resources\CarrierResource\Pages;
 
 use App\Filament\Resources\CarrierResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ViewRecord;
 
-class EditCarrier extends EditRecord
+class ViewCarrier extends ViewRecord
 {
     protected static string $resource = CarrierResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\EditAction::make(),
         ];
     }
 }

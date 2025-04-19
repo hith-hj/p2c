@@ -3,15 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProducerResource\Pages;
-use App\Filament\Resources\ProducerResource\RelationManagers;
+use App\Models\V1\Branch;
 use App\Models\V1\Producer;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Infolist;
+use Filament\Infolists;
 
 class ProducerResource extends Resource
 {
@@ -27,7 +28,7 @@ class ProducerResource extends Resource
                     ->required()
                     ->unique('producers','brand')
                     ->maxLength(50),
-                Forms\Components\Checkbox::make('is default'),
+                Forms\Components\Checkbox::make('is_valid'),
             ]);
     }
 
@@ -37,23 +38,50 @@ class ProducerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('brand')->searchable(),
                 Tables\Columns\TextColumn::make('rate')->sortable(),
-                Tables\Columns\TextColumn::make('is_valid'),
-                Tables\Columns\TextColumn::make('created_at')->sortable(),
+                Tables\Columns\CheckBoxColumn::make('is_valid'),
                 Tables\Columns\TextColumn::make('branches_count')->counts('branches'),
+                Tables\Columns\TextColumn::make('orders_count')->counts('orders'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('is_valid')
                     ->options([ 'not validated','validated', ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->label(''),
+                Tables\Actions\EditAction::make()->label(''),
+                Tables\Actions\DeleteAction::make()->label(''),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\TextEntry::make('brand'),
+                Infolists\Components\TextEntry::make('rate'),
+                InfoLists\Components\TextEntry::make('is_valid'),
+                InfoLists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
+                RepeatableEntry::make('branches')->schema([
+                    InfoLists\Components\TextEntry::make('name'),
+                    InfoLists\Components\TextEntry::make('orders')
+                    ->state(fn (Branch $branch): int =>  $branch->orders()->count()),
+                    InfoLists\Components\TextEntry::make('is_default'),
+                    InfoLists\Components\TextEntry::make('phone'),
+                    InfoLists\Components\TextEntry::make('location.lat')->label('latitude'),
+                    InfoLists\Components\TextEntry::make('location.long')->label('longitude'),
+                ])->grid()->columnSpanFull()->columns(3),
+                RepeatableEntry::make('orders')->schema([
+                    InfoLists\Components\TextEntry::make('cost'),
+                    InfoLists\Components\TextEntry::make('weight'),
+                    InfoLists\Components\TextEntry::make('branch.name'),
+                    InfoLists\Components\TextEntry::make('customer_name'),
+                ])->grid()->columnSpanFull()->columns(2),
+            ])->columns(4);
     }
 
     public static function getRelations(): array
@@ -68,6 +96,7 @@ class ProducerResource extends Resource
         return [
             'index' => Pages\ListProducers::route('/'),
             'create' => Pages\CreateProducer::route('/create'),
+            'view' => Pages\ViewProducer::route('/{record}'),
             'edit' => Pages\EditProducer::route('/{record}/edit'),
         ];
     }

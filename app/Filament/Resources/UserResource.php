@@ -93,12 +93,8 @@ class UserResource extends Resource
                 Infolists\Components\TextEntry::make('phone'),
                 Infolists\Components\TextEntry::make('role'),
                 InfoLists\Components\TextEntry::make('verified_at'),
-                InfoLists\Components\TextEntry::make('verification_code'),
                 InfoLists\Components\TextEntry::make('verified_by'),
-                RepeatableEntry::make('orders')->schema([
-                    InfoLists\Components\TextEntry::make('cost'),
-                    InfoLists\Components\TextEntry::make('weight'),
-                ]),
+                InfoLists\Components\TextEntry::make('verification_code'),
             ]);
     }
 
