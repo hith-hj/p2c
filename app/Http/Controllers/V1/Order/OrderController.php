@@ -120,7 +120,7 @@ class OrderController extends Controller
                 msg: __('main.created'),
                 payload: [
                     'order' => $this->order->create(
-                        auth()->user(),
+                        auth()->user()->badge,
                         $validator->safe()->all()
                     ),
                 ]

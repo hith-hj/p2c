@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\V1\Branch;
+use App\Models\V1\Carrier;
+use App\Models\V1\Producer;
 use App\Models\V1\Transportation;
-use App\Models\V1\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,10 +17,11 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'producer_id');
+            $table->foreignIdFor(Carrier::class, 'carrier_id')->nullable();
+            $table->foreignIdFor(Transportation::class);
+            $table->foreignIdFor(Producer::class, 'producer_id');
             $table->foreignIdFor(Branch::class, 'branch_id');
-            $table->foreignIdFor(User::class, 'carrier_id')->nullable();
-            $table->foreignIdFor(Transportation::class, 'transportation_id');
+            $table->foreignId('customer_id')->nullable();
             $table->string('customer_name')->default('customer');
             $table->string('delivery_type');
             $table->float('src_long');

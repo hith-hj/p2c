@@ -24,4 +24,9 @@ class Producer extends Model
     {
         return $this->hasMany(Branch::class);
     }
+
+    public function orders()
+    {
+        return  $this->hasMany(Order::class, 'producer_id');
+    }
 }
