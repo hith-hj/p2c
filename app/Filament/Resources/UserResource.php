@@ -12,6 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Infolist;
+use Filament\Infolists;
+use Filament\Infolists\Components\RepeatableEntry;
 
 class UserResource extends Resource
 {
@@ -53,7 +56,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('role'),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->dateTime("Y-m-d")
                     ->sortable(),
             ])
             ->filters([
@@ -64,8 +67,9 @@ class UserResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->label(''),
+                Tables\Actions\EditAction::make()->label(''),
+                Tables\Actions\DeleteAction::make()->label(''),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -81,12 +85,31 @@ class UserResource extends Resource
         ];
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\TextEntry::make('email'),
+                Infolists\Components\TextEntry::make('phone'),
+                Infolists\Components\TextEntry::make('role'),
+                InfoLists\Components\TextEntry::make('verified_at'),
+                InfoLists\Components\TextEntry::make('verification_code'),
+                InfoLists\Components\TextEntry::make('verified_by'),
+                RepeatableEntry::make('orders')->schema([
+                    InfoLists\Components\TextEntry::make('cost'),
+                    InfoLists\Components\TextEntry::make('weight'),
+                ]),
+            ]);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view' => Pages\ViewUser::route('/{record}'),
         ];
     }
+
 }
