@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\V1\Branch;
 use App\Models\V1\Carrier;
 use App\Models\V1\Producer;
@@ -8,7 +10,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class() extends Migration
 {
     /**
      * Run the migrations.
@@ -17,12 +19,13 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Carrier::class, 'carrier_id')->nullable();
-            $table->foreignIdFor(Transportation::class);
-            $table->foreignIdFor(Producer::class, 'producer_id');
-            $table->foreignIdFor(Branch::class, 'branch_id');
+            $table->foreignIdFor(Carrier::class)->nullable();
+            $table->foreignIdFor(Transportation::class)->nullable();
+            $table->foreignIdFor(Producer::class)->nullable();
+            $table->foreignIdFor(Branch::class)->nullable();
             $table->foreignId('customer_id')->nullable();
             $table->string('customer_name')->default('customer');
+            $table->tinyText('notes')->nullable();
             $table->string('delivery_type');
             $table->float('src_long');
             $table->float('src_lat');
@@ -35,7 +38,7 @@ return new class extends Migration
             $table->smallInteger('status')->default(0);
             $table->timestamps();
             $table->timestamp('picked_at')->nullable();
-            $table->timestamp('deliverd_at')->nullable();
+            $table->timestamp('delivered_at')->nullable();
         });
     }
 

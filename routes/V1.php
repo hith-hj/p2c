@@ -118,6 +118,8 @@ Route::group(
         Route::middleware([RoleMiddleware::class.':carrier'])->group(function (): void {
             Route::post('accept', 'accept');
             Route::post('reject', 'reject');
+            Route::post('picked', 'picked');
+            Route::post('delivered', 'delivered');
         });
 
         Route::get('/', 'get');

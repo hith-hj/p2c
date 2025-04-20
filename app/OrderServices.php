@@ -24,10 +24,10 @@ trait OrderServices
     private function initalCost(object $transportation, int $weight, int $distance): int
     {
         return (int) round(
-                $transportation->inital_cost +
-                $weight * $transportation->cost_per_kg +
-                $distance * $transportation->cost_per_km
-            );
+            $transportation->inital_cost +
+            $weight * $transportation->cost_per_kg +
+            $distance * $transportation->cost_per_km
+        );
     }
 
     private function finalCost(int $cost, array|int $attrs, int $delivery): int
@@ -46,7 +46,7 @@ trait OrderServices
         return (int) floor($final);
     }
 
-    private function AttrsCost(array $attrs, string $calcType = 'totla') : int|array
+    private function AttrsCost(array $attrs, string $calcType = 'totla'): int|array
     {
         if ($attrs === []) {
             return 0;
@@ -80,6 +80,9 @@ trait OrderServices
     {
         if ($delivery_type === 'urgent') {
             return $percent;
+        }
+        if ($delivery_type === 'express') {
+            return $percent * 15 / 10;
         }
 
         return 0;

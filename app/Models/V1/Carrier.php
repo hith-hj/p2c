@@ -11,7 +11,7 @@ class Carrier extends Model
 {
     use HasFactory;
 
-    protected $hidden = ['created_at','updated_at'];
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $guarded = [];
 
@@ -22,8 +22,8 @@ class Carrier extends Model
 
     public function location()
     {
-        return $this->hasOne(Location::class, 'locatable_id')
-            ->where('locatable_type', static::class);
+        return $this->hasOne(Location::class, 'belongTo_id')
+            ->where('belongTo_type', static::class);
     }
 
     public function user()
@@ -38,15 +38,15 @@ class Carrier extends Model
 
     public function documents()
     {
-        return $this->hasMany(Document::class, 'documented_id')
-            ->where('documented_type', class_basename($this))
+        return $this->hasMany(Document::class, 'belongTo_id')
+            ->where('belongTo_type', class_basename($this))
             ->select(['url', 'doc_type']);
     }
 
     public function profileImage()
     {
-        return $this->hasOne(Document::class, 'documented_id')
-            ->where([['documented_type', class_basename($this)], ['doc_type', 'profile']])
+        return $this->hasOne(Document::class, 'belongTo_id')
+            ->where([['belongTo_type', class_basename($this)], ['doc_type', 'profile']])
             ->select(['url', 'doc_type']);
     }
 
@@ -58,6 +58,6 @@ class Carrier extends Model
 
     public function orders()
     {
-        return  $this->hasMany(Order::class, 'carrier_id');
+        return $this->hasMany(Order::class, 'carrier_id');
     }
 }

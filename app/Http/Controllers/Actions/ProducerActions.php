@@ -7,13 +7,12 @@ namespace App\Http\Controllers\Actions;
 use App\ExceptionHandler;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
-use Illuminate\Support\Collection;
 
 class ProducerActions
 {
     use ExceptionHandler;
 
-    public function all() 
+    public function all()
     {
         $producers = Producer::all();
         $this->NotFound($producers->all(), __('main.producers'));
@@ -33,7 +32,7 @@ class ProducerActions
         return $producers;
     }
 
-    public function get(int $id) : object
+    public function get(int $id): object
     {
         $this->Required($id, __('main.user').' ID');
         $user = User::find($id);
@@ -43,7 +42,7 @@ class ProducerActions
         return $user->badge;
     }
 
-    public function find(int $id) : object
+    public function find(int $id): object
     {
         $this->Required($id, __('main.producer').' ID');
         $producer = Producer::find($id);

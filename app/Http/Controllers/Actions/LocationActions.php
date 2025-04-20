@@ -10,24 +10,24 @@ class LocationActions
 {
     use ExceptionHandler;
 
-    public function create(object $locatable, array $data)
+    public function create(object $belongTo, array $data)
     {
-        $this->Required($locatable, __('main.locatable'));
+        $this->Required($belongTo, __('main.belongTo'));
         $this->Required($data, __('main.data'));
 
-        return $locatable->location()->create([
-            'locatable_type' => $locatable::class,
+        return $belongTo->location()->create([
+            'belongTo_type' => $belongTo::class,
             'long' => $data['coords']['long'],
             'lat' => $data['coords']['lat'],
         ]);
     }
 
-    public function edit(object $locatable, array $data)
+    public function edit(object $belongTo, array $data)
     {
-        $this->Required($locatable, __('main.locatable'));
+        $this->Required($belongTo, __('main.belongTo'));
         $this->Required($data, __('main.data'));
 
-        return $locatable->location()->update([
+        return $belongTo->location()->update([
             'long' => $data['coords']['long'],
             'lat' => $data['coords']['lat'],
         ]);
