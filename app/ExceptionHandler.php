@@ -48,7 +48,12 @@ trait ExceptionHandler
 
     private function empty($argument, $name = '', $msg = 'Error'): void
     {
-        if (! $argument || $argument === null || empty($argument)) {
+        if (
+            ! $argument ||
+            $argument === null ||
+            empty($argument) ||
+            (is_countable($argument) && count($argument) === 0)
+        ) {
             throw new Exception(sprintf('%s %s', $name, $msg));
         }
     }

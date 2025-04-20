@@ -6,6 +6,7 @@ namespace App\Models\V1;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\CodesManager;
 use App\Enums\UserRoles;
 use App\FirebaseNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use CodesManager;
     use FirebaseNotification;
     use HasFactory;
 
@@ -41,7 +43,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
-        'updated_at'
+        'updated_at',
     ];
 
     /**
@@ -88,10 +90,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function sendVerificationCode($by = 'phone'): static
     {
-        $code = mt_rand(10000, 99999);
+        $this->createCode('verification');
         $this->update([
             'verified_at' => null,
-            'verification_code' => $code,
             'verified_by' => $by,
         ]);
         if ($by === 'phone') {
@@ -105,12 +106,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function verify(): static
     {
+        $this->deleteCode('verification');
         $this->update([
-            'verification_code' => null,
             'verified_at' => now(),
         ]);
 
         return $this;
     }
-
 }

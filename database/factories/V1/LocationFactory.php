@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories\V1;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,14 +27,14 @@ class LocationFactory extends Factory
     public function carrier()
     {
         return $this->state([
-            'locatable_type' => 'App\Models\V1\Carrier',
+            'belongTo_type' => 'App\Models\V1\Carrier',
         ]);
     }
 
     public function branch()
     {
         return $this->state([
-            'locatable_type' => 'App\Models\V1\Branch',
+            'belongTo_type' => 'App\Models\V1\Branch',
         ]);
     }
 }

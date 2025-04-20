@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories\V1;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,6 +19,7 @@ class TransportationFactory extends Factory
     public function definition(): array
     {
         $number = fake()->numberBetween(10, 20);
+
         return [
             'name' => fake()->firstNameFemale(),
             'capacity' => fake()->numberBetween(30, 5000),

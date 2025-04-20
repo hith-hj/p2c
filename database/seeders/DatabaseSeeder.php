@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\V1\Attr;
@@ -25,14 +27,14 @@ class DatabaseSeeder extends Seeder
         Attr::factory(5)->create();
         Item::factory(5)->create();
         User::factory()->create([
-            'email'=>'carrier@user.com',
-            'phone'=>'0911111112',
-            'role'=>'carrier'
+            'email' => 'carrier@user.com',
+            'phone' => '0911111112',
+            'role' => 'carrier',
         ]);
         User::factory()->create([
-            'email'=>'producer@user.com',
-            'phone'=>'0911111111',
-            'role'=>'producer'
+            'email' => 'producer@user.com',
+            'phone' => '0911111111',
+            'role' => 'producer',
         ]);
         // Transportaion::factory(10)->create();
     }

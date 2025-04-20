@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderActions $order)
-    {
-    }
+    public function __construct(private readonly OrderActions $order) {}
 
     public function all(Request $request)
     {
@@ -31,7 +29,7 @@ class OrderController extends Controller
     {
         try {
             return $this->success(payload: [
-                'orders' => OrderResource::collection($this->order->get(auth()->id())),
+                'orders' => OrderResource::collection($this->order->get(auth()->user()->badge)),
             ]);
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
@@ -63,7 +61,7 @@ class OrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
-            'delivery_type' => ['required', 'string', 'in:normal,urgent'],
+            'delivery_type' => ['required', 'string', 'in:normal,urgent,express'],
             'weight' => ['required', 'numeric', 'min:1'],
             'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
@@ -79,12 +77,13 @@ class OrderController extends Controller
             return $this->success(
                 payload: [
                     'receipt' => $this->order->calcCost(
-                        $validator->safe()->input('weight'),
-                        $validator->safe()->input('branch_id'),
-                        $validator->safe()->input('dest_long'),
-                        $validator->safe()->input('dest_lat'),
+                        auth()->user()->badge,
+                        $validator->safe()->integer('weight'),
+                        $validator->safe()->integer('branch_id'),
+                        $validator->safe()->float('dest_long'),
+                        $validator->safe()->float('dest_lat'),
                         $validator->safe()->input('delivery_type'),
-                        $validator->safe()->input('attrs'),
+                        $validator->safe()->array('attrs'),
                     ),
                 ]
             );
@@ -98,7 +97,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
             'customer_name' => ['required', 'string', 'max:30'],
-            'delivery_type' => ['required', 'in:normal,urgent'],
+            'delivery_type' => ['required', 'in:normal,urgent,express'],
             'goods_price' => ['required', 'numeric'],
             'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
@@ -116,14 +115,94 @@ class OrderController extends Controller
         }
 
         try {
+            $order = $this->order->create(
+                auth()->user()->badge,
+                $validator->safe()->all()
+            );
+
             return $this->success(
                 msg: __('main.created'),
                 payload: [
-                    'order' => $this->order->create(
-                        auth()->user()->badge,
-                        $validator->safe()->all()
-                    ),
+                    'order' => OrderResource::make($order->fresh()),
                 ]
+            );
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
+        }
+    }
+
+    public function accept(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $order = $this->order->accept(
+                auth()->user()->badge,
+                $validator->safe()->integer('order_id')
+            );
+
+            return $this->success(
+                msg: __('main.accepted'),
+                payload: [
+                    'pickup_code' => $order->code('pickup')?->code,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
+        }
+    }
+
+    public function picked(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $order = $this->order->picked(
+                auth()->user()->badge,
+                $validator->safe()->integer('order_id')
+            );
+
+            return $this->success(
+                msg: __('main.picked'),
+                payload: [
+                    'delivered_code' => $order->code('delivered')->code,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return $this->error(payload: ['errors' => $th->getMessage()]);
+        }
+    }
+
+    public function delivered(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $order = $this->order->delivered(
+                auth()->user()->badge,
+                $validator->safe()->integer('order_id')
+            );
+
+            return $this->success(
+                msg: __('main.delivered'),
             );
         } catch (\Throwable $th) {
             return $this->error(payload: ['errors' => $th->getMessage()]);
@@ -141,29 +220,14 @@ class OrderController extends Controller
         }
 
         try {
-            $this->order->cancel($validator->safe()->integer('order_id'));
-            return $this->success(msg: __('main.canceled'), );
-        } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
-        }
-    }
-
-    public function accept(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'order_id' => ['required', 'exists:orders,id'],
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
-
-        try {
-            $this->order->accept(
+            $order = $this->order->cancel(
                 auth()->user()->badge,
                 $validator->safe()->integer('order_id')
             );
-            return $this->success(msg: __('main.accepted'), );
+
+            return $this->success(
+                msg: __('main.canceled'),
+            );
         } catch (\Throwable $th) {
             return $this->error(payload: ['errors' => $th->getMessage()]);
         }
@@ -180,11 +244,14 @@ class OrderController extends Controller
         }
 
         try {
-            $this->order->reject(
+            $order = $this->order->reject(
                 auth()->user()->badge,
                 $validator->safe()->integer('order_id')
             );
-            return $this->success(msg: __('main.rejected'), );
+
+            return $this->success(
+                msg: __('main.rejected'),
+            );
         } catch (\Throwable $th) {
             return $this->error(payload: ['errors' => $th->getMessage()]);
         }

@@ -90,7 +90,7 @@ class CarrierActions
         $this->Required($carrier, __('main.carrier'));
         $this->Exists($carrier->documents()->count() > 0, __('main.carrier').' '.__('main.documents'));
         $this->Required($data, __('main.documents'));
-        $this->multible($data, $carrier->id, class_basename($carrier));
+        $this->multible($data, $carrier->id, get_class($carrier));
 
         return true;
     }

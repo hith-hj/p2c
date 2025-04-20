@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories\V1;
 
 use App\Models\V1\Branch;
@@ -42,7 +44,7 @@ class UserFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function ($user) {
-            if ($user->role == 'producer') {
+            if ($user->role === 'producer') {
                 Producer::factory()
                     ->for($user)
                     ->has(

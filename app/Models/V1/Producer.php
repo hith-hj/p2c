@@ -11,7 +11,7 @@ class Producer extends Model
 {
     use HasFactory;
 
-    protected $hidden = ['created_at','updated_at'];
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $guarded = [];
 
@@ -27,6 +27,6 @@ class Producer extends Model
 
     public function orders()
     {
-        return  $this->hasMany(Order::class, 'producer_id');
+        return $this->hasMany(Order::class, 'producer_id');
     }
 }

@@ -13,8 +13,6 @@ class Branch extends Model
 
     protected $guarded = [];
 
-    // protected $with=['location:locatable_id,long,lat'];
-
     public function producer()
     {
         return $this->belongsTo(Producer::class);
@@ -22,11 +20,12 @@ class Branch extends Model
 
     public function location()
     {
-        return $this->hasOne(Location::class, 'locatable_id')
-            ->where('locatable_type', static::class);
+        return $this->hasOne(Location::class, 'belongTo_id')
+            ->where('belongTo_type', static::class);
     }
 
-    public function orders(){
-        return $this->hasMany(Order::class,'branch_id');
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'branch_id');
     }
 }

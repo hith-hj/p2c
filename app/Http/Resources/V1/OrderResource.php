@@ -18,8 +18,8 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'producer' => $this->producer?->badge?->brand,
-            'carrier' => $this->carrier?->badge?->first_name,
+            'producer' => $this->producer?->brand,
+            'carrier' => $this->carrier?->first_name,
             'transportation' => $this->transportation?->name,
             'customer_name' => $this->customer_name,
             'src_long' => (float) $this->src_long,
@@ -27,8 +27,8 @@ class OrderResource extends JsonResource
             'dest_long' => (float) $this->dest_long,
             'dest_lat' => (float) $this->dest_lat,
             'distance' => (int) $this->distance,
-            'delivery_type' => $this->delivery_type,
-            'weight' => $this->weight,
+            'delivery_type' => (string) $this->delivery_type,
+            'weight' => (int) $this->weight,
             'cost' => (int) $this->cost,
             'status' => (int) $this->status,
             'created_at' => $this->created_at->diffForHumans(),
@@ -36,6 +36,11 @@ class OrderResource extends JsonResource
             'deliverd_at' => $this->deliverd_at,
             'attrs' => $this->attrs->pluck('name'),
             'items' => $this->items->pluck('name'),
+            'codes' => $this->when(
+                auth()->user()->badge->id === $this->producer_id ||
+                auth()->user()->badge->id === $this->carrier_id,
+                $this->codes()->get(['type', 'code'])
+            ),
         ];
     }
 }

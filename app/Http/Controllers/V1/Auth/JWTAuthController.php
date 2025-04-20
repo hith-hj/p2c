@@ -39,21 +39,25 @@ class JWTAuthController extends Controller
             'firebase_token' => $validator->safe()->input('firebase') ?? null,
         ]);
 
-        $by = $validator->safe()->input('by') ?? 'phone';
-        $user->sendVerificationCode($by);
+        try {
+            $by = $validator->safe()->input('by') ?? 'phone';
+            $user->sendVerificationCode($by);
 
-        return $this->success(
-            payload: ['code' => $user->verification_code],
-            msg: __('main.registerd'),
-            code: 201
-        );
+            return $this->success(
+                payload: ['code' => $user->code('verification')?->code],
+                msg: __('main.registerd'),
+                code: 201
+            );
+        } catch (\Exception $e) {
+            return $this->error(msg: $e->getMessage());
+        }
     }
 
     public function verify(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
-            'code' => ['required', 'numeric', 'exists:users,verification_code'],
+            'code' => ['required', 'numeric', 'exists:codes,code'],
         ]);
 
         if ($validator->fails()) {
@@ -62,9 +66,14 @@ class JWTAuthController extends Controller
 
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
-        $user->verify();
+        try {
+            $user->verify();
 
-        return $this->success(msg: __('main.verified'));
+            return $this->success(msg: __('main.verified'));
+        } catch (\Exception $e) {
+            return $this->error(msg: $e->getMessage());
+        }
+
     }
 
     public function login(Request $request)
