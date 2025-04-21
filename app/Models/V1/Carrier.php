@@ -6,6 +6,9 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Carrier extends Model
 {
@@ -15,48 +18,48 @@ class Carrier extends Model
 
     protected $guarded = [];
 
-    public function transportation()
+    public function transportation(): BelongsTo
     {
         return $this->belongsTo(Transportation::class);
     }
 
-    public function location()
+    public function location(): HasOne
     {
         return $this->hasOne(Location::class, 'belongTo_id')
             ->where('belongTo_type', static::class);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function details()
+    public function details(): HasOne
     {
         return $this->hasOne(CarrierDetails::class);
     }
 
-    public function documents()
+    public function documents(): HasMany
     {
         return $this->hasMany(Document::class, 'belongTo_id')
             ->where('belongTo_type', class_basename($this))
             ->select(['url', 'doc_type']);
     }
 
-    public function profileImage()
+    public function profileImage(): HasOne
     {
         return $this->hasOne(Document::class, 'belongTo_id')
             ->where([['belongTo_type', class_basename($this)], ['doc_type', 'profile']])
             ->select(['url', 'doc_type']);
     }
 
-    public function validate(bool $state)
+    public function validate(bool $state): bool
     {
         return $this->update(['is_valid' => $state]);
 
     }
 
-    public function orders()
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'carrier_id');
     }

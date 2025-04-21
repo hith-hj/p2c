@@ -6,6 +6,7 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Transportation extends Model
 {
@@ -15,7 +16,7 @@ class Transportation extends Model
 
     protected $guarded = [];
 
-    public function carrier()
+    public function carrier(): HasMany
     {
         return $this->hasMany(Carrier::class);
     }

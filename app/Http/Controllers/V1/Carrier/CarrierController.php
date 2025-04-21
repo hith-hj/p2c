@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\V1\Carrier;
 
-use App\Http\Controllers\Actions\CarrierActions;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\CarrierServices;
 use App\Http\Resources\V1\CarrierResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
 {
-    public function __construct(private readonly CarrierActions $carrier) {}
+    public function __construct(private readonly CarrierServices $carrier)
+    {
+    }
 
-    public function all()
+    public function all(): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -25,7 +28,7 @@ class CarrierController extends Controller
         }
     }
 
-    public function paginate(Request $request)
+    public function paginate(Request $request): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -38,7 +41,7 @@ class CarrierController extends Controller
         }
     }
 
-    public function find(Request $request)
+    public function find(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'carrier_id' => ['required', 'exists:carriers,id'],
@@ -49,7 +52,7 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->find($validator->safe()->input('carrier_id'));
+            $carrier = $this->carrier->find($validator->safe()->integer('carrier_id'));
 
             return $this->success(payload: [
                 'carrier' => CarrierResource::make($carrier),
@@ -59,7 +62,7 @@ class CarrierController extends Controller
         }
     }
 
-    public function get()
+    public function get(): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -70,7 +73,7 @@ class CarrierController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'first_name' => ['required', 'string', 'max:20'],
@@ -93,10 +96,10 @@ class CarrierController extends Controller
         }
     }
 
-    public function createDetails(Request $request)
+    public function createDetails(Request $request): JsonResponse
     {
         if (auth()->user()->badge === null) {
-            return $this->error(msg: __('main.carrier').' '.__('main.not found'));
+            return $this->error(msg: __('main.carrier') . ' ' . __('main.not found'));
         }
 
         $validator = Validator::make($request->all(), [
@@ -123,10 +126,10 @@ class CarrierController extends Controller
         }
     }
 
-    public function createDocuments(Request $request)
+    public function createDocuments(Request $request): JsonResponse
     {
         if (auth()->user()->badge === null) {
-            return $this->error(msg: __('main.carrier').' '.__('main.not found'));
+            return $this->error(msg: __('main.carrier') . ' ' . __('main.not found'));
         }
 
         $validator = Validator::make($request->all(), [
@@ -150,7 +153,7 @@ class CarrierController extends Controller
         }
     }
 
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'first_name' => ['required', 'string'],
@@ -182,7 +185,7 @@ class CarrierController extends Controller
         }
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request): JsonResponse
     {
         try {
             $this->carrier->delete(auth()->user()->badge);

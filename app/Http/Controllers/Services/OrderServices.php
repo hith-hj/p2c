@@ -2,21 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Actions;
+namespace App\Http\Controllers\Services;
 
 use App\Enums\OrderStatus;
 use App\ExceptionHandler;
 use App\Models\V1\Carrier;
 use App\Models\V1\Order;
 use App\Models\V1\Producer;
-use App\OrderServices;
+use App\OrderCostServices;
+use Exception;
+use Illuminate\Support\Collection;
 
-class OrderActions
+class OrderServices
 {
     use ExceptionHandler;
-    use OrderServices;
+    use OrderCostServices;
 
-    public function all()
+    public function all(): Collection|Exception
     {
         $orders = Order::all();
         $this->NotFound($orders, __('main.orders'));
@@ -24,15 +26,15 @@ class OrderActions
         return $orders;
     }
 
-    public function get(object $badge)
+    public function get(object $badge): Collection|Exception
     {
         $this->Required($badge, __('main.user').' ID');
         $this->NotFound($badge->orders, __('main.orders'));
 
-        return $badge->orders;
+        return $badge->orders()->with(['attrs','items','producer','carrier','transportation'])->get();
     }
 
-    public function find(int $id): Order
+    public function find(int $id): Order|Exception
     {
         $this->Required($id, __('main.order').' ID');
         $order = Order::where('id', $id)->first();
@@ -49,7 +51,7 @@ class OrderActions
         float $dest_lat,
         string $delivery_type,
         array $attrs
-    ): array {
+    ): array|Exception {
 
         $this->Required($weight, __('main.weight'));
         $this->Required($weight, __('main.producer'));
@@ -58,19 +60,19 @@ class OrderActions
         $this->Required($dest_lat, __('main.latitude'));
         $this->Required($delivery_type, __('main.delivery type'));
 
-        $branch = (new BranchActions())->find($branch_id);
+        $branch = (new BranchServices())->find($branch_id);
         if ($branch->producer_id !== $producer->id) {
-            throw new \Exception(__('main.invalid operation'));
+            throw new Exception(__('main.invalid operation'));
         }
         $src = ['lat' => $branch->location->lat, 'long' => $branch->location->long];
 
         $weight = (int) round($weight);
-        $trans = (new TransportationActions())->getMatchedTransportation($weight);
+        $trans = (new TransportationServices())->getMatchedTransportation($weight);
 
         $dest = ['lat' => $dest_lat, 'long' => $dest_long];
         $distance = $this->calcDistance($src, $dest);
         if ($distance < 100) {
-            throw new \Exception(__('main.Min distance is 100 meter'));
+            throw new Exception(__('main.Min distance is 100 meter'));
         }
 
         $init = $this->initalCost($trans, $weight, $distance);
@@ -89,18 +91,18 @@ class OrderActions
         ];
     }
 
-    public function create(Producer $producer, array $data): Order
+    public function create(Producer $producer, array $data): Order|Exception
     {
         $this->Required($producer, __('main.producer'));
         $this->Required($data, __('main.data'));
         $branch = $producer->branches()->find($data['branch_id']);
         $this->Required($branch, __('main.branch'));
         if ($branch->producer_id !== $producer->id) {
-            throw new \Exception(__('main.invalid operation'));
+            throw new Exception(__('main.invalid operation'));
         }
         $this->Required($branch->location, __('main.branch location'));
 
-        $trans = (new TransportationActions())->getMatchedTransportation($data['weight']);
+        $trans = (new TransportationServices())->getMatchedTransportation($data['weight']);
 
         $data['transportation_id'] = $trans->id;
         $data['src_lat'] = $branch->location->lat;
@@ -134,18 +136,18 @@ class OrderActions
         return $order;
     }
 
-    public function accept(Carrier $carrier, int $order_id): Order
+    public function accept(Carrier $carrier, int $order_id): Order|Exception
     {
         $this->Required($carrier, __('main.carrier'));
         $order = $this->find($order_id);
         if ($order->carrier_id !== null) {
-            throw new \Exception(__('main.order is assigned'));
+            throw new Exception(__('main.order is assigned'));
         }
         if ($order->status !== OrderStatus::pending->value) {
-            throw new \Exception(__('main.invalid order status'));
+            throw new Exception(__('main.invalid order status'));
         }
         if ($order->transportation_id !== $carrier->transportation_id) {
-            throw new \Exception(__('main.transportations is not matched'));
+            throw new Exception(__('main.transportations is not matched'));
         }
         $order->carrier()->associate($carrier);
         $order->update(['status' => OrderStatus::assigned->value]);
@@ -153,28 +155,30 @@ class OrderActions
         return $order;
     }
 
-    public function picked(Carrier $carrier, int $order_id)
+    public function picked(Carrier $carrier, int $order_id): Order|Exception
     {
+        $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
         if (! $order) {
-            throw new \Exception(__('main.not found'));
+            throw new Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::assigned->value) {
-            throw new \Exception(__('main.invalid order status'));
+            throw new Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::picked->value, 'picked_at' => now()]);
 
         return $order;
     }
 
-    public function delivered(Carrier $carrier, int $order_id)
+    public function delivered(Carrier $carrier, int $order_id): Order|Exception
     {
+        $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
         if (! $order) {
-            throw new \Exception(__('main.not found'));
+            throw new Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::picked->value) {
-            throw new \Exception(__('main.invalid order status'));
+            throw new Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()]);
         $order->codes()->delete();
@@ -183,30 +187,31 @@ class OrderActions
         return $order;
     }
 
-    public function cancel(Producer $producer, int $order_id): Order
+    public function cancel(Producer $producer, int $order_id): Order|Exception
     {
         $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
         if ($order->carrier_id !== null) {
-            throw new \Exception(__('main.order is assigned'));
+            throw new Exception(__('main.order is assigned'));
         }
         if ($order->status !== OrderStatus::pending->value) {
-            throw new \Exception(__('main.invalid order status'));
+            throw new Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::canceld]);
         $order->codes()->delete();
 
         return $order;
     }
-
-    public function reject(Carrier $carrier, int $order_id)
+    
+    public function reject(Carrier $carrier, int $order_id): Order|Exception
     {
+        $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
         if (! $order) {
-            throw new \Exception(__('main.not found'));
+            throw new Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::assigned->value) {
-            throw new \Exception(__('main.invalid order status'));
+            throw new Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::rejected->value]);
         $order->codes()->delete();

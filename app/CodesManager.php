@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App;
 
 use App\Models\V1\Code;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 trait CodesManager
 {
-    public function codes()
+    public function codes(): HasMany
     {
         return $this->hasMany(Code::class, 'belongTo_id')
             ->where('belongTo_type', static::class);
@@ -51,7 +52,7 @@ trait CodesManager
         for ($i = 0; $i < 10; $i++) {
             $code = $this->number($length);
             if (
-                mb_strlen(strval($code)) === $length &&
+                mb_strlen((string) $code) === $length &&
                 ! $codes->where([['type', $type], ['code', $code]])->first()
             ) {
                 break;

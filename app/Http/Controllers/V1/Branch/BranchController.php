@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\V1\Branch;
 
-use App\Http\Controllers\Actions\BranchActions;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\BranchServices;
 use App\Http\Resources\V1\BranchResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class BranchController extends Controller
 {
-    public function __construct(public BranchActions $branch) {}
+    public function __construct(public BranchServices $branch) {}
 
-    public function all()
+    public function all(): JsonResponse
     {
         return $this->error(msg: __('main.coming soon'));
     }
 
-    public function get(Request $request)
+    public function get(Request $request): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -32,7 +33,7 @@ class BranchController extends Controller
         }
     }
 
-    public function find(Request $request)
+    public function find(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['sometimes', 'required', 'exists:branches,id'],
@@ -53,7 +54,7 @@ class BranchController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'min:4'],
@@ -78,7 +79,7 @@ class BranchController extends Controller
         }
     }
 
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
@@ -104,7 +105,7 @@ class BranchController extends Controller
         }
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
@@ -128,7 +129,7 @@ class BranchController extends Controller
         }
     }
 
-    public function setDefault(Request $request)
+    public function setDefault(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
