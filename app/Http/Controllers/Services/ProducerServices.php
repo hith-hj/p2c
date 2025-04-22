@@ -23,7 +23,7 @@ class ProducerServices
         return $producers;
     }
 
-    public function paginate(object $request, int $perPage = 4): object|Exception
+    public function paginate(object $request, int $perPage = 4): object
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;

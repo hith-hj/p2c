@@ -26,7 +26,7 @@ class CarrierServices
         return $carriers;
     }
 
-    public function paginate(object $request, int $perPage = 4): object|Exception
+    public function paginate(object $request, int $perPage = 4): object
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;
@@ -38,7 +38,7 @@ class CarrierServices
         return $carriers;
     }
 
-    public function get(int $id): object|Exception
+    public function get(int $id): object
     {
         $this->Required($id, __('main.user').' ID');
         $user = User::find($id);

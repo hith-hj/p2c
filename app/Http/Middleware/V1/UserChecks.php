@@ -15,7 +15,7 @@ class UserChecks
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role, bool $isValid): Response
+    public function handle(Request $request, Closure $next, string $role, bool $isValid = false): Response
     {
         if ($request->user() === null) {
             return response()->json([
