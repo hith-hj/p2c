@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
 {
-    public function __construct(private readonly CarrierServices $carrier)
-    {
-    }
+    public function __construct(private readonly CarrierServices $carrier) {}
 
     public function all(): JsonResponse
     {
@@ -99,7 +97,7 @@ class CarrierController extends Controller
     public function createDetails(Request $request): JsonResponse
     {
         if (auth()->user()->badge === null) {
-            return $this->error(msg: __('main.carrier') . ' ' . __('main.not found'));
+            return $this->error(msg: __('main.carrier').' '.__('main.not found'));
         }
 
         $validator = Validator::make($request->all(), [
@@ -129,7 +127,7 @@ class CarrierController extends Controller
     public function createDocuments(Request $request): JsonResponse
     {
         if (auth()->user()->badge === null) {
-            return $this->error(msg: __('main.carrier') . ' ' . __('main.not found'));
+            return $this->error(msg: __('main.carrier').' '.__('main.not found'));
         }
 
         $validator = Validator::make($request->all(), [

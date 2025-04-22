@@ -13,7 +13,7 @@ class Code extends Model
 
     protected $casts = ['code' => 'integer'];
 
-    public function holder() : BelongsTo
+    public function holder(): BelongsTo
     {
         return $this->belongsTo($this->belongTo_type)
             ->where('id', $this->belongTo_id);

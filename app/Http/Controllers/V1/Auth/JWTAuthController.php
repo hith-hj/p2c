@@ -65,12 +65,13 @@ class JWTAuthController extends Controller
         }
 
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
-        if($user->code('verification')->code !== $validator->safe()->integer('code')){
+        if ($user->code('verification')->code !== $validator->safe()->integer('code')) {
             return $this->error(msg: __('main.invalid code'));
         }
-        
+
         try {
             $user->verify();
+
             return $this->success(msg: __('main.verified'));
         } catch (\Exception $e) {
             return $this->error(msg: $e->getMessage());

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories\V1;
 
-use App\Models\V1\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
