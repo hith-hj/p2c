@@ -10,6 +10,8 @@ use App\CodesManager;
 use App\Enums\UserRoles;
 use App\FirebaseNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -59,17 +61,17 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    public function getJWTIdentifier()
+    public function getJWTIdentifier(): int|string
     {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [];
     }
 
-    public function badge()
+    public function badge(): HasOne
     {
         return match ($this->role) {
             UserRoles::Producer->value => $this->hasOne(Producer::class),
@@ -78,12 +80,12 @@ class User extends Authenticatable implements JWTSubject
         };
     }
 
-    public function settings()
+    public function settings() : HasOne
     {
         return $this->hasOne(Setting::class);
     }
 
-    public function notifications()
+    public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class, 'notifiable_id');
     }

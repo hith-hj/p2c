@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Actions;
+namespace App\Http\Controllers\Services;
 
 use App\ExceptionHandler;
+use App\Models\V1\Location;
+use Exception;
 
-class LocationActions
+class LocationServices
 {
     use ExceptionHandler;
 
-    public function create(object $belongTo, array $data)
+    public function create(object $belongTo, array $data): Location|Exception
     {
         $this->Required($belongTo, __('main.belongTo'));
         $this->Required($data, __('main.data'));
@@ -22,7 +24,7 @@ class LocationActions
         ]);
     }
 
-    public function edit(object $belongTo, array $data)
+    public function edit(object $belongTo, array $data): Location|Exception
     {
         $this->Required($belongTo, __('main.belongTo'));
         $this->Required($data, __('main.data'));

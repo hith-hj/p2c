@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\V1\Producer;
 
-use App\Http\Controllers\Actions\ProducerActions;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\ProducerServices;
 use App\Http\Resources\V1\ProducerResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProducerController extends Controller
 {
-    public function __construct(private readonly ProducerActions $producer) {}
+    public function __construct(private readonly ProducerServices $producer) {}
 
-    public function all()
+    public function all(): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -25,7 +26,7 @@ class ProducerController extends Controller
         }
     }
 
-    public function paginate(Request $request)
+    public function paginate(Request $request): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -38,7 +39,7 @@ class ProducerController extends Controller
         }
     }
 
-    public function get()
+    public function get(): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -49,7 +50,7 @@ class ProducerController extends Controller
         }
     }
 
-    public function find(Request $request)
+    public function find(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'producer_id' => ['required', 'exists:producers,id'],
@@ -60,7 +61,7 @@ class ProducerController extends Controller
         }
 
         try {
-            $producer = $this->producer->find($validator->safe()->input('producer_id'));
+            $producer = $this->producer->find($validator->safe()->integer('producer_id'));
 
             return $this->success(payload: [
                 'producer' => ProducerResource::make($producer),
@@ -70,7 +71,7 @@ class ProducerController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'brand' => ['required', 'string', 'max:20', 'unique:producers,brand'],
@@ -95,7 +96,7 @@ class ProducerController extends Controller
         }
     }
 
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'brand' => ['required', 'string', 'unique:producers,brand'],
@@ -115,7 +116,7 @@ class ProducerController extends Controller
         }
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request): JsonResponse
     {
         try {
             $this->producer->delete(auth()->user()->badge);

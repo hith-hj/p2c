@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\V1\Order;
 
-use App\Http\Controllers\Actions\OrderActions;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\OrderServices;
 use App\Http\Resources\V1\OrderResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderActions $order) {}
+    public function __construct(private readonly OrderServices $order) {}
 
-    public function all(Request $request)
+    public function all(Request $request): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -25,7 +26,7 @@ class OrderController extends Controller
         }
     }
 
-    public function get(Request $request)
+    public function get(Request $request): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -36,7 +37,7 @@ class OrderController extends Controller
         }
     }
 
-    public function find(Request $request)
+    public function find(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
@@ -57,7 +58,7 @@ class OrderController extends Controller
         }
     }
 
-    public function checkCost(Request $request)
+    public function checkCost(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
@@ -92,7 +93,7 @@ class OrderController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
@@ -131,7 +132,7 @@ class OrderController extends Controller
         }
     }
 
-    public function accept(Request $request)
+    public function accept(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
@@ -158,7 +159,7 @@ class OrderController extends Controller
         }
     }
 
-    public function picked(Request $request)
+    public function picked(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
@@ -185,7 +186,7 @@ class OrderController extends Controller
         }
     }
 
-    public function delivered(Request $request)
+    public function delivered(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
@@ -209,7 +210,7 @@ class OrderController extends Controller
         }
     }
 
-    public function cancel(Request $request)
+    public function cancel(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
@@ -233,7 +234,7 @@ class OrderController extends Controller
         }
     }
 
-    public function reject(Request $request)
+    public function reject(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],

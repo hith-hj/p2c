@@ -2,19 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Actions;
+namespace App\Http\Controllers\Services;
 
 use App\DocumentHandler;
 use App\ExceptionHandler;
 use App\Models\V1\Carrier;
+use App\Models\V1\CarrierDetails;
 use App\Models\V1\User;
+use Exception;
+use Illuminate\Foundation\Auth\User as Auth;
+use Illuminate\Support\Collection;
 
-class CarrierActions
+class CarrierServices
 {
     use DocumentHandler;
     use ExceptionHandler;
 
-    public function all()
+    public function all(): Collection|Exception
     {
         $carriers = Carrier::all();
         $this->NotFound($carriers, __('main.carrier'));
@@ -22,7 +26,7 @@ class CarrierActions
         return $carriers;
     }
 
-    public function paginate(object $request, int $perPage = 4)
+    public function paginate(object $request, int $perPage = 4): object|Exception
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;
@@ -34,7 +38,7 @@ class CarrierActions
         return $carriers;
     }
 
-    public function get(int $id)
+    public function get(int $id): object|Exception
     {
         $this->Required($id, __('main.user').' ID');
         $user = User::find($id);
@@ -44,16 +48,16 @@ class CarrierActions
         return $user->badge;
     }
 
-    public function find(int $id)
+    public function find(int $id): Carrier|Exception
     {
         $this->Required($id, __('main.carrier').' ID');
-        $carrier = Carrier::find($id);
+        $carrier = Carrier::where('id', $id)->first();
         $this->NotFound($carrier, __('main.carrier'));
 
         return $carrier;
     }
 
-    public function create(object $user, array $data)
+    public function create(Auth $user, array $data): Carrier|Exception
     {
         $this->Required($user, __('main.user'));
         $this->Exists($user->badge, __('main.carrier'));
@@ -70,7 +74,7 @@ class CarrierActions
         ]);
     }
 
-    public function createDetails(object $carrier, array $data)
+    public function createDetails(Carrier $carrier, array $data): CarrierDetails|Exception
     {
         $this->Required($carrier, __('main.carrier'));
         $this->Exists($carrier->details, __('main.carrier').' '.__('main.details'));
@@ -85,7 +89,7 @@ class CarrierActions
         ]);
     }
 
-    public function createDocuments(object $carrier, array $data): bool
+    public function createDocuments(Carrier $carrier, array $data): bool|Exception
     {
         $this->Required($carrier, __('main.carrier'));
         $this->Exists($carrier->documents()->count() > 0, __('main.carrier').' '.__('main.documents'));
@@ -95,7 +99,7 @@ class CarrierActions
         return true;
     }
 
-    public function update(object $carrier, array $data)
+    public function update(Carrier $carrier, array $data): bool|Exception
     {
         $this->Required($carrier, __('main.carrier'));
         $this->Required($data, __('main.data'));
@@ -103,7 +107,7 @@ class CarrierActions
         return $carrier->update($data);
     }
 
-    public function delete(object $carrier): bool
+    public function delete(Carrier $carrier): bool|Exception
     {
         $this->Required($carrier, __('main.carrier'));
         $carrier->details()->delete();

@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\V1\Transportation;
 
-use App\Http\Controllers\Actions\TransportationActions;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\TransportationServices;
 use App\Http\Resources\V1\TransportationResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class TransportationController extends Controller
 {
-    public function __construct(private readonly TransportationActions $trans) {}
+    public function __construct(private readonly TransportationServices $trans) {}
 
-    public function all(Request $request)
+    public function all(Request $request): JsonResponse
     {
         try {
             return $this->success(payload: [
@@ -25,7 +26,7 @@ class TransportationController extends Controller
         }
     }
 
-    public function find(Request $request)
+    public function find(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'transportation_id' => ['required', 'exists:transportations,id'],
@@ -36,8 +37,10 @@ class TransportationController extends Controller
         }
 
         try {
+            $trans = $this->trans->find($validator->safe()->integer('transportation_id'));
+
             return $this->success(payload: [
-                'Transportaions' => TransportationResource::make($this->trans->find($validator->safe()->input('transportation_id'))),
+                'Transportaions' => TransportationResource::make($trans),
             ]);
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());

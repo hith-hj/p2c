@@ -2,25 +2,28 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Actions;
+namespace App\Http\Controllers\Services;
 
 use App\ExceptionHandler;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
+use Exception;
+use Illuminate\Foundation\Auth\User as Auth;
+use Illuminate\Support\Collection;
 
-class ProducerActions
+class ProducerServices
 {
     use ExceptionHandler;
 
-    public function all()
+    public function all(): Collection|Exception
     {
         $producers = Producer::all();
-        $this->NotFound($producers->all(), __('main.producers'));
+        $this->NotFound($producers, __('main.producers'));
 
         return $producers;
     }
 
-    public function paginate(object $request, int $perPage = 4)
+    public function paginate(object $request, int $perPage = 4): object|Exception
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;
@@ -32,7 +35,7 @@ class ProducerActions
         return $producers;
     }
 
-    public function get(int $id): object
+    public function get(int $id): Producer|Exception
     {
         $this->Required($id, __('main.user').' ID');
         $user = User::find($id);
@@ -42,16 +45,16 @@ class ProducerActions
         return $user->badge;
     }
 
-    public function find(int $id): object
+    public function find(int $id): Producer|Exception
     {
         $this->Required($id, __('main.producer').' ID');
-        $producer = Producer::find($id);
+        $producer = Producer::where('id', $id)->first();
         $this->NotFound($producer, __('main.producer'));
 
         return $producer;
     }
 
-    public function create(object $user, array $data)
+    public function create(Auth $user, array $data): Producer|Exception
     {
         $this->Required($user, __('main.user'));
         $this->Exists($user->badge, __('main.producer'));
@@ -65,16 +68,16 @@ class ProducerActions
             $data['phone'] = $user->phone;
         }
 
-        $branchActions = new BranchActions();
-        $created = $branchActions->create($producer, $data);
-        $branchActions->setBranchAsDefault($created);
+        $branchServices = new BranchServices();
+        $created = $branchServices->create($producer, $data);
+        $branchServices->setBranchAsDefault($created);
 
-        (new LocationActions())->create($created, $data);
+        (new LocationServices())->create($created, $data);
 
         return $producer;
     }
 
-    public function update(object $producer, array $data)
+    public function update(Producer $producer, array $data): bool|Exception
     {
         $this->Required($producer, __('main.producer'));
         $this->Required($data, __('main.data'));
@@ -82,7 +85,7 @@ class ProducerActions
         return $producer->update($data);
     }
 
-    public function delete(object $producer): bool
+    public function delete(Producer $producer): bool|Exception
     {
         $this->Required($producer, __('main.Producer'));
         $producer->branches()->delete();

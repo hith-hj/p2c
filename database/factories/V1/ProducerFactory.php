@@ -20,7 +20,6 @@ class ProducerFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
             'brand' => fake()->colorName(),
             'rate' => fake()->numberBetween(1, 10),
             'is_valid' => fake()->randomElement([true, false]),

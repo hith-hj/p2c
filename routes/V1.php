@@ -9,8 +9,8 @@ use App\Http\Controllers\V1\Label\LabelController;
 use App\Http\Controllers\V1\Order\OrderController;
 use App\Http\Controllers\V1\Producer\ProducerController;
 use App\Http\Controllers\V1\Transportation\TransportationController;
-use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\V1\Auth\JwtMiddleware;
+use App\Http\Middleware\V1\UserChecks;
 
 Route::group(
     ['prefix' => 'auth', 'controller' => JWTAuthController::class],
@@ -47,7 +47,7 @@ Route::withoutMiddleware(JwtMiddleware::class)->group(function (): void {
 Route::group(
     ['prefix' => 'producer', 'controller' => ProducerController::class],
     function (): void {
-        Route::middleware([RoleMiddleware::class.':producer'])->group(function (): void {
+        Route::middleware([UserChecks::class.':producer'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::patch('update', 'update');
@@ -62,7 +62,7 @@ Route::group(
 Route::group(
     ['prefix' => 'branch', 'controller' => BranchController::class],
     function (): void {
-        Route::middleware([RoleMiddleware::class.':producer'])->group(function (): void {
+        Route::middleware([UserChecks::class.':producer'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::patch('update', 'update');
@@ -78,7 +78,7 @@ Route::group(
 Route::group(
     ['prefix' => 'carrier', 'controller' => CarrierController::class],
     function (): void {
-        Route::middleware([RoleMiddleware::class.':carrier'])->group(function (): void {
+        Route::middleware([UserChecks::class.':carrier'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::post('createDetails', 'createDetails');
@@ -95,7 +95,7 @@ Route::group(
 Route::group(
     ['prefix' => 'transportation', 'controller' => TransportationController::class],
     function (): void {
-        // Route::middleware([RoleMiddleware::class . ':carrier'])->group(function () {
+        // Route::middleware([UserChecks::class . ':carrier'])->group(function () {
         //     Route::get('/', 'get');
         //     Route::post('create', 'create');
         //     Route::patch('update', 'update');
@@ -110,17 +110,19 @@ Route::group(
 Route::group(
     ['prefix' => 'order', 'controller' => OrderController::class],
     function (): void {
-        Route::middleware([RoleMiddleware::class.':producer'])->group(function (): void {
-            Route::post('checkCost', 'checkCost');
-            Route::post('create', 'create');
-            Route::post('cancel', 'cancel');
-        });
-        Route::middleware([RoleMiddleware::class.':carrier'])->group(function (): void {
-            Route::post('accept', 'accept');
-            Route::post('reject', 'reject');
-            Route::post('picked', 'picked');
-            Route::post('delivered', 'delivered');
-        });
+        Route::middleware([UserChecks::class.':producer,true'])
+            ->group(function (): void {
+                Route::post('checkCost', 'checkCost');
+                Route::post('create', 'create');
+                Route::post('cancel', 'cancel');
+            });
+        Route::middleware([UserChecks::class.':carrier,true'])
+            ->group(function (): void {
+                Route::post('accept', 'accept');
+                Route::post('reject', 'reject');
+                Route::post('picked', 'picked');
+                Route::post('delivered', 'delivered');
+            });
 
         Route::get('/', 'get');
         Route::get('all', 'all');

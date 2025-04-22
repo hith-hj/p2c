@@ -8,14 +8,18 @@ use App\Models\V1\Document;
 
 trait DocumentHandler
 {
-    public function upload($file, $belongTo_id, $belongTo_type, $doc_type = 'document')
-    {
-        if (! isset($belongTo_id,$belongTo_type)) {
+    public function upload(
+        $file,
+        $belongTo_id,
+        $belongTo_type,
+        $doc_type = 'document'
+    ): Document {
+        if (!isset($belongTo_id, $belongTo_type)) {
             throw new \Exception('Image upload missing information ', 1);
         }
 
         $path = sprintf('uploads/%s/%s/%s', $doc_type, $belongTo_type, $belongTo_id);
-        $fileName = time().'_'.$file->hashName();
+        $fileName = time() . '_' . $file->hashName();
         $filePath = $file->storeAs($path, $fileName, 'public');
 
         return Document::create([

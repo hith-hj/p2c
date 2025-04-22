@@ -7,7 +7,7 @@ namespace App;
 use App\Models\V1\Attr;
 use App\Models\V1\Item;
 
-trait OrderServices
+trait OrderCostServices
 {
     private function calcDistance(array $src, array $dest): int
     {
