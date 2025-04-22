@@ -20,7 +20,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
@@ -51,13 +51,12 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('id')->searchable(),
+                Tables\Columns\TextColumn::make('email')->searchable(),
+                Tables\Columns\TextColumn::make('phone')->searchable(),
                 Tables\Columns\TextColumn::make('role'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime("Y-m-d")
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('verified_at')->dateTime("Y-m-d"),
+                Tables\Columns\TextColumn::make('created_at')->dateTime("Y-m-d")->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('role')

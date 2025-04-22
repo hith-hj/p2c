@@ -19,7 +19,7 @@ class CarrierResource extends Resource
 {
     protected static ?string $model = Carrier::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-truck';
 
     public static function form(Form $form): Form
     {
@@ -33,8 +33,9 @@ class CarrierResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')->searchable(),
+                Tables\Columns\TextColumn::make('user_id')->searchable(),
                 Tables\Columns\TextColumn::make('first_name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('rate')->sortable(),
                 Tables\Columns\CheckBoxColumn::make('is_valid'),
                 Tables\Columns\TextColumn::make('orders_count')->counts('orders'),
                 Tables\Columns\TextColumn::make('transportation.name'),
@@ -91,4 +92,5 @@ class CarrierResource extends Resource
             'edit' => Pages\EditCarrier::route('/{record}/edit'),
         ];
     }
+    
 }

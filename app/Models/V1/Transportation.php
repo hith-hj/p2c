@@ -16,7 +16,7 @@ class Transportation extends Model
 
     protected $guarded = [];
 
-    public function carrier(): HasMany
+    public function carriers(): HasMany
     {
         return $this->hasMany(Carrier::class);
     }

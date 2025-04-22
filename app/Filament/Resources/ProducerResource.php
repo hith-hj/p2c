@@ -18,7 +18,7 @@ class ProducerResource extends Resource
 {
     protected static ?string $model = Producer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     public static function form(Form $form): Form
     {
@@ -36,8 +36,9 @@ class ProducerResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')->searchable(),
+                Tables\Columns\TextColumn::make('user_id')->searchable(),
                 Tables\Columns\TextColumn::make('brand')->searchable(),
-                Tables\Columns\TextColumn::make('rate')->sortable(),
                 Tables\Columns\CheckBoxColumn::make('is_valid'),
                 Tables\Columns\TextColumn::make('branches_count')->counts('branches'),
                 Tables\Columns\TextColumn::make('orders_count')->counts('orders'),
