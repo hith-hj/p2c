@@ -31,7 +31,7 @@ class OrderServices
         $this->Required($badge, __('main.user').' ID');
         $this->NotFound($badge->orders, __('main.orders'));
 
-        return $badge->orders()->with(['attrs','items','producer','carrier','transportation'])->get();
+        return $badge->orders()->with(['attrs', 'items', 'producer', 'carrier', 'transportation'])->get();
     }
 
     public function find(int $id): Order|Exception
@@ -202,7 +202,7 @@ class OrderServices
 
         return $order;
     }
-    
+
     public function reject(Carrier $carrier, int $order_id): Order|Exception
     {
         $this->Required($carrier, __('main.carrier'));

@@ -51,6 +51,7 @@ class BranchServices
     {
         $this->Required($branch, __('main.branch'));
         $this->Required($data, __('main.data'));
+
         return $branch->update($data);
     }
 
@@ -64,7 +65,7 @@ class BranchServices
 
     public function setBranchAsDefault(Branch $branch): bool|Exception
     {
-        $this->Required($branch,__('main.branch'));
+        $this->Required($branch, __('main.branch'));
         $default = Branch::where([
             ['producer_id', $branch->producer_id],
             ['is_default', true],

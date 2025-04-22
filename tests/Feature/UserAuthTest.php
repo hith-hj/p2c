@@ -3,12 +3,13 @@
 declare(strict_types=1);
 use App\Models\V1\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 uses(RefreshDatabase::class);
 
 test('registers_a_user', function () {
     $data = [
         'email' => 'test@example.com',
-        'phone' => '09' . rand(10000000, 99999999),
+        'phone' => '09'.rand(10000000, 99999999),
         'password' => 'password',
         'password_confirmation' => 'password',
         'account_type' => 'producer',
@@ -22,7 +23,7 @@ test('registers_a_user', function () {
 test('fails_to_registers_a_user', function () {
     $data = [
         'email' => 'test@.com',
-        'phone' => '09' . rand(10000000, 99999999),
+        'phone' => '09'.rand(10000000, 99999999),
         'password' => 'passwor',
         'password_confirmation' => 'passworx',
         'account_type' => 'xxx',
@@ -58,8 +59,8 @@ test('verifies_user_successfully', function () {
 
 test('fails_to_verify_with_incorrect_code', function () {
     $data = [
-        'email' => 'test' . rand(100, 999) . '@example.com',
-        'phone' => '09' . rand(10000000, 99999999),
+        'email' => 'test'.rand(100, 999).'@example.com',
+        'phone' => '09'.rand(10000000, 99999999),
         'password' => bcrypt('password'),
         'role' => 'producer',
         'firebase_token' => 'some-firebase-token',
@@ -73,5 +74,3 @@ test('fails_to_verify_with_incorrect_code', function () {
     expect($res->status())->toBe(400);
     expect($res->json())->toHaveKey('payload.errors');
 });
-
-
