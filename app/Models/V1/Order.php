@@ -19,18 +19,18 @@ class Order extends Model
 
     public function producer(): BelongsTo
     {
-        return $this->belongsTo(Producer::class, 'producer_id');
+        return $this->belongsTo(Producer::class);
     }
 
     public function carrier(): BelongsTo
     {
-        return $this->belongsTo(Carrier::class, 'carrier_id');
+        return $this->belongsTo(Carrier::class);
     }
     
 
     public function branch(): BelongsTo
     {
-        return $this->belongsTo(Branch::class, 'branch_id');
+        return $this->belongsTo(Branch::class);
     }
 
     public function attrs(): BelongsToMany

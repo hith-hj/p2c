@@ -61,6 +61,6 @@ class Carrier extends Model
 
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class, 'carrier_id');
+        return $this->hasMany(Order::class);
     }
 }

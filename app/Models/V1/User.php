@@ -9,6 +9,7 @@ namespace App\Models\V1;
 use App\CodesManager;
 use App\Enums\UserRoles;
 use App\FirebaseNotification;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -76,7 +77,7 @@ class User extends Authenticatable implements JWTSubject
         return match ($this->role) {
             UserRoles::Producer->value => $this->hasOne(Producer::class),
             UserRoles::Carrier->value => $this->hasOne(Carrier::class),
-            default => null
+            default => throw new Exception("Invalid role: $this->role ")
         };
     }
 

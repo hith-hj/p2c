@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Factories\V1;
 
+use App\Enums\UserRoles;
 use App\Models\V1\Branch;
 use App\Models\V1\Carrier;
 use App\Models\V1\Location;
 use App\Models\V1\Producer;
-use App\Models\V1\Role;
 use App\Models\V1\Transportation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -37,7 +37,7 @@ class UserFactory extends Factory
             'verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'firebase_token' => Str::random(32),
-            'role' => Role::pluck('name')->random(),
+            'role' => fake()->randomElement(UserRoles::cases()),
         ];
     }
 

@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Services;
 use App\ExceptionHandler;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
-use Exception;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
 
@@ -15,7 +14,7 @@ class ProducerServices
 {
     use ExceptionHandler;
 
-    public function all(): Collection|Exception
+    public function all(): Collection
     {
         $producers = Producer::all();
         $this->NotFound($producers, __('main.producers'));
@@ -23,7 +22,7 @@ class ProducerServices
         return $producers;
     }
 
-    public function paginate(object $request, int $perPage = 4): object|Exception
+    public function paginate(object $request, int $perPage = 4): object
     {
         if ($request->filled('perPage')) {
             $perPage = $request->perPage;
@@ -35,7 +34,7 @@ class ProducerServices
         return $producers;
     }
 
-    public function get(int $id): Producer|Exception
+    public function get(int $id): Producer
     {
         $this->Required($id, __('main.user').' ID');
         $user = User::find($id);
@@ -45,7 +44,7 @@ class ProducerServices
         return $user->badge;
     }
 
-    public function find(int $id): Producer|Exception
+    public function find(int $id): Producer
     {
         $this->Required($id, __('main.producer').' ID');
         $producer = Producer::where('id', $id)->first();
@@ -54,7 +53,7 @@ class ProducerServices
         return $producer;
     }
 
-    public function create(Auth $user, array $data): Producer|Exception
+    public function create(Auth $user, array $data): Producer
     {
         $this->Required($user, __('main.user'));
         $this->Exists($user->badge, __('main.producer'));
@@ -77,7 +76,7 @@ class ProducerServices
         return $producer;
     }
 
-    public function update(Producer $producer, array $data): bool|Exception
+    public function update(Producer $producer, array $data): bool
     {
         $this->Required($producer, __('main.producer'));
         $this->Required($data, __('main.data'));
@@ -85,7 +84,7 @@ class ProducerServices
         return $producer->update($data);
     }
 
-    public function delete(Producer $producer): bool|Exception
+    public function delete(Producer $producer): bool
     {
         $this->Required($producer, __('main.Producer'));
         $producer->branches()->delete();

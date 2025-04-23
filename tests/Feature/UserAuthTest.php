@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 use App\Models\V1\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
-
-test('registers_a_user', function () {
+it('registers_a_user', function () {
     $data = [
         'email' => 'test@example.com',
         'phone' => '09'.rand(10000000, 99999999),
@@ -20,7 +17,7 @@ test('registers_a_user', function () {
     expect($res->json())->toHaveKey('success', true);
 });
 
-test('fails_to_registers_a_user', function () {
+it('fails_to_registers_a_user', function () {
     $data = [
         'email' => 'test@.com',
         'phone' => '09'.rand(10000000, 99999999),
@@ -34,15 +31,8 @@ test('fails_to_registers_a_user', function () {
     expect($res->json())->toHaveKey('success', false);
 });
 
-test('verifies_user_successfully', function () {
-    $data = [
-        'email' => 'test@example.com',
-        'phone' => '0987654321',
-        'password' => bcrypt('password'),
-        'role' => 'producer',
-        'firebase_token' => 'some-firebase-token',
-    ];
-    $user = User::create($data);
+it('verifies_user_successfully', function () {
+    $user = User::factory()->create(['phone' => '0912345678']);
     $user->createCode('verification');
     $code = $user->code('verification')->code;
     expect($code)->not->toBeNull();
@@ -52,20 +42,12 @@ test('verifies_user_successfully', function () {
         'phone' => $user->phone,
         'code' => $code,
     ]);
-
     expect($res->status())->toBe(200);
     expect($res->json())->toHaveKey('message', __('main.verified'));
 });
 
-test('fails_to_verify_with_incorrect_code', function () {
-    $data = [
-        'email' => 'test'.rand(100, 999).'@example.com',
-        'phone' => '09'.rand(10000000, 99999999),
-        'password' => bcrypt('password'),
-        'role' => 'producer',
-        'firebase_token' => 'some-firebase-token',
-    ];
-    $user = User::create($data);
+it('fails_to_verify_with_incorrect_code', function () {
+    $user = User::factory()->create();
     $user->createCode('verification');
     $res = $this->postJson(route('verify'), [
         'phone' => $user->phone,
@@ -73,4 +55,48 @@ test('fails_to_verify_with_incorrect_code', function () {
     ]);
     expect($res->status())->toBe(400);
     expect($res->json())->toHaveKey('payload.errors');
+});
+
+it('allow_verified_user_login', function () {
+    $user = User::factory()->create(['phone' => '0911112222']);
+    $res = $this->postJson('/api/v1/auth/login', [
+        'phone' => $user->phone,
+        'password' => 'password',
+    ]);
+    expect($res->status())->toBe(200);
+    expect($res->json())->toHaveKeys(['payload' => ['user', 'token']]);
+});
+
+it('prevent_unverified_user_login', function () {
+    $user = User::factory()->create([
+        'phone' => '0911112222',
+        'verified_at' => null,
+    ]);
+
+    $res = $this->postJson('/api/v1/auth/login', [
+        'phone' => $user->phone,
+        'password' => 'password',
+    ]);
+
+    expect($res->status())->toBe(401);
+    expect($res->json())->toHaveKey('message', __('main.unverified'));
+});
+
+it('fails_to_login_with_invalid_credentials', function () {
+    $res = $this->postJson('/api/v1/auth/login', [
+        'phone' => '0912345678',
+        'password' => 'wrongpassword',
+    ]);
+    expect($res->status())->toBe(400);
+    expect($res->json())->toHaveKeys(['payload' => ['errors']]);
+});
+
+it('fails_to_login_with_incorrect_credentials', function () {
+    $user = User::factory()->create(['phone' => '0911112222']);
+    $res = $this->postJson('/api/v1/auth/login', [
+        'phone' => $user->phone,
+        'password' => 'wrongpassword',
+    ]);
+    expect($res->status())->toBe(400);
+    expect($res->json())->toHaveKey('message', __('main.invalid credentials'));
 });
