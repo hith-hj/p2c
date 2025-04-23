@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\V1\Producer;
 use App\Models\V1\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-beforeEach(function(){
-    $user = User::factory()->create(['role'=>'carrier']);
+beforeEach(function () {
+    $user = User::factory()->create(['role' => 'carrier']);
     $token = JWTAuth::fromUser($user);
     $this->user = $user;
     $this->actingAs($user)->withHeaders([
@@ -16,7 +18,7 @@ beforeEach(function(){
 
 describe('CarrierController', function () {
     it('retrieves all carriers', function () {
-        User::factory()->count(3)->create(['role'=>'carrier']);
+        User::factory()->count(3)->create(['role' => 'carrier']);
 
         $res = $this->getJson("$this->url/all");
 
@@ -31,7 +33,7 @@ describe('CarrierController', function () {
     });
 
     it('finds a specific carrier', function () {
-        $user = User::factory()->create(['role'=>'carrier']);
+        $user = User::factory()->create(['role' => 'carrier']);
         expect($user->badge)->not->toBeNull();
         $id = $user->badge->id;
         $res = $this->getJson("$this->url/find?carrier_id=$id");
@@ -53,7 +55,7 @@ describe('CarrierController', function () {
             'password' => 'password',
             'role' => 'carrier',
             'firebase_token' => 'some-token-here',
-            'verified_at'=>now(),
+            'verified_at' => now(),
         ]);
         $token = JWTAuth::fromUser($user);
         $this->actingAs($user)->withHeaders([
@@ -69,7 +71,7 @@ describe('CarrierController', function () {
     });
 
     it('updates an existing carrier', function () {
-        $data =['first_name' => 'Edited','last_name' => 'Carrier'];
+        $data = ['first_name' => 'Edited', 'last_name' => 'Carrier'];
         $res = $this->patchJson("$this->url/update", $data);
         expect($res->status())->toBe(200);
         expect($this->user->badge->first_name)->toBe('Edited');

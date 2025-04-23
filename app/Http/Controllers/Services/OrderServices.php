@@ -18,23 +18,25 @@ class OrderServices
     use ExceptionHandler;
     use OrderCostServices;
 
-    public function all(): Collection|Exception
+    public function all(): Collection
     {
-        $orders = Order::all();
+        $orders = Order::with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])->get();
         $this->NotFound($orders, __('main.orders'));
 
         return $orders;
     }
 
-    public function get(object $badge): Collection|Exception
+    public function get(object $badge): Collection
     {
         $this->Required($badge, __('main.user').' ID');
         $this->NotFound($badge->orders, __('main.orders'));
 
-        return $badge->orders()->with(['attrs', 'items', 'producer', 'carrier', 'transportation'])->get();
+        return $badge->orders()
+            ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
+            ->get();
     }
 
-    public function find(int $id): Order|Exception
+    public function find(int $id): Order
     {
         $this->Required($id, __('main.order').' ID');
         $order = Order::where('id', $id)->first();
@@ -51,7 +53,7 @@ class OrderServices
         float $dest_lat,
         string $delivery_type,
         array $attrs
-    ): array|Exception {
+    ): array {
 
         $this->Required($weight, __('main.weight'));
         $this->Required($weight, __('main.producer'));
@@ -91,7 +93,7 @@ class OrderServices
         ];
     }
 
-    public function create(Producer $producer, array $data): Order|Exception
+    public function create(Producer $producer, array $data): Order
     {
         $this->Required($producer, __('main.producer'));
         $this->Required($data, __('main.data'));
@@ -136,7 +138,7 @@ class OrderServices
         return $order;
     }
 
-    public function accept(Carrier $carrier, int $order_id): Order|Exception
+    public function accept(Carrier $carrier, int $order_id): Order
     {
         $this->Required($carrier, __('main.carrier'));
         $order = $this->find($order_id);
@@ -155,7 +157,7 @@ class OrderServices
         return $order;
     }
 
-    public function picked(Carrier $carrier, int $order_id): Order|Exception
+    public function picked(Carrier $carrier, int $order_id): Order
     {
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
@@ -170,7 +172,7 @@ class OrderServices
         return $order;
     }
 
-    public function delivered(Carrier $carrier, int $order_id): Order|Exception
+    public function delivered(Carrier $carrier, int $order_id): Order
     {
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
@@ -187,7 +189,7 @@ class OrderServices
         return $order;
     }
 
-    public function cancel(Producer $producer, int $order_id): Order|Exception
+    public function cancel(Producer $producer, int $order_id): Order
     {
         $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
@@ -203,7 +205,7 @@ class OrderServices
         return $order;
     }
 
-    public function reject(Carrier $carrier, int $order_id): Order|Exception
+    public function reject(Carrier $carrier, int $order_id): Order
     {
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);

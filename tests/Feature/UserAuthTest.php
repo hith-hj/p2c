@@ -32,7 +32,7 @@ it('fails_to_registers_a_user', function () {
 });
 
 it('verifies_user_successfully', function () {
-    $user = User::factory()->create(['phone'=>'0912345678']);
+    $user = User::factory()->create(['phone' => '0912345678']);
     $user->createCode('verification');
     $code = $user->code('verification')->code;
     expect($code)->not->toBeNull();
@@ -58,19 +58,19 @@ it('fails_to_verify_with_incorrect_code', function () {
 });
 
 it('allow_verified_user_login', function () {
-    $user = User::factory()->create(['phone'=>'0911112222']);
+    $user = User::factory()->create(['phone' => '0911112222']);
     $res = $this->postJson('/api/v1/auth/login', [
         'phone' => $user->phone,
         'password' => 'password',
     ]);
     expect($res->status())->toBe(200);
-    expect($res->json())->toHaveKeys(['payload'=>['user','token']]);
+    expect($res->json())->toHaveKeys(['payload' => ['user', 'token']]);
 });
 
 it('prevent_unverified_user_login', function () {
     $user = User::factory()->create([
         'phone' => '0911112222',
-        'verified_at'=>null,
+        'verified_at' => null,
     ]);
 
     $res = $this->postJson('/api/v1/auth/login', [
@@ -79,7 +79,7 @@ it('prevent_unverified_user_login', function () {
     ]);
 
     expect($res->status())->toBe(401);
-    expect($res->json())->toHaveKey('message',__('main.unverified'));
+    expect($res->json())->toHaveKey('message', __('main.unverified'));
 });
 
 it('fails_to_login_with_invalid_credentials', function () {
@@ -88,11 +88,11 @@ it('fails_to_login_with_invalid_credentials', function () {
         'password' => 'wrongpassword',
     ]);
     expect($res->status())->toBe(400);
-    expect($res->json())->toHaveKeys(['payload'=>['errors']]);
+    expect($res->json())->toHaveKeys(['payload' => ['errors']]);
 });
 
 it('fails_to_login_with_incorrect_credentials', function () {
-    $user = User::factory()->create(['phone'=>'0911112222']);
+    $user = User::factory()->create(['phone' => '0911112222']);
     $res = $this->postJson('/api/v1/auth/login', [
         'phone' => $user->phone,
         'password' => 'wrongpassword',

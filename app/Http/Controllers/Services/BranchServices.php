@@ -7,14 +7,13 @@ namespace App\Http\Controllers\Services;
 use App\ExceptionHandler;
 use App\Models\V1\Branch;
 use App\Models\V1\Producer;
-use Exception;
 use Illuminate\Support\Collection;
 
 class BranchServices
 {
     use ExceptionHandler;
 
-    public function find(int $id): Branch|Exception
+    public function find(int $id): Branch
     {
         $this->Required($id, __('main.branch').' ID');
         $branch = Branch::where('id', $id)->first();
@@ -23,7 +22,7 @@ class BranchServices
         return $branch;
     }
 
-    public function get(int $id): Collection|Exception
+    public function get(int $id): Collection
     {
         $this->Required($id, __('main.producer').' ID');
         $producer = Producer::find($id);
@@ -33,7 +32,7 @@ class BranchServices
         return $producer->branches;
     }
 
-    public function create(Producer $producer, array $data): Branch|Exception
+    public function create(Producer $producer, array $data): Branch
     {
         $this->Required($producer, __('main.producer'));
         $this->Required($data, __('main.data'));
@@ -47,7 +46,7 @@ class BranchServices
         return $branch;
     }
 
-    public function update(Branch $branch, array $data): bool|Exception
+    public function update(Branch $branch, array $data): bool
     {
         $this->Required($branch, __('main.branch'));
         $this->Required($data, __('main.data'));
@@ -55,7 +54,7 @@ class BranchServices
         return $branch->update($data);
     }
 
-    public function delete(Branch $branch): bool|Exception
+    public function delete(Branch $branch): bool
     {
         $this->Exists($branch->is_default, __('main.is default'));
         $branch->location()->delete();
@@ -63,7 +62,7 @@ class BranchServices
         return $branch->delete();
     }
 
-    public function setBranchAsDefault(Branch $branch): bool|Exception
+    public function setBranchAsDefault(Branch $branch): bool
     {
         $this->Required($branch, __('main.branch'));
         $default = Branch::where([

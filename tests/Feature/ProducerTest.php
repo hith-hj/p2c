@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\V1\Producer;
 use App\Models\V1\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-beforeEach(function(){
-    $user = User::factory()->create(['role'=>'producer']);
+beforeEach(function () {
+    $user = User::factory()->create(['role' => 'producer']);
     $token = JWTAuth::fromUser($user);
     $this->user = $user;
     $this->actingAs($user)->withHeaders([
@@ -16,7 +18,7 @@ beforeEach(function(){
 
 describe('ProducerController', function () {
     it('retrieves all producers', function () {
-        User::factory()->count(3)->create(['role'=>'producer']);
+        User::factory()->count(3)->create(['role' => 'producer']);
 
         $res = $this->getJson("$this->url/all");
 
@@ -31,7 +33,7 @@ describe('ProducerController', function () {
     });
 
     it('finds a specific producer', function () {
-        $user = User::factory()->create(['role'=>'producer']);
+        $user = User::factory()->create(['role' => 'producer']);
         expect($user->badge)->not->toBeNull();
         $id = $user->badge->id;
         $res = $this->getJson("$this->url/find?producer_id=$id");
@@ -53,7 +55,7 @@ describe('ProducerController', function () {
             'password' => 'password',
             'role' => 'producer',
             'firebase_token' => 'some-token-here',
-            'verified_at'=>now(),
+            'verified_at' => now(),
         ]);
         $token = JWTAuth::fromUser($user);
         $this->actingAs($user)->withHeaders([

@@ -13,7 +13,7 @@ class TransportationServices
 {
     use ExceptionHandler;
 
-    public function all(): Collection|Exception
+    public function all(): Collection
     {
         $transportaions = Transportation::all();
         $this->NotFound($transportaions, __('main.transportations'));
@@ -21,7 +21,7 @@ class TransportationServices
         return $transportaions;
     }
 
-    public function find(int $id): Transportation|Exception
+    public function find(int $id): Transportation
     {
         $this->Required($id, __('main.carrier').' ID');
         $transportaion = Transportation::where('id', $id)->first();
@@ -30,7 +30,7 @@ class TransportationServices
         return $transportaion;
     }
 
-    public function getMatchedTransportation(int $weight): Transportation|Exception
+    public function getMatchedTransportation(int $weight): Transportation
     {
         $maxCapacity = Transportation::max('capacity');
 

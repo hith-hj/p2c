@@ -9,7 +9,6 @@ use App\Models\V1\Branch;
 use App\Models\V1\Carrier;
 use App\Models\V1\Location;
 use App\Models\V1\Producer;
-use App\Models\V1\Role;
 use App\Models\V1\Transportation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;

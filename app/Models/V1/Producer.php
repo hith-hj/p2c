@@ -29,6 +29,6 @@ class Producer extends Model
 
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class, 'producer_id');
+        return $this->hasMany(Order::class);
     }
 }
