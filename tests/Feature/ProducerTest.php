@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Models\V1\Branch;
+use App\Models\V1\Fee;
+use App\Models\V1\Order;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
+use Database\Seeders\DatabaseSeeder;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
@@ -14,6 +18,7 @@ beforeEach(function () {
         'Authorization' => "Bearer $token",
     ]);
     $this->url = 'api/v1/producer';
+    (new DatabaseSeeder())->run();
 });
 
 describe('ProducerController', function () {
@@ -22,13 +27,13 @@ describe('ProducerController', function () {
 
         $res = $this->getJson("$this->url/all");
 
-        $res->assertStatus(200);
+        expect($res->status())->toBe(200);
         expect($res->json('payload.producers'))->toBeArray()->not->toBeEmpty();
     });
 
     it('retrieves authenticated user producer', function () {
         $res = $this->getJson($this->url);
-        $res->assertStatus(200);
+        expect($res->status())->toBe(200);
         expect($res->json('payload.producer'))->toBeArray()->not->toBeEmpty();
     });
 
@@ -37,14 +42,14 @@ describe('ProducerController', function () {
         expect($user->badge)->not->toBeNull();
         $id = $user->badge->id;
         $res = $this->getJson("$this->url/find?producer_id=$id");
-        $res->assertStatus(200);
+        expect($res->status())->toBe(200);
         expect($res->json('payload.producer'))->toBeArray()->not->toBeEmpty();
     });
 
     it('fails to find a producer with an invalid ID', function () {
         $res = $this->getJson("$this->url/find?producer_id=999");
 
-        $res->assertStatus(400);
+        expect($res->status())->toBe(400);
         expect($res->json('payload.errors'))->toBeArray()->not->toBeEmpty();
     });
 
@@ -65,20 +70,345 @@ describe('ProducerController', function () {
             'brand' => 'Test Brand',
             'coords' => ['long' => 10.5, 'lat' => 20.3],
         ]);
-        $res->assertStatus(200);
+        expect($res->status())->toBe(200);
         expect($res->json('payload.producer.brand'))->toBe('Test Brand');
     });
 
     it('updates an existing producer', function () {
         $res = $this->patchJson("$this->url/update", ['brand' => 'New Brand']);
 
-        $res->assertStatus(200);
+        expect($res->status())->toBe(200);
         expect($this->user->badge->brand)->toBe('New Brand');
     });
 
     it('deletes a producer', function () {
         $res = $this->deleteJson("$this->url/delete");
-        $res->assertStatus(200);
+        expect($res->status())->toBe(200);
         expect(Producer::find($this->user->id))->toBeNull();
+    });
+
+    it('can create new branch for borducer', function () {
+        $data = [
+            'name' => 'brach1',
+            'phone' => '0912312312',
+            'coords' => ['lat' => '11.11', 'long' => '12.12'],
+        ];
+        $res = $this->postJson('/api/v1/branch/create', $data);
+        expect($res->status())->toBe(200);
+        expect($res->json('payload.branch'))->not->toBeNull();
+    });
+
+    it('can update branch for borducer', function () {
+        $data = [
+            'name' => 'branch',
+            'phone' => '0934555312',
+        ];
+        $branch = $this->user->badge->branches()->create($data);
+        $data2 = [
+            'name' => 'branchre',
+            'phone' => '0934666312',
+        ];
+        $res = $this->patchJson("/api/v1/branch/update?branch_id=$branch->id", $data2);
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.updated'));
+    });
+
+    it('prevent producer from set branch as default if not owner', function () {
+        $branch = Branch::factory()->create(['producer_id' => 20, 'is_default' => false]);
+        $res = $this->postJson("/api/v1/branch/setDefault?branch_id=$branch->id");
+
+        expect($branch->fresh()->is_default)->toBe(0);
+        expect($res->status())->toBe(403);
+        expect($res->json('message'))->toBe(__('main.unauthorized'));
+    });
+
+    it('allow producer to delete branch if not default', function () {
+        $branch = $this->user->badge->branches()->where('is_default', false)->first();
+        expect($branch)->not->toBeNull();
+        expect($branch->is_default)->toBe(0);
+        $res = $this->deleteJson("/api/v1/branch/delete?branch_id=$branch->id");
+
+        expect($branch->fresh())->toBeNull();
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.deleted'));
+    });
+
+    it('prevent producer from delete branch if not his', function () {
+        $branch = Branch::factory()->create(['producer_id' => 20]);
+        expect($branch)->not->toBeNull();
+        $res = $this->deleteJson("/api/v1/branch/delete?branch_id=$branch->id");
+
+        expect($res->status())->toBe(403);
+        expect($res->json('message'))->toBe(__('main.unauthorized'));
+    });
+
+    it('allow producer to create order', function () {
+        $data = [
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'attrs' => [1],
+            'items' => [1],
+        ];
+        $res = $this->postJson('/api/v1/order/create', $data);
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.created'));
+        expect($res->json('payload.order'))->not->toBeNull();
+        expect($res->json('payload.order.customer_name'))->toEqual('testing');
+    });
+
+    it('check if when order created it creates codes for it', function () {
+        $data = [
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'attrs' => [1],
+            'items' => [1],
+        ];
+        $res = $this->postJson('/api/v1/order/create', $data);
+        $order = Order::where('id', $res->json('payload.order.id'))->first();
+        expect($res->json('message'))->toBe(__('main.created'));
+        expect($order->codes)->not()->toBeNull();
+        expect($order->codes->toArray())->toBeArray();
+        expect($res->status())->toBe(200);
+    });
+
+    it('prevent producer to create order with bad info', function () {
+        $data = [
+            // "branch_id" => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            // "cost"=> 1709,
+            'attrs' => [1],
+            'items' => [1],
+        ];
+        $res = $this->postJson('/api/v1/order/create', $data);
+        expect($res->status())->toBe(400);
+        expect($res->json('payload.errors'))->not->toBeNull();
+    });
+
+    it('allow producer to cancel order when bending', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+        ]);
+        $res = $this->postJson("/api/v1/order/cancel?order_id=$order->id");
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.canceled'));
+    });
+
+    it('check if when order is canceled his codes are deleted', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+        ]);
+        $res = $this->postJson("/api/v1/order/cancel?order_id=$order->id");
+        expect($order->codes()->count())->toBe(0);
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.canceled'));
+    });
+
+    it('prevent producer to cancel order when not bending', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 1,
+        ]);
+        $res = $this->postJson("/api/v1/order/cancel?order_id=$order->id");
+        expect($res->status())->toBe(400);
+        expect($res->json('payload.errors'))->not->toBeNull();
+    });
+
+    it('allow producer to force cancel order when assigned', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 1,
+        ]);
+        $res = $this->postJson("/api/v1/order/forceCancel?order_id=$order->id");
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.canceled'));
+    });
+
+    it('checks if fee is stored for producer when force cancel order ', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 1,
+        ]);
+        $res = $this->postJson("/api/v1/order/forceCancel?order_id=$order->id");
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.canceled'));
+        $fee = Fee::where([['subject_id', $order->id], ['subject_type', get_class($order)]])->first();
+        expect($fee)->not->toBeNull();
+    });
+
+    it('prevent producer from force cancel order when not assigned', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 2,
+        ]);
+        $res = $this->postJson("/api/v1/order/forceCancel?order_id=$order->id");
+        expect($res->status())->toBe(400);
+        expect($res->json('payload.errors'))->not->toBeNull();
+    });
+
+    it('allow producer to finish order when delivered', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'carrier_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 3,
+        ]);
+        $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.finished'));
+    });
+
+    it('check if when order is finished his codes are deleted', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'carrier_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 3,
+        ]);
+        $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
+        expect($order->codes()->count())->toBe(0);
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.finished'));
+    });
+
+    it('prevent producer to finish order when not delivered', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'carrier_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 2,
+        ]);
+        $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
+        expect($res->status())->toBe(400);
+        expect($res->json('payload.errors'))->not->toBeNull();
+    });
+
+    it('checks if fee stored when order is finished', function () {
+        $order = $this->user->badge->orders()->create([
+            'branch_id' => 1,
+            'carrier_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'src_long' => 33.524680,
+            'src_lat' => 36.317824,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'status' => 3,
+        ]);
+        $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.finished'));
+        $fee = Fee::where([['subject_id', $order->id], ['subject_type', get_class($order)]])->first();
+        expect($fee)->not->toBeNull();
     });
 });

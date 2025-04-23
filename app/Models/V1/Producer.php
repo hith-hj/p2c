@@ -31,4 +31,10 @@ class Producer extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function fees(): HasMany
+    {
+        return $this->hasMany(Fee::class, 'belongTo_id')
+            ->where('belongTo_type', class_basename($this));
+    }
 }
