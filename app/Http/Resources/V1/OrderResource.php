@@ -22,7 +22,7 @@ class OrderResource extends JsonResource
             'carrier' => $this->carrier?->first_name,
             'transportation' => $this->transportation?->name,
             'customer_name' => $this->customer_name,
-            'branch' => $this->branch->get(['id', 'name']),
+            'branch' => $this->branch->only(['id','name']),
             'src_long' => (float) $this->src_long,
             'src_lat' => (float) $this->src_lat,
             'dest_long' => (float) $this->dest_long,
