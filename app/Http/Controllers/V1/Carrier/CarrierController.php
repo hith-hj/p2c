@@ -15,6 +15,7 @@ class CarrierController extends Controller
 {
     public function __construct(private readonly CarrierServices $carrier) {}
 
+    //todo : add function to store carrier location frquently (on login)
     public function all(): JsonResponse
     {
         try {

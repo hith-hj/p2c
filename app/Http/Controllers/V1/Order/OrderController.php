@@ -20,6 +20,8 @@ class OrderController extends Controller
         try {
             $page = $request->integer('page') === 0 ? 1 : $request->integer('page');
             $perPage = $request->integer('perPage') === 0 ? 10 : $request->integer('perPage');
+            //todo : get orders based on carrier location
+            // volume = width * height* length (cubic volume)
             $orders = $this->order->all(
                 $page,
                 $perPage,
