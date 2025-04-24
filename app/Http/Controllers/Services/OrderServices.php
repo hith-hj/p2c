@@ -175,7 +175,7 @@ class OrderServices
         return $order;
     }
 
-    public function delivered(Carrier $carrier, int $order_id): Order
+    public function delivered(Carrier $carrier, int $order_id, int $code): Order
     {
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
@@ -184,6 +184,9 @@ class OrderServices
         }
         if ($order->status !== OrderStatus::picked->value) {
             throw new Exception(__('main.invalid order status'));
+        }
+        if($order->code('delivered')->code !== $code){
+            throw new Exception(__('main.invalid code'));
         }
         $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()]);
         $order->codes()->delete();

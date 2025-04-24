@@ -169,9 +169,6 @@ class OrderController extends Controller
 
             return $this->success(
                 msg: __('main.accepted'),
-                payload: [
-                    'pickup_code' => $order->code('pickup')?->code,
-                ]
             );
         } catch (\Throwable $th) {
             return $this->error(payload: ['errors' => $th->getMessage()]);
@@ -196,9 +193,6 @@ class OrderController extends Controller
 
             return $this->success(
                 msg: __('main.picked'),
-                payload: [
-                    'delivered_code' => $order->code('delivered')->code,
-                ]
             );
         } catch (\Throwable $th) {
             return $this->error(payload: ['errors' => $th->getMessage()]);
@@ -229,7 +223,6 @@ class OrderController extends Controller
 
     public function delivered(Request $request): JsonResponse
     {
-        // todo: implement code check
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
             'code' => ['required', 'exists:codes,code'],
@@ -242,7 +235,8 @@ class OrderController extends Controller
         try {
             $order = $this->order->delivered(
                 auth()->user()->badge,
-                $validator->safe()->integer('order_id')
+                $validator->safe()->integer('order_id'),
+                $validator->safe()->integer('code'),
             );
 
             return $this->success(
