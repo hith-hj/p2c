@@ -17,8 +17,8 @@ trait DocumentHandler
         if (! isset($belongTo_id, $belongTo_type)) {
             throw new \Exception('Image upload missing information ', 1);
         }
-
-        $path = sprintf('uploads/%s/%s/%s', $doc_type, $belongTo_type, $belongTo_id);
+        
+        $path = sprintf('uploads/%s/%s/%s', $doc_type, class_basename($belongTo_type), $belongTo_id);
         $fileName = time().'_'.$file->hashName();
         $filePath = $file->storeAs($path, $fileName, 'public');
 

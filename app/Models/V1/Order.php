@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace App\Models\V1;
 
 use App\CodesManager;
+use App\FeeCalculater;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
     use CodesManager;
+    use FeeCalculater;
     use HasFactory;
 
     protected $guarded = [];
@@ -46,5 +49,11 @@ class Order extends Model
     public function transportation(): BelongsTo
     {
         return $this->belongsTo(Transportation::class);
+    }
+
+    public function fees(): HasMany
+    {
+        return $this->hasMany(Fee::class, 'belongTo_id')
+            ->where('belongTo_type', class_basename($this));
     }
 }

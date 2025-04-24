@@ -12,4 +12,5 @@ enum OrderStatus: int
     case assigned = 1;
     case picked = 2;
     case delivered = 3;
+    case finished = 4;
 }

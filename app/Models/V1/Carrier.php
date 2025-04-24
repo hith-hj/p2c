@@ -42,14 +42,14 @@ class Carrier extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class, 'belongTo_id')
-            ->where('belongTo_type', class_basename($this))
+            ->where('belongTo_type', get_class($this))
             ->select(['url', 'doc_type']);
     }
 
     public function profileImage(): HasOne
     {
         return $this->hasOne(Document::class, 'belongTo_id')
-            ->where([['belongTo_type', class_basename($this)], ['doc_type', 'profile']])
+            ->where([['belongTo_type', get_class($this)], ['doc_type', 'profile']])
             ->select(['url', 'doc_type']);
     }
 
@@ -62,5 +62,11 @@ class Carrier extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function fees(): HasMany
+    {
+        return $this->hasMany(Fee::class, 'belongTo_id')
+            ->where('belongTo_type', class_basename($this));
     }
 }

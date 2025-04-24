@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\V1;
 
+use App\Enums\UserRoles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,7 +23,7 @@ class OrderResource extends JsonResource
             'carrier' => $this->carrier?->first_name,
             'transportation' => $this->transportation?->name,
             'customer_name' => $this->customer_name,
-            'branch' => $this->branch->only(['id','name']),
+            'branch' => $this->branch->only(['id', 'name']),
             'src_long' => (float) $this->src_long,
             'src_lat' => (float) $this->src_lat,
             'dest_long' => (float) $this->dest_long,
@@ -39,9 +40,14 @@ class OrderResource extends JsonResource
             'attrs' => $this->attrs->select(['id', 'name']),
             'items' => $this->items->select(['id', 'name']),
             'codes' => $this->when(
-                auth()->user()->badge->id === $this->producer_id ||
-                auth()->user()->badge->id === $this->carrier_id,
+                auth()->user()->badge->id === $this->producer_id &&
+                auth()->user()->role === UserRoles::Producer->value,
                 $this->codes()->get(['type', 'code'])
+            ),
+            'pickup_code' => $this->when(
+                auth()->user()->badge->id === $this->carrier_id &&
+                auth()->user()->role === UserRoles::Carrier->value,
+                $this->codes()->where('type', 'pickup')->get(['type', 'code'])
             ),
         ];
     }

@@ -77,8 +77,8 @@ class ProducerController extends Controller
             'brand' => ['required', 'string', 'max:20', 'unique:producers,brand'],
             'phone' => ['sometimes', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
             'coords' => ['required', 'array', 'size:2'],
-            'coords.long' => ['required', 'numeric', 'between:-180,180', 'required_with:latitude'],
-            'coords.lat' => ['required', 'numeric', 'between:-90,90', 'required_with:longitude'],
+            'coords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
+            'coords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
         ]);
 
         if ($validator->fails()) {

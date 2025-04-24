@@ -44,7 +44,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branch->find($validator->safe()->input('branch_id'));
+            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
 
             return $this->success(payload: [
                 'branche' => BranchResource::make($branch),
@@ -60,8 +60,8 @@ class BranchController extends Controller
             'name' => ['required', 'string', 'min:4'],
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
             'coords' => ['required', 'array', 'size:2'],
-            'coords.long' => ['required', 'numeric', 'between:-180,180', 'required_with:latitude'],
-            'coords.lat' => ['required', 'numeric', 'between:-90,90', 'required_with:longitude'],
+            'coords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
+            'coords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
         ]);
 
         if ($validator->fails()) {
@@ -92,7 +92,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branch->find($validator->safe()->input('branch_id'));
+            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
             if ($branch->producer_id !== auth()->user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
@@ -116,7 +116,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branch->find($validator->safe()->input('branch_id'));
+            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
             if ($branch->producer_id !== auth()->user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
@@ -140,7 +140,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branch->find($validator->safe()->input('branch_id'));
+            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
             if ($branch->producer_id !== auth()->user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }

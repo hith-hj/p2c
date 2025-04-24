@@ -11,29 +11,32 @@ use App\Models\V1\Order;
 use App\Models\V1\Producer;
 use App\OrderCostServices;
 use Exception;
-use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
 
 class OrderServices
 {
     use ExceptionHandler;
     use OrderCostServices;
 
-    public function all(): Collection
+    public function all(int $page = 1, int $perPage = 10): Paginator
     {
-        $orders = Order::with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])->get();
+        $orders = Order::query()
+            ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
+            ->simplePaginate(perPage: $perPage, page: $page);
         $this->NotFound($orders, __('main.orders'));
 
         return $orders;
     }
 
-    public function get(object $badge): Collection
+    public function get(object $badge, int $page = 1, int $perPage = 10): Paginator
     {
         $this->Required($badge, __('main.user').' ID');
-        $this->NotFound($badge->orders, __('main.orders'));
-
-        return $badge->orders()
+        $orders = $badge->orders()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
-            ->get();
+            ->simplePaginate(perPage: $perPage, page: $page);
+        $this->NotFound($orders, __('main.orders'));
+
+        return $orders;
     }
 
     public function find(int $id): Order
@@ -172,7 +175,7 @@ class OrderServices
         return $order;
     }
 
-    public function delivered(Carrier $carrier, int $order_id): Order
+    public function delivered(Carrier $carrier, int $order_id, int $code): Order
     {
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
@@ -182,10 +185,28 @@ class OrderServices
         if ($order->status !== OrderStatus::picked->value) {
             throw new Exception(__('main.invalid order status'));
         }
+        if($order->code('delivered')->code !== $code){
+            throw new Exception(__('main.invalid code'));
+        }
         $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()]);
         $order->codes()->delete();
 
-        // Calcuate payment
+        return $order;
+    }
+
+    public function finish(Producer $producer, int $order_id): Order
+    {
+        $this->Required($producer, __('main.producer'));
+        $order = $producer->orders()->find($order_id);
+        if (! $order) {
+            throw new Exception(__('main.not found'));
+        }
+        if ($order->status !== OrderStatus::delivered->value) {
+            throw new Exception(__('main.invalid order status'));
+        }
+        $order->update(['status' => OrderStatus::finished->value]);
+        $order->createFee($order->carrier);
+
         return $order;
     }
 
@@ -193,6 +214,9 @@ class OrderServices
     {
         $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
+        if (! $order) {
+            throw new Exception(__('main.not found'));
+        }
         if ($order->carrier_id !== null) {
             throw new Exception(__('main.order is assigned'));
         }
@@ -201,6 +225,23 @@ class OrderServices
         }
         $order->update(['status' => OrderStatus::canceld]);
         $order->codes()->delete();
+
+        return $order;
+    }
+
+    public function forceCancel(Producer $producer, int $order_id): Order
+    {
+        $this->Required($producer, __('main.producer'));
+        $order = $producer->orders()->find($order_id);
+        if (! $order) {
+            throw new Exception(__('main.not found'));
+        }
+        if ($order->status !== OrderStatus::assigned->value) {
+            throw new Exception(__('main.invalid order status'));
+        }
+        $order->update(['status' => OrderStatus::canceld]);
+        $order->codes()->delete();
+        $order->createFee($producer);
 
         return $order;
     }
@@ -217,6 +258,7 @@ class OrderServices
         }
         $order->update(['status' => OrderStatus::rejected->value]);
         $order->codes()->delete();
+        $order->createFee($carrier);
 
         return $order;
     }

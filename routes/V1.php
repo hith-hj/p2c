@@ -115,6 +115,8 @@ Route::group(
                 Route::post('checkCost', 'checkCost');
                 Route::post('create', 'create');
                 Route::post('cancel', 'cancel');
+                Route::post('forceCancel', 'forceCancel');
+                Route::post('finish', 'finish');
             });
         Route::middleware([UserChecks::class.':carrier,true'])
             ->group(function (): void {

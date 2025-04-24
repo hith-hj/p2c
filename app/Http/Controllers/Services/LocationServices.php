@@ -18,8 +18,8 @@ class LocationServices
 
         return $belongTo->location()->create([
             'belongTo_type' => $belongTo::class,
-            'long' => $data['coords']['long'],
-            'lat' => $data['coords']['lat'],
+            'long' => round((float) $data['coords']['long'],8),
+            'lat' => round((float) $data['coords']['lat'],8),
         ]);
     }
 
@@ -29,8 +29,8 @@ class LocationServices
         $this->Required($data, __('main.data'));
 
         return $belongTo->location()->update([
-            'long' => $data['coords']['long'],
-            'lat' => $data['coords']['lat'],
+            'long' => round((float) $data['coords']['long'],8),
+            'lat' => round((float) $data['coords']['lat'],8),
         ]);
     }
 }
