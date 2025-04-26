@@ -8,6 +8,7 @@ use App\DocumentHandler;
 use App\ExceptionHandler;
 use App\Models\V1\Carrier;
 use App\Models\V1\CarrierDetails;
+use App\Models\V1\Location;
 use App\Models\V1\User;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
@@ -115,5 +116,13 @@ class CarrierServices
         $carrier->delete();
 
         return true;
+    }
+
+    public function setLocation(Carrier $carrier, array $data): bool|Location
+    {
+        $this->Required($carrier, __('main.carrier'));
+        $this->Required($data, __('main.data'));
+
+        return (new LocationServices())->edit($carrier, $data);
     }
 }

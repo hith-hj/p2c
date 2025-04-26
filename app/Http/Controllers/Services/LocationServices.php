@@ -18,19 +18,29 @@ class LocationServices
 
         return $belongTo->location()->create([
             'belongTo_type' => $belongTo::class,
-            'long' => round((float) $data['coords']['long'],8),
-            'lat' => round((float) $data['coords']['lat'],8),
+            'long' => round((float) $data['cords']['long'], 8),
+            'lat' => round((float) $data['cords']['lat'], 8),
         ]);
     }
 
-    public function edit(object $belongTo, array $data): Location
+    public function edit(object $belongTo, array $data): bool|Location
     {
         $this->Required($belongTo, __('main.belongTo'));
         $this->Required($data, __('main.data'));
 
-        return $belongTo->location()->update([
-            'long' => round((float) $data['coords']['long'],8),
-            'lat' => round((float) $data['coords']['lat'],8),
+        if ($belongTo->location()->exists()) {
+            return $this->update($belongTo, $data);
+        }
+
+        return $this->create($belongTo, $data);
+
+    }
+
+    public function update(object $belongTo, array $data): bool|Location
+    {
+        return $belongTo->location->update([
+            'long' => round((float) $data['cords']['long'], 8),
+            'lat' => round((float) $data['cords']['lat'], 8),
         ]);
     }
 }

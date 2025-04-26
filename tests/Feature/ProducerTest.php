@@ -68,7 +68,7 @@ describe('ProducerController', function () {
         ]);
         $res = $this->postJson("$this->url/create", [
             'brand' => 'Test Brand',
-            'coords' => ['long' => 10.5, 'lat' => 20.3],
+            'cords' => ['long' => 10.5, 'lat' => 20.3],
         ]);
         expect($res->status())->toBe(200);
         expect($res->json('payload.producer.brand'))->toBe('Test Brand');
@@ -91,7 +91,7 @@ describe('ProducerController', function () {
         $data = [
             'name' => 'brach1',
             'phone' => '0912312312',
-            'coords' => ['lat' => '11.11', 'long' => '12.12'],
+            'cords' => ['lat' => '11.11', 'long' => '12.12'],
         ];
         $res = $this->postJson('/api/v1/branch/create', $data);
         expect($res->status())->toBe(200);
@@ -260,7 +260,7 @@ describe('ProducerController', function () {
         ]);
         $res = $this->postJson("/api/v1/order/cancel?order_id=$order->id");
         expect($res->status())->toBe(400);
-        expect($res->json('payload.errors'))->not->toBeNull();
+        expect($res->json('message'))->not->toBeNull();
     });
 
     it('allow producer to force cancel order when assigned', function () {
@@ -322,7 +322,7 @@ describe('ProducerController', function () {
         ]);
         $res = $this->postJson("/api/v1/order/forceCancel?order_id=$order->id");
         expect($res->status())->toBe(400);
-        expect($res->json('payload.errors'))->not->toBeNull();
+        expect($res->json('message'))->not->toBeNull();
     });
 
     it('allow producer to finish order when delivered', function () {
@@ -386,7 +386,7 @@ describe('ProducerController', function () {
         ]);
         $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
         expect($res->status())->toBe(400);
-        expect($res->json('payload.errors'))->not->toBeNull();
+        expect($res->json('message'))->not->toBeNull();
     });
 
     it('checks if fee stored when order is finished', function () {

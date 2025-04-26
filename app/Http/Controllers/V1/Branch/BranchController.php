@@ -59,9 +59,9 @@ class BranchController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'min:4'],
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
-            'coords' => ['required', 'array', 'size:2'],
-            'coords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
-            'coords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
+            'cords' => ['required', 'array', 'size:2'],
+            'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
+            'cords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
         ]);
 
         if ($validator->fails()) {

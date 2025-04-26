@@ -83,6 +83,7 @@ Route::group(
             Route::post('create', 'create');
             Route::post('createDetails', 'createDetails');
             Route::post('createDocuments', 'createDocuments');
+            Route::post('setLocation', 'setLocation');
             Route::patch('update', 'update');
             Route::delete('delete', 'delete');
         });

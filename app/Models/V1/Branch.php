@@ -24,7 +24,7 @@ class Branch extends Model
     public function location(): HasOne
     {
         return $this->hasOne(Location::class, 'belongTo_id')
-            ->where('belongTo_type', static::class);
+            ->where('belongTo_type', get_class($this));
     }
 
     public function orders(): HasMany

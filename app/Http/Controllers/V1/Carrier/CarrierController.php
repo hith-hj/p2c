@@ -15,7 +15,6 @@ class CarrierController extends Controller
 {
     public function __construct(private readonly CarrierServices $carrier) {}
 
-    //todo : add function to store carrier location frquently (on login)
     public function all(): JsonResponse
     {
         try {
@@ -190,6 +189,28 @@ class CarrierController extends Controller
             $this->carrier->delete(auth()->user()->badge);
 
             return $this->success(msg: __('main.deleted'));
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
+        }
+    }
+
+    public function setLocation(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'cords' => ['required', 'array', 'size:2'],
+            'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
+            'cords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $res = $this->carrier->setLocation(auth()->user()->badge, $validator->safe()->all());
+
+            return $this->success(msg: __('main.Location updated'), payload: [$res]);
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
         }
