@@ -33,7 +33,7 @@ class TransportationServices
     public function getMatchedTransportation(int $weight): Transportation
     {
         $maxCapacity = Transportation::max('capacity');
-        //todo : get transportation based on the dimension of object
+        // todo : get transportation based on the dimension of object
         // volume = width * height* length (cubic volume)
         if ($weight > $maxCapacity) {
             throw new Exception("Max Capacity Currently is $maxCapacity");

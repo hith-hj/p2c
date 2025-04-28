@@ -9,12 +9,12 @@ use Illuminate\Support\Carbon;
 
 trait FeeCalculater
 {
-    public function createFee(object $badge): Fee|null
+    public function createFee(object $badge): ?Fee
     {
         $fee = $this->fee($this->cost);
         $delay_fee = $this->delayFee($fee);
         $due_date = $this->dueDate();
-        if (! $this->feeExists($badge) && method_exists($badge,'fees')) {
+        if (! $this->feeExists($badge) && method_exists($badge, 'fees')) {
             $record = $badge->fees()->create([
                 'belongTo_type' => get_class($badge),
                 'subject_id' => $this->id,
@@ -27,6 +27,7 @@ trait FeeCalculater
 
             return $record;
         }
+
         return null;
     }
 

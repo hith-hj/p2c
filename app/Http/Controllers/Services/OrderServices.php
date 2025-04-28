@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Services;
 
+use App\Enums\OrderDeliveryTypes;
 use App\Enums\OrderStatus;
 use App\ExceptionHandler;
 use App\Models\V1\Carrier;
@@ -11,6 +12,7 @@ use App\Models\V1\Order;
 use App\Models\V1\Producer;
 use App\OrderCostServices;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Paginator;
 
 class OrderServices
@@ -18,21 +20,51 @@ class OrderServices
     use ExceptionHandler;
     use OrderCostServices;
 
-    public function all(int $page = 1, int $perPage = 10): Paginator
+    public function all(int $page = 1, int $perPage = 10, array $filters = [], array $orderBy = []): Paginator
     {
         $orders = Order::query()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
+            ->where('status', OrderStatus::pending->value)
+            ->when(! empty($filters), function (Builder $query) use ($filters) {
+                $query
+                    ->when(isset($filters['delivery_type']), function (Builder $type) use ($filters) {
+                        if (in_array($filters['delivery_type'], OrderDeliveryTypes::values())) {
+                            $type->where('delivery_type', $filters['delivery_type']);
+                        }
+                    });
+            })
+            ->when(! empty($orderBy) && count($orderBy) === 1, function (Builder $query) use ($orderBy) {
+                $key = array_key_first($orderBy);
+                $value = array_pop($orderBy);
+                if (in_array($key, ['cost', 'distance', 'weight']) || in_array($value, ['asc', 'desc'])) {
+                    $query->orderBy($key, $value);
+                }
+            })
             ->simplePaginate(perPage: $perPage, page: $page);
         $this->NotFound($orders, __('main.orders'));
 
         return $orders;
     }
 
-    public function get(object $badge, int $page = 1, int $perPage = 10): Paginator
+    public function get(object $badge, int $page, int $perPage, array $filters): Paginator
     {
         $this->Required($badge, __('main.user').' ID');
         $orders = $badge->orders()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
+            ->when(! empty($filters), function (Builder $query) use ($filters) {
+                $query->when(isset($filters['status']), function (Builder $status) use ($filters) {
+                    if (in_array($filters['status'], OrderStatus::cases())) {
+                        $status->where('status', $filters['status']);
+                    }
+                });
+            })
+            ->when(! empty($orderBy) && count($orderBy) === 1, function (Builder $query) use ($orderBy) {
+                $key = array_key_first($orderBy);
+                $value = array_pop($orderBy);
+                if (in_array($key, ['cost', 'distance', 'weight']) || in_array($value, ['asc', 'desc'])) {
+                    $query->orderBy($key, $value);
+                }
+            })
             ->simplePaginate(perPage: $perPage, page: $page);
         $this->NotFound($orders, __('main.orders'));
 
@@ -112,6 +144,7 @@ class OrderServices
         $data['transportation_id'] = $trans->id;
         $data['src_lat'] = $branch->location->lat;
         $data['src_long'] = $branch->location->long;
+        $data['delivery_type'] = OrderDeliveryTypes::from($data['delivery_type']);
 
         $order = $producer->orders()->create([
             'branch_id' => $data['branch_id'],
@@ -185,7 +218,7 @@ class OrderServices
         if ($order->status !== OrderStatus::picked->value) {
             throw new Exception(__('main.invalid order status'));
         }
-        if($order->code('delivered')->code !== $code){
+        if ($order->code('delivered')->code !== $code) {
             throw new Exception(__('main.invalid code'));
         }
         $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()]);

@@ -20,31 +20,31 @@ class UserChecks
         if ($request->user() === null) {
             return response()->json([
                 'success' => false,
-                'error' => 'You need to login',
+                'message' => 'You need to login',
             ], 401);
         }
 
         if ($request->user()->role !== $role) {
             return response()->json([
                 'success' => false,
-                'error' => 'Un Authorized action',
+                'message' => 'Un Authorized action',
             ], 403);
         }
 
         if ($request->user()->verified_at === null) {
             return response()->json([
                 'success' => false,
-                'error' => 'Unverified account',
+                'message' => 'Unverified account',
             ], 401);
         }
 
         if (
             $isValid &&
-            (! $request->user()->badge || $request->user()->badge->is_valid === false)
+            ($request->user()->badge === null || $request->user()->badge->is_valid === 0)
         ) {
             return response()->json([
                 'success' => false,
-                'error' => 'Invalid account',
+                'message' => 'Invalid account',
             ], 401);
         }
 

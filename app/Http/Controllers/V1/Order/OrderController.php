@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\V1\Order;
 
+use App\Enums\OrderDeliveryTypes;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Services\OrderServices;
 use App\Http\Resources\V1\OrderResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -20,11 +22,16 @@ class OrderController extends Controller
         try {
             $page = $request->integer('page') === 0 ? 1 : $request->integer('page');
             $perPage = $request->integer('perPage') === 0 ? 10 : $request->integer('perPage');
-            //todo : get orders based on carrier location
+            $filters = $request->filled('filters') ? $request->array('filters') : [];
+            $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
+            // todo : get orders based on carrier location
             // volume = width * height* length (cubic volume)
+
             $orders = $this->order->all(
                 $page,
                 $perPage,
+                $filters,
+                $orderBy
             );
 
             return $this->success(payload: [
@@ -33,7 +40,8 @@ class OrderController extends Controller
                 'orders' => OrderResource::collection($orders),
             ]);
         } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
+            // return $this->error(msg: $th->getMessage());
+            return $this->success(payload: ['orders' => []]);
         }
     }
 
@@ -42,10 +50,14 @@ class OrderController extends Controller
         try {
             $page = $request->integer('page') === 0 ? 1 : $request->integer('page');
             $perPage = $request->integer('perPage') === 0 ? 10 : $request->integer('perPage');
+            $filters = $request->filled('filters') ? $request->array('filters') : [];
+            $orders = $request->filled('orders') ? $request->array('orders') : [];
+
             $orders = $this->order->get(
                 auth()->user()->badge,
                 $page,
                 $perPage,
+                $filters
             );
 
             return $this->success(payload: [
@@ -54,7 +66,7 @@ class OrderController extends Controller
                 'orders' => OrderResource::collection($orders),
             ]);
         } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
+            return $this->success(payload: ['orders' => []]);
         }
     }
 
@@ -83,7 +95,7 @@ class OrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
-            'delivery_type' => ['required', 'string', 'in:normal,urgent,express'],
+            'delivery_type' => ['required', 'string', Rule::in(OrderDeliveryTypes::cases())],
             'weight' => ['required', 'numeric', 'min:1'],
             'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
@@ -110,7 +122,7 @@ class OrderController extends Controller
                 ]
             );
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -119,7 +131,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
             'customer_name' => ['required', 'string', 'max:30'],
-            'delivery_type' => ['required', 'in:normal,urgent,express'],
+            'delivery_type' => ['required', Rule::in(OrderDeliveryTypes::cases())],
             'goods_price' => ['required', 'numeric'],
             'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
@@ -149,7 +161,7 @@ class OrderController extends Controller
                 ]
             );
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -169,11 +181,9 @@ class OrderController extends Controller
                 $validator->safe()->integer('order_id')
             );
 
-            return $this->success(
-                msg: __('main.accepted'),
-            );
+            return $this->success(msg: __('main.accepted'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -197,7 +207,7 @@ class OrderController extends Controller
                 msg: __('main.picked'),
             );
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -219,7 +229,7 @@ class OrderController extends Controller
 
             return $this->success(msg: __('main.finished'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -241,11 +251,9 @@ class OrderController extends Controller
                 $validator->safe()->integer('code'),
             );
 
-            return $this->success(
-                msg: __('main.delivered'),
-            );
+            return $this->success(msg: __('main.delivered'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -265,11 +273,9 @@ class OrderController extends Controller
                 $validator->safe()->integer('order_id')
             );
 
-            return $this->success(
-                msg: __('main.canceled'),
-            );
+            return $this->success(msg: __('main.canceled'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -289,11 +295,9 @@ class OrderController extends Controller
                 $validator->safe()->integer('order_id')
             );
 
-            return $this->success(
-                msg: __('main.canceled'),
-            );
+            return $this->success(msg: __('main.canceled'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -313,11 +317,9 @@ class OrderController extends Controller
                 $validator->safe()->integer('order_id')
             );
 
-            return $this->success(
-                msg: __('main.rejected'),
-            );
+            return $this->success(msg: __('main.rejected'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 }

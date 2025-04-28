@@ -114,7 +114,8 @@ class JWTAuthController extends Controller
         try {
             return $this->success(payload: ['token' => Auth::refresh()]);
         } catch (\Exception $exception) {
-            return $this->error(payload: ['errors' => $exception->getMessage().' Login again']);
+            return $this->error(msg: $exception->getMessage()." , Login again");
+
         }
     }
 

@@ -12,7 +12,7 @@ trait CodesManager
     public function codes(): HasMany
     {
         return $this->hasMany(Code::class, 'belongTo_id')
-            ->where('belongTo_type', static::class);
+            ->where('belongTo_type', get_class($this));
     }
 
     public function code(string $type): Code
@@ -29,7 +29,7 @@ trait CodesManager
     {
         $code = $this->generate($type, $length);
         $this->codes()->create([
-            'belongTo_type' => static::class,
+            'belongTo_type' => get_class($this),
             'type' => $type,
             'code' => $code,
         ]);
