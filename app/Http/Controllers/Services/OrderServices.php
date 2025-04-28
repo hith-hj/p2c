@@ -20,8 +20,12 @@ class OrderServices
     use ExceptionHandler;
     use OrderCostServices;
 
-    public function all(int $page = 1, int $perPage = 10, array $filters = [], array $orderBy = []): Paginator
-    {
+    public function all(
+        int $page = 1,
+        int $perPage = 10,
+        array $filters = [],
+        array $orderBy = []
+    ): Paginator {
         $orders = Order::query()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
             ->where('status', OrderStatus::pending->value)
@@ -46,9 +50,13 @@ class OrderServices
         return $orders;
     }
 
-    public function get(object $badge, int $page, int $perPage, array $filters): Paginator
-    {
-        $this->Required($badge, __('main.user').' ID');
+    public function get(
+        object $badge,
+        int $page = 1,
+        int $perPage = 10,
+        array $filters = [],
+        array $orderBy = []
+    ): Paginator {
         $orders = $badge->orders()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
             ->when(! empty($filters), function (Builder $query) use ($filters) {

@@ -33,7 +33,8 @@ class CarrierResource extends JsonResource
             'details' => $this->details,
             'documents' => $docs->pluck('url')->map(fn ($url) => asset($url)),
             'profile_image' => $profile->pluck('url')->map(fn ($url) => asset($url)),
-            'is_filled' => (int) ($this->details()->exists() && $this->documents()->exists() && $this->transportation()->exists()),
+            'fees' => $this->fees,
+            'is_filled' => (int) (! $this->documents->isEmpty() && $this->details !== null && $this->transportation !== null),
         ];
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\V1\Producer\ProducerController;
 use App\Http\Controllers\V1\Transportation\TransportationController;
 use App\Http\Middleware\V1\Auth\JwtMiddleware;
 use App\Http\Middleware\V1\UserChecks;
+use Illuminate\Support\Facades\Route;
 
 Route::group(
     ['prefix' => 'auth', 'controller' => JWTAuthController::class],

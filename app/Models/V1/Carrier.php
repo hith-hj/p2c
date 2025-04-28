@@ -14,7 +14,7 @@ class Carrier extends Model
 {
     use HasFactory;
 
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $hidden = ['updated_at'];
 
     protected $guarded = [];
 
@@ -42,21 +42,13 @@ class Carrier extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class, 'belongTo_id')
-            ->where('belongTo_type', get_class($this))
-            ->select(['url', 'doc_type']);
+            ->where('belongTo_type', get_class($this));
     }
 
     public function profileImage(): HasOne
     {
         return $this->hasOne(Document::class, 'belongTo_id')
-            ->where([['belongTo_type', get_class($this)], ['doc_type', 'profile']])
-            ->select(['url', 'doc_type']);
-    }
-
-    public function validate(bool $state): bool
-    {
-        return $this->update(['is_valid' => $state]);
-
+            ->where([['belongTo_type', get_class($this)], ['doc_type', 'profile']]);
     }
 
     public function orders(): HasMany
@@ -67,6 +59,11 @@ class Carrier extends Model
     public function fees(): HasMany
     {
         return $this->hasMany(Fee::class, 'belongTo_id')
-            ->where('belongTo_type', class_basename($this));
+            ->where('belongTo_type', get_class($this));
+    }
+
+    public function validate(bool $state): bool
+    {
+        return $this->update(['is_valid' => $state]);
     }
 }

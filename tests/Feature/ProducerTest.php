@@ -13,7 +13,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 beforeEach(function () {
     $user = User::factory()->create(['role' => 'producer']);
     $token = JWTAuth::fromUser($user);
-    $user->badge->update(['is_valid'=>1]);
+    $user->badge->update(['is_valid' => 1]);
     $this->user = $user;
     $this->actingAs($user)->withHeaders([
         'Authorization' => "Bearer $token",
@@ -140,9 +140,9 @@ describe('ProducerController', function () {
         expect($res->status())->toBe(403);
         expect($res->json('message'))->toBe(__('main.unauthorized'));
     });
-    
+
     it('prevent producer from delete branch if default', function () {
-        $branch = Branch::factory()->create(['producer_id' => $this->user->badge->id,'is_default'=>true]);
+        $branch = Branch::factory()->create(['producer_id' => $this->user->badge->id, 'is_default' => true]);
         expect($branch)->not->toBeNull();
         $res = $this->deleteJson("/api/v1/branch/delete?branch_id=$branch->id");
 
@@ -185,9 +185,9 @@ describe('ProducerController', function () {
             'attrs' => [1],
             'items' => [1],
         ];
-        $this->user->badge->update(['is_valid'=>false]);
+        $this->user->badge->update(['is_valid' => false]);
         $res = $this->postJson('/api/v1/order/create', $data);
-        expect($res->status())->toBeIn([400,401]);
+        expect($res->status())->toBeIn([400, 401]);
         expect($res->json('message'))->not->toBeNull();
     });
 
