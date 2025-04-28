@@ -90,7 +90,7 @@ class CarrierController extends Controller
                 payload: ['carrier' => CarrierResource::make($carrier)]
             );
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -120,7 +120,7 @@ class CarrierController extends Controller
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -147,7 +147,7 @@ class CarrierController extends Controller
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
             );
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -179,7 +179,7 @@ class CarrierController extends Controller
                 'carrier' => CarrierResource::make($carrier->fresh()),
             ]);
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 

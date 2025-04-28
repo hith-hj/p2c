@@ -29,7 +29,7 @@ class BranchController extends Controller
                 ),
             ]);
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -50,7 +50,7 @@ class BranchController extends Controller
                 'branche' => BranchResource::make($branch),
             ]);
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ class BranchController extends Controller
                 'branch' => BranchResource::make($branch),
             ]);
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ class BranchController extends Controller
 
             return $this->success(msg: __('main.updated'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ class BranchController extends Controller
 
             return $this->success(msg: __('main.deleted'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
@@ -149,7 +149,7 @@ class BranchController extends Controller
 
             return $this->success(msg: __('main.is default'));
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 }

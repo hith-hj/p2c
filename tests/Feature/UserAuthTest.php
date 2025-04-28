@@ -6,7 +6,7 @@ use App\Models\V1\User;
 it('registers_a_user', function () {
     $data = [
         'email' => 'test@example.com',
-        'phone' => '09'.rand(10000000, 99999999),
+        'phone' => '0912312312',
         'password' => 'password',
         'password_confirmation' => 'password',
         'account_type' => 'producer',
@@ -14,13 +14,13 @@ it('registers_a_user', function () {
     ];
     $res = $this->postJson(route('register'), $data);
     expect($res->status())->toBe(201);
-    expect($res->json())->toHaveKey('success', true);
+    expect($res->json('success'))->toBe(true);
 });
 
 it('fails_to_registers_a_user', function () {
     $data = [
         'email' => 'test@.com',
-        'phone' => '09'.rand(10000000, 99999999),
+        'phone' => '0912312312',
         'password' => 'passwor',
         'password_confirmation' => 'passworx',
         'account_type' => 'xxx',
@@ -28,7 +28,7 @@ it('fails_to_registers_a_user', function () {
     ];
     $res = $this->postJson(route('register'), $data);
     expect($res->status())->toBe(400);
-    expect($res->json())->toHaveKey('success', false);
+    expect($res->json('success'))->toBe(false);
 });
 
 it('verifies_user_successfully', function () {
@@ -43,7 +43,7 @@ it('verifies_user_successfully', function () {
         'code' => $code,
     ]);
     expect($res->status())->toBe(200);
-    expect($res->json())->toHaveKey('message', __('main.verified'));
+    expect($res->json('message'))->toBe(__('main.verified'));
 });
 
 it('fails_to_verify_with_incorrect_code', function () {
@@ -54,7 +54,7 @@ it('fails_to_verify_with_incorrect_code', function () {
         'code' => 00000,
     ]);
     expect($res->status())->toBe(400);
-    expect($res->json())->toHaveKey('payload.errors');
+    expect($res->json('payload.errors'))->not->toBeNull();
 });
 
 it('allow_verified_user_login', function () {
@@ -64,7 +64,7 @@ it('allow_verified_user_login', function () {
         'password' => 'password',
     ]);
     expect($res->status())->toBe(200);
-    expect($res->json())->toHaveKeys(['payload' => ['user', 'token']]);
+    expect($res->json('payload'))->toHaveKeys(['user', 'token']);
 });
 
 it('prevent_unverified_user_login', function () {
@@ -79,7 +79,7 @@ it('prevent_unverified_user_login', function () {
     ]);
 
     expect($res->status())->toBe(401);
-    expect($res->json())->toHaveKey('message', __('main.unverified'));
+    expect($res->json('message'))->toBe(__('main.unverified'));
 });
 
 it('fails_to_login_with_invalid_credentials', function () {
@@ -88,7 +88,7 @@ it('fails_to_login_with_invalid_credentials', function () {
         'password' => 'wrongpassword',
     ]);
     expect($res->status())->toBe(400);
-    expect($res->json())->toHaveKeys(['payload' => ['errors']]);
+    expect($res->json('payload.errors'))->not->toBeNull();
 });
 
 it('fails_to_login_with_incorrect_credentials', function () {
@@ -98,5 +98,5 @@ it('fails_to_login_with_incorrect_credentials', function () {
         'password' => 'wrongpassword',
     ]);
     expect($res->status())->toBe(400);
-    expect($res->json())->toHaveKey('message', __('main.invalid credentials'));
+    expect($res->json('message'))->toBe(__('main.invalid credentials'));
 });

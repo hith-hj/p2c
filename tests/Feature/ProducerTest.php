@@ -13,6 +13,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 beforeEach(function () {
     $user = User::factory()->create(['role' => 'producer']);
     $token = JWTAuth::fromUser($user);
+    $user->badge->update(['is_valid'=>1]);
     $this->user = $user;
     $this->actingAs($user)->withHeaders([
         'Authorization' => "Bearer $token",
@@ -63,10 +64,9 @@ describe('ProducerController', function () {
             'verified_at' => now(),
         ]);
         $token = JWTAuth::fromUser($user);
-        $this->actingAs($user)->withHeaders([
+        $res = $this->actingAs($user)->withHeaders([
             'Authorization' => "Bearer $token",
-        ]);
-        $res = $this->postJson("$this->url/create", [
+        ])->postJson("$this->url/create", [
             'brand' => 'Test Brand',
             'cords' => ['long' => 10.5, 'lat' => 20.3],
         ]);
@@ -76,9 +76,8 @@ describe('ProducerController', function () {
 
     it('updates an existing producer', function () {
         $res = $this->patchJson("$this->url/update", ['brand' => 'New Brand']);
-
         expect($res->status())->toBe(200);
-        expect($this->user->badge->brand)->toBe('New Brand');
+        expect($this->user->badge->fresh()->brand)->toBe('New Brand');
     });
 
     it('deletes a producer', function () {
@@ -141,6 +140,15 @@ describe('ProducerController', function () {
         expect($res->status())->toBe(403);
         expect($res->json('message'))->toBe(__('main.unauthorized'));
     });
+    
+    it('prevent producer from delete branch if default', function () {
+        $branch = Branch::factory()->create(['producer_id' => $this->user->badge->id,'is_default'=>true]);
+        expect($branch)->not->toBeNull();
+        $res = $this->deleteJson("/api/v1/branch/delete?branch_id=$branch->id");
+
+        expect($res->status())->toBe(400);
+        expect($res->json('success'))->toBeFalse();
+    });
 
     it('allow producer to create order', function () {
         $data = [
@@ -163,7 +171,27 @@ describe('ProducerController', function () {
         expect($res->json('payload.order.customer_name'))->toEqual('testing');
     });
 
-    it('check if when order created it creates codes for it', function () {
+    it('prevent invalid producer from create new order', function () {
+        $data = [
+            'branch_id' => 1,
+            'customer_name' => 'testing',
+            'delivery_type' => 'normal',
+            'goods_price' => 100000,
+            'dest_long' => 33.524680,
+            'dest_lat' => 36.317824,
+            'weight' => 2,
+            'distance' => 690,
+            'cost' => 1709,
+            'attrs' => [1],
+            'items' => [1],
+        ];
+        $this->user->badge->update(['is_valid'=>false]);
+        $res = $this->postJson('/api/v1/order/create', $data);
+        expect($res->status())->toBeIn([400,401]);
+        expect($res->json('message'))->not->toBeNull();
+    });
+
+    it('check if codes is created when new order is created', function () {
         $data = [
             'branch_id' => 1,
             'customer_name' => 'testing',
@@ -344,6 +372,7 @@ describe('ProducerController', function () {
         $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
         expect($res->status())->toBe(200);
         expect($res->json('message'))->toBe(__('main.finished'));
+        expect($order->fresh()->status)->toBe(4);
     });
 
     it('check if when order is finished his codes are deleted', function () {
@@ -387,6 +416,7 @@ describe('ProducerController', function () {
         $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
         expect($res->status())->toBe(400);
         expect($res->json('message'))->not->toBeNull();
+        expect($order->fresh()->status)->toBe(2);
     });
 
     it('checks if fee stored when order is finished', function () {

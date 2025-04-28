@@ -92,7 +92,7 @@ class ProducerController extends Controller
                 payload: ['producer' => ProducerResource::make($producer)]
             );
         } catch (\Throwable $th) {
-            return $this->error(payload: ['errors' => $th->getMessage()]);
+            return $this->error(msg: $th->getMessage());
         }
     }
 
