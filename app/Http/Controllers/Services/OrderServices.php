@@ -30,12 +30,11 @@ class OrderServices
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
             ->where('status', OrderStatus::pending->value)
             ->when(! empty($filters), function (Builder $query) use ($filters) {
-                $query
-                    ->when(isset($filters['delivery_type']), function (Builder $type) use ($filters) {
-                        if (in_array($filters['delivery_type'], OrderDeliveryTypes::values())) {
-                            $type->where('delivery_type', $filters['delivery_type']);
-                        }
-                    });
+                $query->when(isset($filters['delivery_type']), function (Builder $type) use ($filters) {
+                    if (in_array($filters['delivery_type'], OrderDeliveryTypes::values())) {
+                        $type->where('delivery_type', $filters['delivery_type']);
+                    }
+                });
             })
             ->when(! empty($orderBy) && count($orderBy) === 1, function (Builder $query) use ($orderBy) {
                 $key = array_key_first($orderBy);
@@ -81,7 +80,7 @@ class OrderServices
 
     public function find(int $id): Order
     {
-        $this->Required($id, __('main.order').' ID');
+        $this->Required($id, __('main.order') . ' ID');
         $order = Order::where('id', $id)->first();
         $this->NotFound($order, __('main.order'));
 
