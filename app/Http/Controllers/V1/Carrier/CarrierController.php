@@ -9,6 +9,7 @@ use App\Http\Controllers\Services\CarrierServices;
 use App\Http\Resources\V1\CarrierResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
@@ -64,7 +65,7 @@ class CarrierController extends Controller
     {
         try {
             return $this->success(payload: [
-                'carrier' => CarrierResource::make($this->carrier->get(auth()->id())),
+                'carrier' => CarrierResource::make($this->carrier->get(Auth::id())),
             ]);
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
@@ -84,7 +85,7 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->create(auth()->user(), $validator->safe()->all());
+            $carrier = $this->carrier->create(Auth::user(), $validator->safe()->all());
 
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier)]
@@ -96,7 +97,7 @@ class CarrierController extends Controller
 
     public function createDetails(Request $request): JsonResponse
     {
-        if (auth()->user()->badge === null) {
+        if (Auth::user()->badge === null) {
             return $this->error(msg: __('main.carrier').' '.__('main.not found'));
         }
 
@@ -113,8 +114,11 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->find(auth()->user()->badge->id);
+            $carrier = $this->carrier->find(Auth::user()->badge->id);
             $details = $this->carrier->createDetails($carrier, $validator->safe()->all());
+            if ($carrier->documents()->exists()) {
+                $carrier->validate(true);
+            }
 
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
@@ -126,7 +130,7 @@ class CarrierController extends Controller
 
     public function createDocuments(Request $request): JsonResponse
     {
-        if (auth()->user()->badge === null) {
+        if (Auth::user()->badge === null) {
             return $this->error(msg: __('main.carrier').' '.__('main.not found'));
         }
 
@@ -140,8 +144,11 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->find(auth()->user()->badge->id);
+            $carrier = $this->carrier->find(Auth::user()->badge->id);
             $this->carrier->createDocuments($carrier, $validator->safe()->input('images'));
+            if ($carrier->details()->exists()) {
+                $carrier->validate(true);
+            }
 
             return $this->success(
                 payload: ['carrier' => CarrierResource::make($carrier->fresh())]
@@ -164,7 +171,7 @@ class CarrierController extends Controller
         }
 
         try {
-            $carrier = $this->carrier->find(auth()->user()->badge->id);
+            $carrier = $this->carrier->find(Auth::user()->badge->id);
             if ($validator->safe()->exists('transportation_id')) {
                 if ($carrier->details()->count() > 0) {
                     $carrier->details()->delete();
@@ -186,7 +193,7 @@ class CarrierController extends Controller
     public function delete(Request $request): JsonResponse
     {
         try {
-            $this->carrier->delete(auth()->user()->badge);
+            $this->carrier->delete(Auth::user()->badge);
 
             return $this->success(msg: __('main.deleted'));
         } catch (\Throwable $th) {
@@ -208,9 +215,9 @@ class CarrierController extends Controller
         }
 
         try {
-            $res = $this->carrier->setLocation(auth()->user()->badge, $validator->safe()->all());
+            $res = $this->carrier->setLocation(Auth::user()->badge, $validator->safe()->all());
 
-            return $this->success(msg: __('main.Location updated'), payload: [$res]);
+            return $this->success(msg: __('main.Location updated'));
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
         }

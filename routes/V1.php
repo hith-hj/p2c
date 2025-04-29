@@ -5,12 +5,14 @@ declare(strict_types=1);
 use App\Http\Controllers\V1\Auth\JWTAuthController;
 use App\Http\Controllers\V1\Branch\BranchController;
 use App\Http\Controllers\V1\Carrier\CarrierController;
+use App\Http\Controllers\V1\Fee\FeeController;
 use App\Http\Controllers\V1\Label\LabelController;
 use App\Http\Controllers\V1\Order\OrderController;
 use App\Http\Controllers\V1\Producer\ProducerController;
 use App\Http\Controllers\V1\Transportation\TransportationController;
 use App\Http\Middleware\V1\Auth\JwtMiddleware;
 use App\Http\Middleware\V1\UserChecks;
+use Illuminate\Support\Facades\Route;
 
 Route::group(
     ['prefix' => 'auth', 'controller' => JWTAuthController::class],
@@ -128,6 +130,14 @@ Route::group(
             });
 
         Route::get('/', 'get');
+        Route::get('all', 'all');
+        Route::get('find', 'find');
+    }
+);
+
+Route::group(
+    ['prefix' => 'fee', 'controller' => FeeController::class],
+    function (): void {
         Route::get('all', 'all');
         Route::get('find', 'find');
     }

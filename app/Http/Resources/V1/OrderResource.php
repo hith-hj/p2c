@@ -7,6 +7,7 @@ namespace App\Http\Resources\V1;
 use App\Enums\UserRoles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class OrderResource extends JsonResource
 {
@@ -34,20 +35,20 @@ class OrderResource extends JsonResource
             'weight' => (int) $this->weight,
             'cost' => (int) $this->cost,
             'status' => (int) $this->status,
-            'created_at' => $this->created_at->diffForHumans(),
-            'updated_at' => $this->updated_at->diffForHumans(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'picked_at' => $this->picked_at,
-            'deliverd_at' => $this->deliverd_at,
+            'delivered_at' => $this->delivered_at,
             'attrs' => $this->attrs->select(['id', 'name']),
             'items' => $this->items->select(['id', 'name']),
             'codes' => $this->when(
-                auth()->user()->badge->id === $this->producer_id &&
-                auth()->user()->role === UserRoles::Producer->value,
+                Auth::user()->badge->id === $this->producer_id &&
+                Auth::user()->role === UserRoles::Producer->value,
                 $this->codes()->get(['type', 'code'])
             ),
             'pickup_code' => $this->when(
-                auth()->user()->badge->id === $this->carrier_id &&
-                auth()->user()->role === UserRoles::Carrier->value,
+                Auth::user()->badge->id === $this->carrier_id &&
+                Auth::user()->role === UserRoles::Carrier->value,
                 $this->codes()->where('type', 'pickup')->get(['type', 'code'])
             ),
         ];

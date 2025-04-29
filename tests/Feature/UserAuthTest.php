@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 use App\Models\V1\User;
 
 it('registers_a_user', function () {

@@ -45,7 +45,7 @@ class CarrierServices
         $this->NotFound($user, __('main.user'));
         $this->NotFound($user->badge, __('main.carrier'));
 
-        return $user->badge;
+        return $user->badge->load(['orders', 'transportation', 'fees', 'details', 'location', 'documents']);
     }
 
     public function find(int $id): Carrier

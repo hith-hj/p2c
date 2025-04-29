@@ -17,10 +17,10 @@ return new class() extends Migration
             $table->id();
             $table->foreignId('belongTo_id');
             $table->string('belongTo_type');
-            $table->string('subject_id');
+            $table->foreignId('subject_id');
             $table->string('subject_type');
-            $table->float('amount');
-            $table->float('delay_fee');
+            $table->integer('amount');
+            $table->integer('delay_fee');
             $table->timestamp('due_date');
             $table->tinyInteger('status');
             $table->timestamps();

@@ -37,7 +37,7 @@ class UserFactory extends Factory
             'verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'firebase_token' => Str::random(32),
-            'role' => fake()->randomElement(UserRoles::cases()),
+            'role' => fake()->randomElement(UserRoles::values()),
         ];
     }
 

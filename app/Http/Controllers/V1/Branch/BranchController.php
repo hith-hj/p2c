@@ -9,6 +9,7 @@ use App\Http\Controllers\Services\BranchServices;
 use App\Http\Resources\V1\BranchResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class BranchController extends Controller
@@ -25,7 +26,7 @@ class BranchController extends Controller
         try {
             return $this->success(payload: [
                 'branches' => BranchResource::collection(
-                    $this->branch->get(auth()->user()->badge?->id)
+                    $this->branch->get(Auth::user()->badge?->id)
                 ),
             ]);
         } catch (\Throwable $th) {
@@ -69,7 +70,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branch->create(auth()->user()->badge, $validator->safe()->all());
+            $branch = $this->branch->create(Auth::user()->badge, $validator->safe()->all());
 
             return $this->success(payload: [
                 'branch' => BranchResource::make($branch),
@@ -93,7 +94,7 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->integer('branch_id'));
-            if ($branch->producer_id !== auth()->user()->badge->id) {
+            if ($branch->producer_id !== Auth::user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
 
@@ -117,7 +118,7 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->integer('branch_id'));
-            if ($branch->producer_id !== auth()->user()->badge->id) {
+            if ($branch->producer_id !== Auth::user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
 
@@ -141,7 +142,7 @@ class BranchController extends Controller
 
         try {
             $branch = $this->branch->find($validator->safe()->integer('branch_id'));
-            if ($branch->producer_id !== auth()->user()->badge->id) {
+            if ($branch->producer_id !== Auth::user()->badge->id) {
                 return $this->error(msg: __('main.unauthorized'), code: 403);
             }
 

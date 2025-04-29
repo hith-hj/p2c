@@ -13,8 +13,6 @@ class Producer extends Model
 {
     use HasFactory;
 
-    protected $hidden = ['created_at', 'updated_at'];
-
     protected $guarded = [];
 
     public function user(): BelongsTo
@@ -35,6 +33,6 @@ class Producer extends Model
     public function fees(): HasMany
     {
         return $this->hasMany(Fee::class, 'belongTo_id')
-            ->where('belongTo_type', class_basename($this));
+            ->where('belongTo_type', get_class($this));
     }
 }

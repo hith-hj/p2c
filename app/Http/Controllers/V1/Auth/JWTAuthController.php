@@ -95,7 +95,7 @@ class JWTAuthController extends Controller
                 return $this->error(msg: __('main.invalid credentials'));
             }
 
-            $user = auth()->user();
+            $user = Auth::user();
             if ($user->verified_at === null || $user->verification_code !== null) {
                 return $this->error(msg: __('main.unverified'), code: 401);
             }
@@ -114,8 +114,7 @@ class JWTAuthController extends Controller
         try {
             return $this->success(payload: ['token' => Auth::refresh()]);
         } catch (\Exception $exception) {
-            return $this->error(msg: $exception->getMessage()." , Login again");
-
+            return $this->error(msg: $exception->getMessage().' , Login again');
         }
     }
 
@@ -219,7 +218,7 @@ class JWTAuthController extends Controller
             return $this->error(payload: ['errors' => $validator->errors()]);
         }
 
-        $user = auth()->user();
+        $user = Auth::user();
         if (! Hash::check($validator->safe()->input('old_password'), $user->password)) {
             return $this->error(msg: __('main.invalid password'));
         }
@@ -235,7 +234,7 @@ class JWTAuthController extends Controller
 
     public function deleteUser()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         JWTAuth::invalidate(JWTAuth::getToken());
         $user->badge()?->delete();
         $user->delete();

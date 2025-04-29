@@ -20,18 +20,21 @@ class OrderServices
     use ExceptionHandler;
     use OrderCostServices;
 
-    public function all(int $page = 1, int $perPage = 10, array $filters = [], array $orderBy = []): Paginator
-    {
+    public function all(
+        int $page = 1,
+        int $perPage = 10,
+        array $filters = [],
+        array $orderBy = []
+    ): Paginator {
         $orders = Order::query()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
             ->where('status', OrderStatus::pending->value)
             ->when(! empty($filters), function (Builder $query) use ($filters) {
-                $query
-                    ->when(isset($filters['delivery_type']), function (Builder $type) use ($filters) {
-                        if (in_array($filters['delivery_type'], OrderDeliveryTypes::values())) {
-                            $type->where('delivery_type', $filters['delivery_type']);
-                        }
-                    });
+                $query->when(isset($filters['delivery_type']), function (Builder $type) use ($filters) {
+                    if (in_array($filters['delivery_type'], OrderDeliveryTypes::values())) {
+                        $type->where('delivery_type', $filters['delivery_type']);
+                    }
+                });
             })
             ->when(! empty($orderBy) && count($orderBy) === 1, function (Builder $query) use ($orderBy) {
                 $key = array_key_first($orderBy);
@@ -46,9 +49,13 @@ class OrderServices
         return $orders;
     }
 
-    public function get(object $badge, int $page, int $perPage, array $filters): Paginator
-    {
-        $this->Required($badge, __('main.user').' ID');
+    public function get(
+        object $badge,
+        int $page = 1,
+        int $perPage = 10,
+        array $filters = [],
+        array $orderBy = []
+    ): Paginator {
         $orders = $badge->orders()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
             ->when(! empty($filters), function (Builder $query) use ($filters) {
@@ -159,6 +166,7 @@ class OrderServices
             'distance' => $data['distance'],
             'weight' => $data['weight'],
             'cost' => $data['cost'],
+            'note' => $data['note'] ?? null,
         ]);
 
         if (isset($data['attrs']) && ! empty($data['attrs'])) {
@@ -222,7 +230,6 @@ class OrderServices
             throw new Exception(__('main.invalid code'));
         }
         $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()]);
-        $order->codes()->delete();
 
         return $order;
     }
@@ -238,6 +245,7 @@ class OrderServices
             throw new Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::finished->value]);
+        $order->codes()->delete();
         $order->createFee($order->carrier);
 
         return $order;

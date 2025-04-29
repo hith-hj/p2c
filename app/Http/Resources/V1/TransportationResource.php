@@ -19,11 +19,11 @@ class TransportationResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'capacity' => $this->capacity,
-            'cost_per_km' => $this->cost_per_km,
-            'cost_per_kg' => $this->cost_per_kg,
-            'inital_cost' => $this->inital_cost,
-            'cancel_cost' => $this->cancel_cost,
+            'capacity' => (int) $this->capacity,
+            'cost_per_km' => (int) $this->cost_per_km,
+            'cost_per_kg' => (int) $this->cost_per_kg,
+            'inital_cost' => (int) $this->inital_cost,
+            'cancel_cost' => (int) $this->cancel_cost,
             'category' => $this->category,
         ];
     }

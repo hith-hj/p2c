@@ -9,6 +9,7 @@ use App\Http\Controllers\Services\ProducerServices;
 use App\Http\Resources\V1\ProducerResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProducerController extends Controller
@@ -43,7 +44,7 @@ class ProducerController extends Controller
     {
         try {
             return $this->success(payload: [
-                'producer' => ProducerResource::make($this->producer->get(auth()->id())),
+                'producer' => ProducerResource::make($this->producer->get(Auth::id())),
             ]);
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
@@ -86,7 +87,7 @@ class ProducerController extends Controller
         }
 
         try {
-            $producer = $this->producer->create(auth()->user(), $validator->safe()->all());
+            $producer = $this->producer->create(Auth::user(), $validator->safe()->all());
 
             return $this->success(
                 payload: ['producer' => ProducerResource::make($producer)]
@@ -107,7 +108,7 @@ class ProducerController extends Controller
         }
 
         try {
-            $producer = auth()->user()->badge;
+            $producer = Auth::user()->badge;
             $this->producer->update($producer, $validator->safe()->only(['brand']));
 
             return $this->success(msg: __('main.updated'), payload: ['producer' => ProducerResource::make($producer->fresh())]);
@@ -119,7 +120,7 @@ class ProducerController extends Controller
     public function delete(Request $request): JsonResponse
     {
         try {
-            $this->producer->delete(auth()->user()->badge);
+            $this->producer->delete(Auth::user()->badge);
 
             return $this->success(msg: __('main.deleted'));
         } catch (\Throwable $th) {

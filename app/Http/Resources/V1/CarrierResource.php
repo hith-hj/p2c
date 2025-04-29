@@ -28,12 +28,12 @@ class CarrierResource extends JsonResource
             'is_valid' => (int) $this->is_valid,
             'is_online' => (int) $this->is_online,
             'is_available' => (int) $this->is_available,
-            'created_at' => $this->created_at->diffForHumans(),
+            'created_at' => $this->created_at,
             'transportation' => $this->transportation,
             'details' => $this->details,
             'documents' => $docs->pluck('url')->map(fn ($url) => asset($url)),
             'profile_image' => $profile->pluck('url')->map(fn ($url) => asset($url)),
-            'is_filled' => (int) ($this->details()->exists() && $this->documents()->exists() && $this->transportation()->exists()),
+            'is_filled' => (int) (! $this->documents->isEmpty() && $this->details !== null && $this->transportation !== null),
         ];
     }
 }
