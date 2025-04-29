@@ -25,7 +25,7 @@ return new class() extends Migration
             $table->foreignIdFor(Branch::class)->nullable();
             $table->foreignId('customer_id')->nullable();
             $table->string('customer_name')->default('customer');
-            $table->tinyText('notes')->nullable();
+            $table->tinyText('note')->nullable();
             $table->string('delivery_type');
             $table->float('src_long');
             $table->float('src_lat');

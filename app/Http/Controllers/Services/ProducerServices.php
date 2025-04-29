@@ -88,7 +88,7 @@ class ProducerServices
     {
         $this->Required($producer, __('main.Producer'));
         $producer->branches()->delete();
-        $producer->orders()->delete();
+        // $producer->orders()->delete();
         $producer->delete();
 
         return true;

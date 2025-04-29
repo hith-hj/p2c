@@ -21,7 +21,7 @@ class ProducerResource extends JsonResource
             'brand' => $this->brand,
             'is_valid' => (int) $this->is_valid,
             'rate' => (int) $this->rate,
-            'created_at' => $this->created_at->diffForHumans(),
+            'created_at' => $this->created_at,
             // 'branches'=>BranchResource::collection($this->branches),
         ];
     }

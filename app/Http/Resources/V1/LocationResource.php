@@ -20,7 +20,7 @@ class LocationResource extends JsonResource
             'id' => $this->id,
             'long' => $this->long,
             'lat' => $this->lat,
-            'created_at' => $this->created_at->diffForHumans(),
+            'created_at' => $this->created_at,
         ];
     }
 }

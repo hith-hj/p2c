@@ -31,25 +31,18 @@ trait FeeCalculater
         return null;
     }
 
-    public function pay(int $id): bool
+    private function fee(int $cost): int
     {
-        $fee = $this->fees()->find($id);
+        $percent = (int) config('app.fee_amount', 20);
 
-        return $fee->delete();
+        return (int) round($cost * ($percent / 100));
     }
 
-    private function fee(int $cost): float
+    private function delayFee(int $fee): int
     {
-        $percent = (float) config('app.fee_amount', 20);
+        $percent = (int) config('app.delay_fee', 20);
 
-        return $cost * ($percent / 100);
-    }
-
-    private function delayFee(float $fee): float
-    {
-        $percent = config('app.delay_fee', 20);
-
-        return $fee * ($percent / 100);
+        return (int) round($fee * ($percent / 100));
     }
 
     private function dueDate(): Carbon

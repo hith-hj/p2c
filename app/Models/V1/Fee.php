@@ -10,8 +10,17 @@ class Fee extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'due_date' => 'datetime',
+    ];
+
+    public function holder()
+    {
+        return $this->morphTo(__FUNCTION__, 'belongTo_type', 'belongTo_id');
+    }
+
     public function subject()
     {
-        return $this->hasOne($this->belongTo_type)->where('id', $this->belongTo_id);
+        return $this->morphTo(__FUNCTION__, 'subject_type', 'subject_id');
     }
 }

@@ -14,8 +14,6 @@ class Carrier extends Model
 {
     use HasFactory;
 
-    protected $hidden = ['updated_at'];
-
     protected $guarded = [];
 
     public function transportation(): BelongsTo

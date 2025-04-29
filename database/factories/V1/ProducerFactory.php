@@ -21,7 +21,8 @@ class ProducerFactory extends Factory
         return [
             'brand' => fake()->colorName(),
             'rate' => fake()->numberBetween(1, 10),
-            'is_valid' => fake()->randomElement([true, false]),
+            // 'is_valid' => fake()->randomElement([true, false]),
+            'is_valid' => true,
         ];
     }
 }

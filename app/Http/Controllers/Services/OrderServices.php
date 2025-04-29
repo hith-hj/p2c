@@ -80,7 +80,7 @@ class OrderServices
 
     public function find(int $id): Order
     {
-        $this->Required($id, __('main.order') . ' ID');
+        $this->Required($id, __('main.order').' ID');
         $order = Order::where('id', $id)->first();
         $this->NotFound($order, __('main.order'));
 
@@ -166,6 +166,7 @@ class OrderServices
             'distance' => $data['distance'],
             'weight' => $data['weight'],
             'cost' => $data['cost'],
+            'note' => $data['note'] ?? null,
         ]);
 
         if (isset($data['attrs']) && ! empty($data['attrs'])) {
@@ -229,7 +230,6 @@ class OrderServices
             throw new Exception(__('main.invalid code'));
         }
         $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()]);
-        $order->codes()->delete();
 
         return $order;
     }
@@ -245,6 +245,7 @@ class OrderServices
             throw new Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::finished->value]);
+        $order->codes()->delete();
         $order->createFee($order->carrier);
 
         return $order;

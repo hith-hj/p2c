@@ -10,9 +10,9 @@ use App\Http\Controllers\Services\OrderServices;
 use App\Http\Resources\V1\OrderResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -21,8 +21,8 @@ class OrderController extends Controller
     public function all(Request $request): JsonResponse
     {
         try {
-            $page = $request->integer('page') === 0 ? 1 : $request->integer('page');
-            $perPage = $request->integer('perPage') === 0 ? 10 : $request->integer('perPage');
+            $page = $request->filled('page') ? $request->integer('page') : 1;
+            $perPage = $request->filled('perPage') ? $request->integer('perPage') : 10;
             $filters = $request->filled('filters') ? $request->array('filters') : [];
             $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
             // todo : get orders based on carrier location
@@ -41,7 +41,6 @@ class OrderController extends Controller
                 'orders' => OrderResource::collection($orders),
             ]);
         } catch (\Throwable $th) {
-            // return $this->error(msg: $th->getMessage());
             return $this->success(payload: ['orders' => []]);
         }
     }
@@ -49,8 +48,8 @@ class OrderController extends Controller
     public function get(Request $request): JsonResponse
     {
         try {
-            $page = $request->integer('page') === 0 ? 1 : $request->integer('page');
-            $perPage = $request->integer('perPage') === 0 ? 10 : $request->integer('perPage');
+            $page = $request->filled('page') ? $request->integer('page') : 1;
+            $perPage = $request->filled('perPage') ? $request->integer('perPage') : 10;
             $filters = $request->filled('filters') ? $request->array('filters') : [];
             $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
 
@@ -144,6 +143,7 @@ class OrderController extends Controller
             'attrs.*' => ['required', 'exists:attrs,id'],
             'items' => ['sometimes', 'array'],
             'items.*' => ['required', 'exists:items,id'],
+            'note' => ['sometimes', 'string', 'max:200'],
         ]);
 
         if ($validator->fails()) {
@@ -213,28 +213,6 @@ class OrderController extends Controller
         }
     }
 
-    public function finish(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'order_id' => ['required', 'exists:orders,id'],
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
-
-        try {
-            $order = $this->order->finish(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id')
-            );
-
-            return $this->success(msg: __('main.finished'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
-    }
-
     public function delivered(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -254,6 +232,28 @@ class OrderController extends Controller
             );
 
             return $this->success(msg: __('main.delivered'));
+        } catch (\Throwable $th) {
+            return $this->error(msg: $th->getMessage());
+        }
+    }
+
+    public function finish(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => ['required', 'exists:orders,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(payload: ['errors' => [$validator->errors()]]);
+        }
+
+        try {
+            $order = $this->order->finish(
+                Auth::user()->badge,
+                $validator->safe()->integer('order_id')
+            );
+
+            return $this->success(msg: __('main.finished'));
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
         }

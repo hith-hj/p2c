@@ -35,10 +35,10 @@ class OrderResource extends JsonResource
             'weight' => (int) $this->weight,
             'cost' => (int) $this->cost,
             'status' => (int) $this->status,
-            'created_at' => $this->created_at->diffForHumans(),
-            'updated_at' => $this->updated_at->diffForHumans(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'picked_at' => $this->picked_at,
-            'deliverd_at' => $this->deliverd_at,
+            'delivered_at' => $this->delivered_at,
             'attrs' => $this->attrs->select(['id', 'name']),
             'items' => $this->items->select(['id', 'name']),
             'codes' => $this->when(

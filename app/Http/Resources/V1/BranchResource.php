@@ -21,7 +21,7 @@ class BranchResource extends JsonResource
             'name' => $this->name,
             'phone' => $this->phone,
             'is_default' => (int) $this->is_default,
-            'created_at' => $this->created_at->diffForHumans(),
+            'created_at' => $this->created_at,
             'location' => LocationResource::make($this->location),
         ];
     }

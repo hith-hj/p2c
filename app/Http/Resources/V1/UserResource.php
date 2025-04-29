@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'role' => $this->role,
-            'created_at' => $this->created_at->diffForHumans(),
+            'created_at' => $this->created_at,
             'is_verified' => $this->verified_at?->format('Y-m-d'),
             'is_filled' => (int) ($this->badge !== null),
         ];

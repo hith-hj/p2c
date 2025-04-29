@@ -217,7 +217,7 @@ class CarrierController extends Controller
         try {
             $res = $this->carrier->setLocation(Auth::user()->badge, $validator->safe()->all());
 
-            return $this->success(msg: __('main.Location updated'), payload: [$res]);
+            return $this->success(msg: __('main.Location updated'));
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
         }
