@@ -18,86 +18,89 @@ it('registers_a_user', function () {
     expect($res->json('success'))->toBe(true);
 });
 
-it('fails_to_registers_a_user', function () {
-    $data = [
-        'email' => 'test@.com',
-        'phone' => '0912312312',
-        'password' => 'passwor',
-        'password_confirmation' => 'passworx',
-        'account_type' => 'xxx',
-        'firebase_token' => '',
-    ];
-    $res = $this->postJson(route('register'), $data);
-    expect($res->status())->toBe(400);
-    expect($res->json('success'))->toBe(false);
-});
+describe('AuthController', function () {
 
-it('verifies_user_successfully', function () {
-    $user = User::factory()->create(['phone' => '0912345678']);
-    $user->createCode('verification');
-    $code = $user->code('verification')->code;
-    expect($code)->not->toBeNull();
-    expect($code)->toBeInt();
+    it('fails_to_registers_a_user', function () {
+        $data = [
+            'email' => 'test@.com',
+            'phone' => '0912312312',
+            'password' => 'passwor',
+            'password_confirmation' => 'passworx',
+            'account_type' => 'xxx',
+            'firebase_token' => '',
+        ];
+        $res = $this->postJson(route('register'), $data);
+        expect($res->status())->toBe(400);
+        expect($res->json('success'))->toBe(false);
+    });
 
-    $res = $this->postJson(route('verify'), [
-        'phone' => $user->phone,
-        'code' => $code,
-    ]);
-    expect($res->status())->toBe(200);
-    expect($res->json('message'))->toBe(__('main.verified'));
-});
+    it('verifies_user_successfully', function () {
+        $user = User::factory()->create(['phone' => '0912345678']);
+        $user->createCode('verification');
+        $code = $user->code('verification')->code;
+        expect($code)->not->toBeNull();
+        expect($code)->toBeInt();
 
-it('fails_to_verify_with_incorrect_code', function () {
-    $user = User::factory()->create();
-    $user->createCode('verification');
-    $res = $this->postJson(route('verify'), [
-        'phone' => $user->phone,
-        'code' => 00000,
-    ]);
-    expect($res->status())->toBe(400);
-    expect($res->json('payload.errors'))->not->toBeNull();
-});
+        $res = $this->postJson(route('verify'), [
+            'phone' => $user->phone,
+            'code' => $code,
+        ]);
+        expect($res->status())->toBe(200);
+        expect($res->json('message'))->toBe(__('main.verified'));
+    });
 
-it('allow_verified_user_login', function () {
-    $user = User::factory()->create(['phone' => '0911112222']);
-    $res = $this->postJson('/api/v1/auth/login', [
-        'phone' => $user->phone,
-        'password' => 'password',
-    ]);
-    expect($res->status())->toBe(200);
-    expect($res->json('payload'))->toHaveKeys(['user', 'token']);
-});
+    it('fails_to_verify_with_incorrect_code', function () {
+        $user = User::factory()->create();
+        $user->createCode('verification');
+        $res = $this->postJson(route('verify'), [
+            'phone' => $user->phone,
+            'code' => 00000,
+        ]);
+        expect($res->status())->toBe(400);
+        expect($res->json('payload.errors'))->not->toBeNull();
+    });
 
-it('prevent_unverified_user_login', function () {
-    $user = User::factory()->create([
-        'phone' => '0911112222',
-        'verified_at' => null,
-    ]);
+    it('allow_verified_user_login', function () {
+        $user = User::factory()->create(['phone' => '0911112222']);
+        $res = $this->postJson('/api/v1/auth/login', [
+            'phone' => $user->phone,
+            'password' => 'password',
+        ]);
+        expect($res->status())->toBe(200);
+        expect($res->json('payload'))->toHaveKeys(['user', 'token']);
+    });
 
-    $res = $this->postJson('/api/v1/auth/login', [
-        'phone' => $user->phone,
-        'password' => 'password',
-    ]);
+    it('prevent_unverified_user_login', function () {
+        $user = User::factory()->create([
+            'phone' => '0911112222',
+            'verified_at' => null,
+        ]);
 
-    expect($res->status())->toBe(401);
-    expect($res->json('message'))->toBe(__('main.unverified'));
-});
+        $res = $this->postJson('/api/v1/auth/login', [
+            'phone' => $user->phone,
+            'password' => 'password',
+        ]);
 
-it('fails_to_login_with_invalid_credentials', function () {
-    $res = $this->postJson('/api/v1/auth/login', [
-        'phone' => '0912345678',
-        'password' => 'wrongpassword',
-    ]);
-    expect($res->status())->toBe(400);
-    expect($res->json('payload.errors'))->not->toBeNull();
-});
+        expect($res->status())->toBe(401);
+        expect($res->json('message'))->toBe(__('main.unverified'));
+    });
 
-it('fails_to_login_with_incorrect_credentials', function () {
-    $user = User::factory()->create(['phone' => '0911112222']);
-    $res = $this->postJson('/api/v1/auth/login', [
-        'phone' => $user->phone,
-        'password' => 'wrongpassword',
-    ]);
-    expect($res->status())->toBe(400);
-    expect($res->json('message'))->toBe(__('main.invalid credentials'));
+    it('fails_to_login_with_invalid_credentials', function () {
+        $res = $this->postJson('/api/v1/auth/login', [
+            'phone' => '0912345678',
+            'password' => 'wrongpassword',
+        ]);
+        expect($res->status())->toBe(400);
+        expect($res->json('payload.errors'))->not->toBeNull();
+    });
+
+    it('fails_to_login_with_incorrect_credentials', function () {
+        $user = User::factory()->create(['phone' => '0911112222']);
+        $res = $this->postJson('/api/v1/auth/login', [
+            'phone' => $user->phone,
+            'password' => 'wrongpassword',
+        ]);
+        expect($res->status())->toBe(400);
+        expect($res->json('message'))->toBe(__('main.invalid credentials'));
+    });
 });

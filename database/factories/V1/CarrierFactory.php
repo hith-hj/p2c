@@ -19,6 +19,8 @@ class CarrierFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => fake()->uuid,
+            'transportation_id' => fake()->unique()->numberBetween(1, 100),
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'rate' => fake()->numberBetween(1, 10),

@@ -94,7 +94,7 @@ class OrderServices
         float $dest_long,
         float $dest_lat,
         string $delivery_type,
-        array $attrs
+        array $attrs = [],
     ): array {
 
         $this->Required($weight, __('main.weight'));

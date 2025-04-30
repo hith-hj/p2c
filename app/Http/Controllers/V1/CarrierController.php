@@ -161,8 +161,8 @@ class CarrierController extends Controller
     public function update(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
+            'first_name' => ['sometimes', 'string'],
+            'last_name' => ['sometimes', 'string'],
             'transportation_id' => ['sometimes', 'exists:transportations,id'],
         ]);
 
