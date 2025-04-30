@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\V1\Label;
+namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\V1\Attr;
