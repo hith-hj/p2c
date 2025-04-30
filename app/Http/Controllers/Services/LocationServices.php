@@ -15,6 +15,9 @@ class LocationServices
     {
         $this->Required($belongTo, __('main.belongTo'));
         $this->Required($data, __('main.data'));
+        if (! method_exists($belongTo, 'location')) {
+            $this->NotFound(false, 'Location method');
+        }
 
         return $belongTo->location()->create([
             'belongTo_type' => $belongTo::class,
@@ -27,7 +30,9 @@ class LocationServices
     {
         $this->Required($belongTo, __('main.belongTo'));
         $this->Required($data, __('main.data'));
-
+        if (! method_exists($belongTo, 'location')) {
+            $this->NotFound(false, 'Location method');
+        }
         if ($belongTo->location()->exists()) {
             return $this->update($belongTo, $data);
         }

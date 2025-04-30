@@ -71,8 +71,6 @@ class ProducerServices
         $created = $branchServices->create($producer, $data);
         $branchServices->setBranchAsDefault($created);
 
-        (new LocationServices())->create($created, $data);
-
         return $producer;
     }
 

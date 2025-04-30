@@ -11,13 +11,10 @@ use Database\Seeders\DatabaseSeeder;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
-    $user = User::factory()->create(['role' => 'producer']);
-    $token = JWTAuth::fromUser($user);
-    $user->badge->update(['is_valid' => 1]);
-    $this->user = $user;
-    $this->actingAs($user)->withHeaders([
-        'Authorization' => "Bearer $token",
-    ]);
+    $this->user = User::factory()->create(['role' => 'producer']);
+    $this->user->badge->update(['is_valid' => 1]);
+    $token = JWTAuth::fromUser($this->user);
+    $this->withHeaders(['Authorization' => "Bearer $token"]);
     $this->url = 'api/v1/producer';
     (new DatabaseSeeder())->run();
 });
@@ -72,6 +69,16 @@ describe('ProducerController', function () {
         ]);
         expect($res->status())->toBe(200);
         expect($res->json('payload.producer.brand'))->toBe('Test Brand');
+    });
+
+    it('prevent user to create a new producer if producer exists', function () {
+        $res = $this->postJson("$this->url/create", [
+            'brand' => 'Test Brand',
+            'cords' => ['long' => 10.5, 'lat' => 20.3],
+        ]);
+        expect($res->status())->toBe(400);
+        expect($res->json('success'))->toBe(false);
+        expect($res->json('message'))->not->toBeNull();
     });
 
     it('updates an existing producer', function () {

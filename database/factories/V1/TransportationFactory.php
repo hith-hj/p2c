@@ -22,7 +22,7 @@ class TransportationFactory extends Factory
 
         return [
             'name' => fake()->firstNameFemale(),
-            'capacity' => fake()->numberBetween(30, 5000),
+            'capacity' => fake()->numberBetween(300, 5000),
             'cost_per_kg' => $number,
             'cost_per_km' => $number * 4,
             'initial_cost' => $number * 1.5,

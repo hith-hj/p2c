@@ -123,6 +123,7 @@ Route::group(
             });
         Route::middleware([UserChecks::class.':carrier,true'])
             ->group(function (): void {
+                Route::get('all', 'all');
                 Route::post('accept', 'accept');
                 Route::post('reject', 'reject');
                 Route::post('picked', 'picked');
@@ -130,7 +131,6 @@ Route::group(
             });
 
         Route::get('/', 'get');
-        Route::get('all', 'all');
         Route::get('find', 'find');
     }
 );
