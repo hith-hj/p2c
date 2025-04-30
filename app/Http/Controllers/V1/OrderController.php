@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\V1\Order;
+namespace App\Http\Controllers\V1;
 
 use App\Enums\OrderDeliveryTypes;
 use App\Http\Controllers\Controller;

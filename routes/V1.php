@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\V1\Auth\JWTAuthController;
-use App\Http\Controllers\V1\Branch\BranchController;
-use App\Http\Controllers\V1\Carrier\CarrierController;
-use App\Http\Controllers\V1\Fee\FeeController;
-use App\Http\Controllers\V1\Label\LabelController;
-use App\Http\Controllers\V1\Order\OrderController;
-use App\Http\Controllers\V1\Producer\ProducerController;
-use App\Http\Controllers\V1\Transportation\TransportationController;
+use App\Http\Controllers\V1\AuthController;
+use App\Http\Controllers\V1\BranchController;
+use App\Http\Controllers\V1\CarrierController;
+use App\Http\Controllers\V1\FeeController;
+use App\Http\Controllers\V1\LabelController;
+use App\Http\Controllers\V1\OrderController;
+use App\Http\Controllers\V1\ProducerController;
+use App\Http\Controllers\V1\TransportationController;
 use App\Http\Middleware\V1\Auth\JwtMiddleware;
 use App\Http\Middleware\V1\UserChecks;
 use Illuminate\Support\Facades\Route;
 
 Route::group(
-    ['prefix' => 'auth', 'controller' => JWTAuthController::class],
+    ['prefix' => 'auth', 'controller' => AuthController::class],
     function (): void {
         Route::withoutMiddleware([JwtMiddleware::class])->group(function (): void {
             Route::post('register', 'register')->name('register');
