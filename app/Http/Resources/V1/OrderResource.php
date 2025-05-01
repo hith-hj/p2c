@@ -39,6 +39,7 @@ class OrderResource extends JsonResource
             'updated_at' => $this->updated_at,
             'picked_at' => $this->picked_at,
             'delivered_at' => $this->delivered_at,
+            'dte' => $this->dte,
             'attrs' => $this->attrs->select(['id', 'name']),
             'items' => $this->items->select(['id', 'name']),
             'codes' => $this->when(

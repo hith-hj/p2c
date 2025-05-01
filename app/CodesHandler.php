@@ -7,7 +7,7 @@ namespace App;
 use App\Models\V1\Code;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-trait CodesManager
+trait CodesHandler
 {
     public function codes(): HasMany
     {

@@ -20,7 +20,7 @@ beforeEach(function () {
 
 describe('Order Services', function () {
 
-    it('retrieves all bending orders for Carrier', function () {
+    it('retrieves all orders for Carrier with bending status', function () {
         $result = $this->orderServices->all();
         expect($result)->toBeInstanceOf(Paginator::class)->toHaveCount(4);
     });
@@ -32,7 +32,7 @@ describe('Order Services', function () {
 
     it('retrieves orders for a specific producer', function () {
         $result = $this->orderServices->get($this->producer->badge);
-        expect($result)->toBeInstanceOf(Paginator::class);
+        expect($result)->toBeInstanceOf(Paginator::class)->toHaveCount(2);
     });
 
     it('fail to retrieves orders for specific producer when no order exists', function () {
@@ -42,7 +42,7 @@ describe('Order Services', function () {
 
     it('retrieves orders for a specific carrier', function () {
         $result = $this->orderServices->get($this->carrier->badge);
-        expect($result)->toBeInstanceOf(Paginator::class);
+        expect($result)->toBeInstanceOf(Paginator::class)->toHaveCount(2);
     });
 
     it('fail to retrieves orders for specific carrier when no order exists', function () {
@@ -52,9 +52,7 @@ describe('Order Services', function () {
 
     it('retrieves an order by ID', function () {
         $order = Order::factory()->create();
-
         $result = $this->orderServices->find($order->id);
-
         expect($result)->toBeInstanceOf(Order::class)->id->toBe($order->id);
     });
 

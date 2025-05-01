@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Services;
 
+use App\OrderDteCalculator;
 use App\Enums\OrderDeliveryTypes;
 use App\Enums\OrderStatus;
 use App\ExceptionHandler;
@@ -11,7 +12,6 @@ use App\Models\V1\Carrier;
 use App\Models\V1\Order;
 use App\Models\V1\Producer;
 use App\OrderCostServices;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Paginator;
 
@@ -19,6 +19,7 @@ class OrderServices
 {
     use ExceptionHandler;
     use OrderCostServices;
+    use OrderDteCalculator;
 
     public function all(
         int $page = 1,
@@ -80,7 +81,7 @@ class OrderServices
 
     public function find(int $id): Order
     {
-        $this->Required($id, __('main.order').' ID');
+        $this->Required($id, __('main.order') . ' ID');
         $order = Order::where('id', $id)->first();
         $this->NotFound($order, __('main.order'));
 
@@ -106,17 +107,18 @@ class OrderServices
 
         $branch = (new BranchServices())->find($branch_id);
         if ($branch->producer_id !== $producer->id) {
-            throw new Exception(__('main.invalid operation'));
+            throw new \Exception(__('main.invalid operation'));
         }
-        $src = ['lat' => $branch->location->lat, 'long' => $branch->location->long];
 
         $weight = (int) round($weight);
         $trans = (new TransportationServices())->getMatchedTransportation($weight);
 
+        $src = ['lat' => $branch->location->lat, 'long' => $branch->location->long];
         $dest = ['lat' => $dest_lat, 'long' => $dest_long];
         $distance = $this->calcDistance($src, $dest);
-        if ($distance < 100) {
-            throw new Exception(__('main.Min distance is 100 meter'));
+        $distanceInMeter = $distance * 1000;
+        if ($distanceInMeter < 300) {
+            throw new \Exception(__('main.Distance range should be between 200 and 50000 meter'));
         }
 
         $init = $this->initalCost($trans, $weight, $distance);
@@ -124,14 +126,19 @@ class OrderServices
         $attrs = $this->AttrsCost($attrs);
         $delivery = $this->deliveryTypeCost($delivery_type);
         $final = $this->finalCost($rounded, $attrs, $delivery);
-
+        $dte = $this->Dte([
+            'created_at' => now(),
+            'delivery_type' => $delivery_type,
+            'distance' => $distanceInMeter
+        ]);
         return [
-            'distance:m' => $distance * 1000,
+            'distance:m' => $distanceInMeter,
             'weight:kg' => $weight,
             'rounded' => $rounded,
             'delivery' => $delivery,
             'attrs' => $attrs,
             'final' => $final,
+            'Dte' => $dte,
         ];
     }
 
@@ -142,25 +149,18 @@ class OrderServices
         $branch = $producer->branches()->find($data['branch_id']);
         $this->Required($branch, __('main.branch'));
         if ($branch->producer_id !== $producer->id) {
-            throw new Exception(__('main.invalid operation'));
+            throw new \Exception(__('main.invalid operation'));
         }
         $this->Required($branch->location, __('main.branch location'));
-
         $trans = (new TransportationServices())->getMatchedTransportation($data['weight']);
-
-        $data['transportation_id'] = $trans->id;
-        $data['src_lat'] = $branch->location->lat;
-        $data['src_long'] = $branch->location->long;
-        $data['delivery_type'] = OrderDeliveryTypes::from($data['delivery_type']);
-
         $order = $producer->orders()->create([
-            'branch_id' => $data['branch_id'],
-            'transportation_id' => $data['transportation_id'],
-            'customer_name' => $data['customer_name'],
+            'branch_id' => $branch->id,
+            'src_long' => $branch->location->long,
+            'src_lat' => $branch->location->lat,
+            'transportation_id' => $trans->id,
             'delivery_type' => $data['delivery_type'],
+            'customer_name' => $data['customer_name'],
             'goods_price' => $data['goods_price'],
-            'src_long' => $data['src_long'],
-            'src_lat' => $data['src_lat'],
             'dest_long' => $data['dest_long'],
             'dest_lat' => $data['dest_lat'],
             'distance' => $data['distance'],
@@ -176,9 +176,9 @@ class OrderServices
         if (isset($data['items']) && ! empty($data['items'])) {
             $order->items()->attach($data['items']);
         }
+        $order->storeDte();
         $order->createCode('pickup', 4);
         $order->createCode('delivered', 4);
-
         return $order;
     }
 
@@ -187,13 +187,13 @@ class OrderServices
         $this->Required($carrier, __('main.carrier'));
         $order = $this->find($order_id);
         if ($order->carrier_id !== null) {
-            throw new Exception(__('main.order is assigned'));
+            throw new \Exception(__('main.order is assigned'));
         }
         if ($order->status !== OrderStatus::pending->value) {
-            throw new Exception(__('main.invalid order status'));
+            throw new \Exception(__('main.invalid order status'));
         }
         if ($order->transportation_id !== $carrier->transportation_id) {
-            throw new Exception(__('main.transportations is not matched'));
+            throw new \Exception(__('main.transportations is not matched'));
         }
         $order->carrier()->associate($carrier);
         $order->update(['status' => OrderStatus::assigned->value]);
@@ -206,12 +206,12 @@ class OrderServices
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
         if (! $order) {
-            throw new Exception(__('main.not found'));
+            throw new \Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::assigned->value) {
-            throw new Exception(__('main.invalid order status'));
+            throw new \Exception(__('main.invalid order status'));
         }
-        $order->update(['status' => OrderStatus::picked->value, 'picked_at' => now()]);
+        $order->update(['status' => OrderStatus::picked->value, 'picked_at' => now()->toDateTimeString()]);
 
         return $order;
     }
@@ -221,15 +221,15 @@ class OrderServices
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
         if (! $order) {
-            throw new Exception(__('main.not found'));
+            throw new \Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::picked->value) {
-            throw new Exception(__('main.invalid order status'));
+            throw new \Exception(__('main.invalid order status'));
         }
         if ($order->code('delivered')->code !== $code) {
-            throw new Exception(__('main.invalid code'));
+            throw new \Exception(__('main.invalid code'));
         }
-        $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()]);
+        $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()->toDateTimeString()]);
 
         return $order;
     }
@@ -239,10 +239,10 @@ class OrderServices
         $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
         if (! $order) {
-            throw new Exception(__('main.not found'));
+            throw new \Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::delivered->value) {
-            throw new Exception(__('main.invalid order status'));
+            throw new \Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::finished->value]);
         $order->codes()->delete();
@@ -256,13 +256,13 @@ class OrderServices
         $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
         if (! $order) {
-            throw new Exception(__('main.not found'));
+            throw new \Exception(__('main.not found'));
         }
         if ($order->carrier_id !== null) {
-            throw new Exception(__('main.order is assigned'));
+            throw new \Exception(__('main.order is assigned'));
         }
         if ($order->status !== OrderStatus::pending->value) {
-            throw new Exception(__('main.invalid order status'));
+            throw new \Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::canceld]);
         $order->codes()->delete();
@@ -275,10 +275,10 @@ class OrderServices
         $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
         if (! $order) {
-            throw new Exception(__('main.not found'));
+            throw new \Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::assigned->value) {
-            throw new Exception(__('main.invalid order status'));
+            throw new \Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::canceld]);
         $order->codes()->delete();
@@ -292,10 +292,10 @@ class OrderServices
         $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
         if (! $order) {
-            throw new Exception(__('main.not found'));
+            throw new \Exception(__('main.not found'));
         }
         if ($order->status !== OrderStatus::assigned->value) {
-            throw new Exception(__('main.invalid order status'));
+            throw new \Exception(__('main.invalid order status'));
         }
         $order->update(['status' => OrderStatus::rejected->value]);
         $order->codes()->delete();

@@ -7,7 +7,7 @@ namespace App;
 use App\Models\V1\Fee;
 use Illuminate\Support\Carbon;
 
-trait FeeCalculater
+trait FeeCalculator
 {
     public function createFee(object $badge): ?Fee
     {
