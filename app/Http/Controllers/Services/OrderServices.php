@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Services;
 
-use App\OrderDteCalculator;
 use App\Enums\OrderDeliveryTypes;
 use App\Enums\OrderStatus;
 use App\ExceptionHandler;
+use App\Models\V1\Branch;
 use App\Models\V1\Carrier;
 use App\Models\V1\Order;
 use App\Models\V1\Producer;
 use App\OrderCostServices;
+use App\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 
 class OrderServices
 {
@@ -26,26 +27,15 @@ class OrderServices
         int $perPage = 10,
         array $filters = [],
         array $orderBy = []
-    ): Paginator {
+    ): Collection {
         $orders = Order::query()
             ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
-            ->where('status', OrderStatus::pending->value)
-            ->when(! empty($filters), function (Builder $query) use ($filters) {
-                $query->when(isset($filters['delivery_type']), function (Builder $type) use ($filters) {
-                    if (in_array($filters['delivery_type'], OrderDeliveryTypes::values())) {
-                        $type->where('delivery_type', $filters['delivery_type']);
-                    }
-                });
-            })
-            ->when(! empty($orderBy) && count($orderBy) === 1, function (Builder $query) use ($orderBy) {
-                $key = array_key_first($orderBy);
-                $value = array_pop($orderBy);
-                if (in_array($key, ['cost', 'distance', 'weight']) || in_array($value, ['asc', 'desc'])) {
-                    $query->orderBy($key, $value);
-                }
-            })
-            ->simplePaginate(perPage: $perPage, page: $page);
-        $this->NotFound($orders, __('main.orders'));
+            ->where('status', OrderStatus::pending->value);
+        $this->applyFilters($orders, $filters, ['delivery_type' => OrderDeliveryTypes::values()]);
+        $this->applyOrderBy($orders, $orderBy, ['cost', 'distance', 'weight']);
+        $orders->paginate(perPage: $perPage, page: $page);
+        $orders = $orders->get();
+        throw_if($orders->isEmpty(), 'Exception', __('main.orders'));
 
         return $orders;
     }
@@ -56,108 +46,87 @@ class OrderServices
         int $perPage = 10,
         array $filters = [],
         array $orderBy = []
-    ): Paginator {
-        $orders = $badge->orders()
-            ->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch'])
-            ->when(! empty($filters), function (Builder $query) use ($filters) {
-                $query->when(isset($filters['status']), function (Builder $status) use ($filters) {
-                    if (in_array($filters['status'], OrderStatus::cases())) {
-                        $status->where('status', $filters['status']);
-                    }
-                });
-            })
-            ->when(! empty($orderBy) && count($orderBy) === 1, function (Builder $query) use ($orderBy) {
-                $key = array_key_first($orderBy);
-                $value = array_pop($orderBy);
-                if (in_array($key, ['cost', 'distance', 'weight']) || in_array($value, ['asc', 'desc'])) {
-                    $query->orderBy($key, $value);
-                }
-            })
-            ->simplePaginate(perPage: $perPage, page: $page);
-        $this->NotFound($orders, __('main.orders'));
+    ): Collection {
+        $orders = $badge->orders();
+        $orders->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch']);
+        $this->applyFilters($orders, $filters, ['status' => OrderStatus::values()]);
+        $this->applyOrderBy($orders, $orderBy, ['cost', 'distance', 'weight']);
+        $orders->paginate(perPage: $perPage, page: $page);
+        $orders = $orders->get();
+        throw_if($orders->isEmpty(), 'Exception', __('main.orders'));
 
         return $orders;
     }
 
     public function find(int $id): Order
     {
-        $this->Required($id, __('main.order') . ' ID');
         $order = Order::where('id', $id)->first();
-        $this->NotFound($order, __('main.order'));
+        throw_if($order === null, 'Exception', __('main.order'));
 
         return $order;
     }
 
-    public function calcCost(
-        Producer $producer,
-        int $weight,
-        int $branch_id,
-        float $dest_long,
-        float $dest_lat,
-        string $delivery_type,
-        array $attrs = [],
-    ): array {
-
-        $this->Required($weight, __('main.weight'));
-        $this->Required($weight, __('main.producer'));
-        $this->Required($branch_id, __('main.branch'));
-        $this->Required($dest_long, __('main.longitude'));
-        $this->Required($dest_lat, __('main.latitude'));
-        $this->Required($delivery_type, __('main.delivery type'));
-
-        $branch = (new BranchServices())->find($branch_id);
-        if ($branch->producer_id !== $producer->id) {
-            throw new \Exception(__('main.invalid operation'));
-        }
-
-        $weight = (int) round($weight);
-        $trans = (new TransportationServices())->getMatchedTransportation($weight);
-
-        $src = ['lat' => $branch->location->lat, 'long' => $branch->location->long];
-        $dest = ['lat' => $dest_lat, 'long' => $dest_long];
-        $distance = $this->calcDistance($src, $dest);
+    public function calcCost(Producer $producer, array $data): array
+    {
+        $data = $this->checkAndCastData($data, [
+            'weight' => 'int',
+            'branch_id' => 'int',
+            'dest_long' => 'float',
+            'dest_lat' => 'float',
+            'delivery_type' => 'string',
+        ]);
+        $branch = (new BranchServices())->find($data['branch_id']);
+        $this->chackIfValidBranchWithLocation($branch, $producer);
+        $transportation = (new TransportationServices())->getMatchedTransportation($data['weight']);
+        $distance = $this->calcDistance(
+            src: ['lat' => $branch->location->lat, 'long' => $branch->location->long],
+            dest: ['lat' => $data['dest_lat'], 'long' => $data['dest_long']]
+        );
         $distanceInMeter = $distance * 1000;
-        if ($distanceInMeter < 300) {
-            throw new \Exception(__('main.Distance range should be between 200 and 50000 meter'));
-        }
-
-        $init = $this->initalCost($trans, $weight, $distance);
-        $rounded = (int) round($init);
-        $attrs = $this->AttrsCost($attrs);
-        $delivery = $this->deliveryTypeCost($delivery_type);
-        $final = $this->finalCost($rounded, $attrs, $delivery);
+        $this->checkIfValidDistance($distanceInMeter);
+        $inital = $this->initalCost($transportation, $data['weight'], $distance);
+        $delivery = $this->deliveryTypeCost($data['delivery_type']);
+        $attrs = $this->AttrsCost($data);
+        $final = $this->finalCost($inital, $attrs, $delivery);
+        // todo : use transportation type to imporve dte
         $dte = $this->Dte([
             'created_at' => now(),
-            'delivery_type' => $delivery_type,
-            'distance' => $distanceInMeter
+            'delivery_type' => $data['delivery_type'],
+            'distance' => $distanceInMeter,
         ]);
+
         return [
             'distance:m' => $distanceInMeter,
-            'weight:kg' => $weight,
-            'rounded' => $rounded,
+            'weight' => $data['weight'],
+            'inital' => $inital,
             'delivery' => $delivery,
             'attrs' => $attrs,
             'final' => $final,
-            'Dte' => $dte,
+            'dte' => $dte,
         ];
     }
 
     public function create(Producer $producer, array $data): Order
     {
-        $this->Required($producer, __('main.producer'));
-        $this->Required($data, __('main.data'));
+        $data = $this->checkAndCastData($data, [
+            'branch_id' => 'int',
+            'delivery_type' => 'string',
+            'customer_name' => 'string',
+            'goods_price' => 'int',
+            'dest_long' => 'float',
+            'dest_lat' => 'float',
+            'distance' => 'int',
+            'weight' => 'int',
+            'cost' => 'int',
+        ]);
         $branch = $producer->branches()->find($data['branch_id']);
-        $this->Required($branch, __('main.branch'));
-        if ($branch->producer_id !== $producer->id) {
-            throw new \Exception(__('main.invalid operation'));
-        }
-        $this->Required($branch->location, __('main.branch location'));
-        $trans = (new TransportationServices())->getMatchedTransportation($data['weight']);
+        $this->chackIfValidBranchWithLocation($branch, $producer);
+        $transportation = (new TransportationServices())->getMatchedTransportation($data['weight']);
         $order = $producer->orders()->create([
             'branch_id' => $branch->id,
             'src_long' => $branch->location->long,
             'src_lat' => $branch->location->lat,
-            'transportation_id' => $trans->id,
+            'transportation_id' => $transportation->id,
             'delivery_type' => $data['delivery_type'],
             'customer_name' => $data['customer_name'],
             'goods_price' => $data['goods_price'],
@@ -168,33 +137,25 @@ class OrderServices
             'cost' => $data['cost'],
             'note' => $data['note'] ?? null,
         ]);
-
-        if (isset($data['attrs']) && ! empty($data['attrs'])) {
-            $order->attrs()->attach($data['attrs']);
-        }
-
-        if (isset($data['items']) && ! empty($data['items'])) {
-            $order->items()->attach($data['items']);
-        }
+        $this->attachRelations($order, $data);
         $order->storeDte();
         $order->createCode('pickup', 4);
         $order->createCode('delivered', 4);
+
         return $order;
     }
 
     public function accept(Carrier $carrier, int $order_id): Order
     {
-        $this->Required($carrier, __('main.carrier'));
         $order = $this->find($order_id);
-        if ($order->carrier_id !== null) {
-            throw new \Exception(__('main.order is assigned'));
-        }
-        if ($order->status !== OrderStatus::pending->value) {
-            throw new \Exception(__('main.invalid order status'));
-        }
-        if ($order->transportation_id !== $carrier->transportation_id) {
-            throw new \Exception(__('main.transportations is not matched'));
-        }
+        throw_if($order === null, 'Exception', __('main.Not found'));
+        throw_if($order->carrier_id !== null, 'Exception', __('main.order is assigned'));
+        throw_if($order->status !== OrderStatus::pending->value, 'Exception', __('main.invalid order status'));
+        throw_if(
+            $order->transportation_id !== $carrier->transportation_id,
+            'Exception',
+            __('main.transportations is not matched')
+        );
         $order->carrier()->associate($carrier);
         $order->update(['status' => OrderStatus::assigned->value]);
 
@@ -203,47 +164,36 @@ class OrderServices
 
     public function picked(Carrier $carrier, int $order_id): Order
     {
-        $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
-        if (! $order) {
-            throw new \Exception(__('main.not found'));
-        }
-        if ($order->status !== OrderStatus::assigned->value) {
-            throw new \Exception(__('main.invalid order status'));
-        }
-        $order->update(['status' => OrderStatus::picked->value, 'picked_at' => now()->toDateTimeString()]);
+        throw_if($order === null, 'Exception', __('main.Not found'));
+        throw_if($order->status !== OrderStatus::assigned->value, 'Exception', __('main.invalid order status'));
+        $order->update([
+            'status' => OrderStatus::picked->value,
+            'picked_at' => now()->toDateTimeString(),
+        ]);
 
         return $order;
     }
 
     public function delivered(Carrier $carrier, int $order_id, int $code): Order
     {
-        $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
-        if (! $order) {
-            throw new \Exception(__('main.not found'));
-        }
-        if ($order->status !== OrderStatus::picked->value) {
-            throw new \Exception(__('main.invalid order status'));
-        }
-        if ($order->code('delivered')->code !== $code) {
-            throw new \Exception(__('main.invalid code'));
-        }
-        $order->update(['status' => OrderStatus::delivered->value, 'delivered_at' => now()->toDateTimeString()]);
+        throw_if($order === null, 'Exception', __('main.Not found'));
+        throw_if($order->status !== OrderStatus::picked->value, 'Exception', __('main.invalid order status'));
+        throw_if($order->code('delivered')->code !== $code, 'Exception', __('main.invalid code'));
+        $order->update([
+            'status' => OrderStatus::delivered->value,
+            'delivered_at' => now()->toDateTimeString(),
+        ]);
 
         return $order;
     }
 
     public function finish(Producer $producer, int $order_id): Order
     {
-        $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
-        if (! $order) {
-            throw new \Exception(__('main.not found'));
-        }
-        if ($order->status !== OrderStatus::delivered->value) {
-            throw new \Exception(__('main.invalid order status'));
-        }
+        throw_if($order === null, 'Exception', __('main.Not found'));
+        throw_if($order->status !== OrderStatus::delivered->value, 'Exception', __('main.invalid order status'));
         $order->update(['status' => OrderStatus::finished->value]);
         $order->codes()->delete();
         $order->createFee($order->carrier);
@@ -253,18 +203,11 @@ class OrderServices
 
     public function cancel(Producer $producer, int $order_id): Order
     {
-        $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
-        if (! $order) {
-            throw new \Exception(__('main.not found'));
-        }
-        if ($order->carrier_id !== null) {
-            throw new \Exception(__('main.order is assigned'));
-        }
-        if ($order->status !== OrderStatus::pending->value) {
-            throw new \Exception(__('main.invalid order status'));
-        }
-        $order->update(['status' => OrderStatus::canceld]);
+        throw_if($order === null, 'Exception', __('main.Not found'));
+        throw_if($order->carrier_id !== null, 'Exception', __('main.order is assigned'));
+        throw_if($order->status !== OrderStatus::pending->value, 'Exception', __('main.invalid order status'));
+        $order->update(['status' => OrderStatus::canceld->value]);
         $order->codes()->delete();
 
         return $order;
@@ -272,15 +215,10 @@ class OrderServices
 
     public function forceCancel(Producer $producer, int $order_id): Order
     {
-        $this->Required($producer, __('main.producer'));
         $order = $producer->orders()->find($order_id);
-        if (! $order) {
-            throw new \Exception(__('main.not found'));
-        }
-        if ($order->status !== OrderStatus::assigned->value) {
-            throw new \Exception(__('main.invalid order status'));
-        }
-        $order->update(['status' => OrderStatus::canceld]);
+        throw_if($order === null, 'Exception', __('main.Not found'));
+        throw_if($order->status !== OrderStatus::assigned->value, 'Exception', __('main.invalid order status'));
+        $order->update(['status' => OrderStatus::canceld->value]);
         $order->codes()->delete();
         $order->createFee($producer);
 
@@ -289,18 +227,90 @@ class OrderServices
 
     public function reject(Carrier $carrier, int $order_id): Order
     {
-        $this->Required($carrier, __('main.carrier'));
         $order = $carrier->orders()->find($order_id);
-        if (! $order) {
-            throw new \Exception(__('main.not found'));
-        }
-        if ($order->status !== OrderStatus::assigned->value) {
-            throw new \Exception(__('main.invalid order status'));
-        }
+        throw_if($order === null, 'Exception', __('main.Not found'));
+        throw_if($order->status !== OrderStatus::assigned->value, 'Exception', __('main.invalid order status'));
         $order->update(['status' => OrderStatus::rejected->value]);
         $order->codes()->delete();
         $order->createFee($carrier);
 
         return $order;
+    }
+
+    private function applyFilters(object $query, array $filters, array $allowedFilters = []): object
+    {
+        return $query->when(! empty($filters), function (Builder $filter) use ($filters, $allowedFilters) {
+            foreach ($filters as $key => $value) {
+                if (! in_array($key, array_keys($allowedFilters))) {
+                    return;
+                }
+                if (is_numeric($value)) {
+                    $value = (int) $value;
+                }
+                if (in_array($value, $allowedFilters[$key])) {
+                    $filter->where($key, $value);
+                }
+            }
+        });
+    }
+
+    private function applyOrderBy(object $query, array $orderBy, array $allowedOrderBy = []): object
+    {
+        return $query->when(
+            ! empty($orderBy) && count($orderBy) === 1,
+            function (Builder $query) use ($orderBy, $allowedOrderBy) {
+                $key = array_key_first($orderBy);
+                $value = array_pop($orderBy);
+                if (in_array($key, $allowedOrderBy) && in_array($value, ['asc', 'desc'])) {
+                    $query->orderBy($key, $value);
+                }
+            }
+        );
+    }
+
+    private function checkAndCastData(array $data, $requiredFields = []): array
+    {
+        throw_if(empty($data), 'Exception', __('main.data is empty'));
+        if (empty($requiredFields)) {
+            return $data;
+        }
+        $missing = array_diff(array_keys($requiredFields), array_keys($data));
+        throw_if(! empty($missing), 'Exception', __('main.fields missing').implode(', ', $missing));
+        foreach ($requiredFields as $key => $value) {
+            settype($data[$key], $value);
+        }
+
+        return $data;
+    }
+
+    private function attachRelations(Order $order, array $data): Order
+    {
+        if (isset($data['attrs']) && ! empty($data['attrs'])) {
+            $order->attrs()->attach($data['attrs']);
+        }
+
+        if (isset($data['items']) && ! empty($data['items'])) {
+            $order->items()->attach($data['items']);
+        }
+
+        return $order;
+    }
+
+    private function checkIfValidDistance(int $distanceInMeter, int $minRange = 300, int $maxRange = 50000): void
+    {
+        throw_if(
+            $distanceInMeter < $minRange || $distanceInMeter > $maxRange,
+            'Exception',
+            __("main.Distance should be between 200 and 50000 meter, your is : $distanceInMeter")
+        );
+
+    }
+
+    private function chackIfValidBranchWithLocation(Branch $branch, Producer $producer): void
+    {
+        throw_if($branch === null, 'Exception', __('main.branch is required'));
+        throw_if($branch->producer_id !== $producer->id, 'Exception', __('main.invalid operation'));
+        throw_if($branch->location === null, 'Exception', __('main.branch location is required'));
+
     }
 }

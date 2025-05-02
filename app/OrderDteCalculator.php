@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use App\Enums\OrderDeliveryTypes;
@@ -9,7 +11,7 @@ trait OrderDteCalculator
 {
     public function storeDte(): bool
     {
-        return $this->update(['dte'=>$this->Dte($this)['dte'] ]);
+        return $this->update(['dte' => $this->Dte($this)['dte']->toDateTimeString()]);
     }
 
     /**
@@ -17,10 +19,10 @@ trait OrderDteCalculator
      **/
     public function Dte(object|array $order): array
     {
-        if($order === null){
+        if ($order === null) {
             $order = $this;
         }
-        $order = $this->checkOrder($order);
+        $order = $this->checkOrder($order, ['created_at', 'delivery_type', 'distance']);
         $delivery_type = $order->delivery_type;
         $distance_In_Km = $order->distance / 1000;
         $dte = $this->getCreatedAt($order);
@@ -28,6 +30,7 @@ trait OrderDteCalculator
         $deliveryTime = $this->getDeliveryTimePerKm($delivery_type, $distance_In_Km);
         $dte->addHours($pickupTime + $deliveryTime);
         [$dte, $nightAdjusted] = $this->adjustForNight($dte);
+
         return [
             'dte' => $dte,
             'night_adjusted' => $nightAdjusted,
@@ -38,25 +41,19 @@ trait OrderDteCalculator
         ];
     }
 
-    private function checkOrder(object|array $order): object
+    private function checkOrder(object|array $order, $requiredFields = []): object
     {
         if (is_array($order)) {
-            $order = (object)$order;
+            $order = (object) $order;
         }
         $missing = [];
-        if (! isset($order->created_at)) {
-            $missing[] = 'created at ';
+        foreach ($requiredFields as $field) {
+            if (! isset($order->$field)) {
+                $missing[] = $field;
+            }
         }
-        if (! isset($order->distance)) {
-            $missing[] = 'distance ';
-        }
-        if (! isset($order->delivery_type)) {
-            $missing[] = 'delivery type ';
-        }
-        if (count($missing)) {
-            $missing = implode(',', $missing);
-            throw new \Exception("Edt Calculation fails missing : $missing");
-        }
+        throw_if(! empty($missing), 'Exception', __('main. Edt fields missing').implode(', ', $missing));
+
         return $order;
     }
 
@@ -85,6 +82,7 @@ trait OrderDteCalculator
                 $adjusted = true;
             }
         }
+
         return [$dte, $adjusted];
     }
 
@@ -96,11 +94,12 @@ trait OrderDteCalculator
     private function getDeliveryTimePerKm(string $deliveryType, float $distance = 1): int
     {
         $base = match ($deliveryType) {
-            OrderDeliveryTypes::normal->value  => 2,
-            OrderDeliveryTypes::urgent->value  => 1,
+            OrderDeliveryTypes::normal->value => 2,
+            OrderDeliveryTypes::urgent->value => 1,
             OrderDeliveryTypes::express->value => 0.5,
             default => 3,
         };
+
         return (int) round($base * $distance);
     }
 }

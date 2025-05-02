@@ -47,12 +47,12 @@ class OrderController extends Controller
 
     public function get(Request $request): JsonResponse
     {
-        try {
-            $page = $request->filled('page') ? $request->integer('page') : 1;
-            $perPage = $request->filled('perPage') ? $request->integer('perPage') : 10;
-            $filters = $request->filled('filters') ? $request->array('filters') : [];
-            $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
+        $page = $request->filled('page') ? $request->integer('page') : 1;
+        $perPage = $request->filled('perPage') ? $request->integer('perPage') : 10;
+        $filters = $request->filled('filters') ? $request->array('filters') : [];
+        $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
 
+        try {
             $orders = $this->order->get(
                 Auth::user()->badge,
                 $page,
@@ -97,11 +97,13 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
             'delivery_type' => ['required', 'string', Rule::in(OrderDeliveryTypes::cases())],
-            'weight' => ['required', 'numeric', 'min:1'],
+            'weight' => ['required', 'numeric', 'min:1', 'max:5000'],
             'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
-            'attrs' => ['sometimes', 'array'],
+            'attrs' => ['sometimes', 'array', 'max:5'],
             'attrs.*' => ['required', 'exists:attrs,id'],
+            'items' => ['sometimes', 'array', 'max:5'],
+            'items.*' => ['required', 'exists:items,id'],
         ]);
 
         if ($validator->fails()) {
@@ -109,19 +111,9 @@ class OrderController extends Controller
         }
 
         try {
-            return $this->success(
-                payload: [
-                    'receipt' => $this->order->calcCost(
-                        Auth::user()->badge,
-                        $validator->safe()->integer('weight'),
-                        $validator->safe()->integer('branch_id'),
-                        $validator->safe()->float('dest_long'),
-                        $validator->safe()->float('dest_lat'),
-                        $validator->safe()->input('delivery_type'),
-                        $validator->safe()->array('attrs'),
-                    ),
-                ]
-            );
+            $receipt = $this->order->calcCost(Auth::user()->badge, $validator->safe()->all());
+
+            return $this->success(payload: ['receipt' => $receipt]);
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());
         }
@@ -136,12 +128,12 @@ class OrderController extends Controller
             'goods_price' => ['required', 'numeric'],
             'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
-            'weight' => ['required', 'numeric', 'min:1'],
-            'distance' => ['required', 'numeric', 'min:200'],
+            'weight' => ['required', 'numeric', 'min:1', 'max:5000'],
+            'distance' => ['required', 'numeric', 'min:200', 'max:50000'],
             'cost' => ['required', 'numeric'],
-            'attrs' => ['sometimes', 'array'],
+            'attrs' => ['sometimes', 'array', 'max:5'],
             'attrs.*' => ['required', 'exists:attrs,id'],
-            'items' => ['sometimes', 'array'],
+            'items' => ['sometimes', 'array', 'max:5'],
             'items.*' => ['required', 'exists:items,id'],
             'note' => ['sometimes', 'string', 'max:200'],
         ]);
@@ -151,16 +143,11 @@ class OrderController extends Controller
         }
 
         try {
-            $order = $this->order->create(
-                Auth::user()->badge,
-                $validator->safe()->all()
-            );
+            $order = $this->order->create(Auth::user()->badge, $validator->safe()->all());
 
             return $this->success(
                 msg: __('main.created'),
-                payload: [
-                    'order' => OrderResource::make($order->fresh()),
-                ]
+                payload: ['order' => OrderResource::make($order->fresh())]
             );
         } catch (\Throwable $th) {
             return $this->error(msg: $th->getMessage());

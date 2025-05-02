@@ -46,18 +46,18 @@ trait OrderCostServices
         return (int) floor($final);
     }
 
-    private function AttrsCost(array $attrs, string $calcType = 'totla'): int|array
+    private function AttrsCost(array $data, string $calcType = 'totla'): int|array
     {
-        if ($attrs === []) {
+        if (! isset($data['attrs']) || $data['attrs'] === []) {
             return 0;
         }
 
-        $query = Attr::whereIn('id', $attrs);
+        $query = Attr::whereIn('id', $data['attrs']);
 
         return match ($calcType) {
-            default => $query->sum('extra_cost_percent'),
-            'total' => $query->sum('extra_cost_percent'),
             'byone' => $query->pluck('extra_cost_percent')->toArray(),
+            'total' => $query->sum('extra_cost_percent'),
+            default => $query->sum('extra_cost_percent'),
         };
     }
 
