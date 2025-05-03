@@ -36,6 +36,18 @@ class DatabaseSeeder extends Seeder
             'phone' => '0911111111',
             'role' => 'producer',
         ]);
+        User::factory()->create([
+            'email' => 'carrier@maya.com',
+            'phone' => '0993769515',
+            'role' => 'carrier',
+            'password' => 'Mm12345@@'
+        ]);
+        User::factory()->create([
+            'email' => 'producer@maya.com',
+            'phone' => '0993769517',
+            'role' => 'producer',
+            'password' => 'Mm12345@@'
+        ]);
         // Transportaion::factory(10)->create();
     }
 }

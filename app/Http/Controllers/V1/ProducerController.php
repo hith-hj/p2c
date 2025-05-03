@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Services\ProducerServices;
+use App\Http\Services\ProducerServices;
 use App\Http\Resources\V1\ProducerResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

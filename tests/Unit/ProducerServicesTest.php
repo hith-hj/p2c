@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Services\ProducerServices;
+use App\Http\Services\ProducerServices;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
 use Illuminate\Support\Collection;

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Enums\OrderDeliveryTypes;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Services\OrderServices;
+use App\Http\Services\OrderServices;
 use App\Http\Resources\V1\OrderResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

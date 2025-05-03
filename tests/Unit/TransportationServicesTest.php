@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Services\TransportationServices;
+use App\Http\Services\TransportationServices;
 use App\Models\V1\Transportation;
 use Illuminate\Support\Collection;
 
