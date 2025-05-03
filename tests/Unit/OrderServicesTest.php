@@ -74,7 +74,7 @@ describe('Order Services', function () {
         );
 
         expect($data)->toBeArray()
-            ->toHaveKeys(['distance:m', 'weight', 'inital', 'delivery', 'attrs', 'final', 'dte']);
+            ->toHaveKeys(['distance:m', 'inital', 'delivery', 'attrs', 'final', 'dte']);
     });
 
     it('fails to calculates cost of an order if producer missing', function () {
@@ -185,13 +185,24 @@ describe('Order Services', function () {
     })->throws(Exception::class);
 
     it('accepts an order for a carrier', function () {
-        Order::find(1)->update([
+        $order = Order::find(1);
+        $order->update(['transportation_id'=>$this->carrier->badge->transportation_id, 'status'=>0,'carrier_id'=>null]);
+        $result = $this->orderServices->accept($this->carrier->badge, $order->id);
+        expect($result)->toBeInstanceOf(Order::class)->status->toBe(1);
+        expect($order->fresh()->carrier_id)->toBe($this->carrier->badge->id);
+    });
+
+    it('modifiy dte field for order when order is accepts', function () {
+        $order = Order::find(1);
+        $firstDte = $order->dte;
+        $order->update([
             'status' => 0,
             'carrier_id' => null,
             'transportation_id' => $this->carrier->badge->transportation_id,
         ]);
         $result = $this->orderServices->accept($this->carrier->badge, 1);
         expect($result)->toBeInstanceOf(Order::class);
+        expect($order->fresh()->dte)->not->toEqual($firstDte);
     });
 
     it('fail to accepts an order for a carrier if order is assigned', function () {
@@ -234,7 +245,8 @@ describe('Order Services', function () {
     it('delivers a picked order', function () {
         $order = Order::find(1);
         $order->update(['status' => OrderStatus::picked->value]);
-        $result = $this->orderServices->delivered($this->carrier->badge, 1, $order->code('delivered')->code);
+        $result = $this->orderServices
+            ->delivered($this->carrier->badge, 1, $order->code('delivered')->code);
 
         expect($result)->toBeInstanceOf(Order::class);
     });

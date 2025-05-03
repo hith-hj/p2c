@@ -11,7 +11,7 @@ use App\Models\V1\Branch;
 use App\Models\V1\Carrier;
 use App\Models\V1\Order;
 use App\Models\V1\Producer;
-use App\OrderCostServices;
+use App\OrderCostCalculator;
 use App\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
 class OrderServices
 {
     use ExceptionHandler;
-    use OrderCostServices;
+    use OrderCostCalculator;
     use OrderDteCalculator;
 
     public function all(
@@ -77,31 +77,20 @@ class OrderServices
         ]);
         $branch = (new BranchServices())->find($data['branch_id']);
         $this->chackIfValidBranchWithLocation($branch, $producer);
-        $transportation = (new TransportationServices())->getMatchedTransportation($data['weight']);
-        $distance = $this->calcDistance(
-            src: ['lat' => $branch->location->lat, 'long' => $branch->location->long],
-            dest: ['lat' => $data['dest_lat'], 'long' => $data['dest_long']]
-        );
-        $distanceInMeter = $distance * 1000;
-        $this->checkIfValidDistance($distanceInMeter);
-        $inital = $this->initalCost($transportation, $data['weight'], $distance);
-        $delivery = $this->deliveryTypeCost($data['delivery_type']);
-        $attrs = $this->AttrsCost($data);
-        $final = $this->finalCost($inital, $attrs, $delivery);
+        $cost= $this->getCost($branch,$data);
         // todo : use transportation type to imporve dte
         $dte = $this->Dte([
             'created_at' => now(),
             'delivery_type' => $data['delivery_type'],
-            'distance' => $distanceInMeter,
+            'distance' => $cost['distance:m'],
         ]);
 
         return [
-            'distance:m' => $distanceInMeter,
-            'weight' => $data['weight'],
-            'inital' => $inital,
-            'delivery' => $delivery,
-            'attrs' => $attrs,
-            'final' => $final,
+            'distance:m' => $cost['distance:m'],
+            'inital' => $cost['inital'],
+            'delivery' => $cost['delivery'],
+            'attrs' => $cost['attrs'],
+            'final' => $cost['final'],
             'dte' => $dte,
         ];
     }
@@ -121,7 +110,7 @@ class OrderServices
         ]);
         $branch = $producer->branches()->find($data['branch_id']);
         $this->chackIfValidBranchWithLocation($branch, $producer);
-        $transportation = (new TransportationServices())->getMatchedTransportation($data['weight']);
+        $transportation = $this->getTransportation($data['weight']);
         $order = $producer->orders()->create([
             'branch_id' => $branch->id,
             'src_long' => $branch->location->long,
@@ -130,8 +119,8 @@ class OrderServices
             'delivery_type' => $data['delivery_type'],
             'customer_name' => $data['customer_name'],
             'goods_price' => $data['goods_price'],
-            'dest_long' => $data['dest_long'],
-            'dest_lat' => $data['dest_lat'],
+            'dest_long' => round((float) $data['dest_long'], 8),
+            'dest_lat' => round((float) $data['dest_lat'], 8),
             'distance' => $data['distance'],
             'weight' => $data['weight'],
             'cost' => $data['cost'],
@@ -157,7 +146,15 @@ class OrderServices
             __('main.transportations is not matched')
         );
         $order->carrier()->associate($carrier);
-        $order->update(['status' => OrderStatus::assigned->value]);
+        $dte = $this->Dte([
+            'created_at' => now(),
+            'delivery_type' => $order->delivery_type,
+            'distance' => $order->distance,
+        ]);
+        $order->update([
+            'status' => OrderStatus::assigned->value,
+            'dte' => $dte['dte']->toDateTimeString()
+        ]);
 
         return $order;
     }
@@ -294,16 +291,6 @@ class OrderServices
         }
 
         return $order;
-    }
-
-    private function checkIfValidDistance(int $distanceInMeter, int $minRange = 300, int $maxRange = 50000): void
-    {
-        throw_if(
-            $distanceInMeter < $minRange || $distanceInMeter > $maxRange,
-            'Exception',
-            __("main.Distance should be between 200 and 50000 meter, your is : $distanceInMeter")
-        );
-
     }
 
     private function chackIfValidBranchWithLocation(Branch $branch, Producer $producer): void

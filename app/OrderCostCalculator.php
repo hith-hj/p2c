@@ -4,11 +4,42 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Http\Services\TransportationServices;
 use App\Models\V1\Attr;
+use App\Models\V1\Branch;
 use App\Models\V1\Item;
 
-trait OrderCostServices
+trait OrderCostCalculator
 {
+    private function getCost(
+        Branch $branch,
+        array $data
+    ): array {
+        $transportation = $this->getTransportation($data['weight']);
+        $distance = $this->calcDistance(
+            src: ['lat' => $branch->location->lat, 'long' => $branch->location->long],
+            dest: ['lat' => $data['dest_lat'], 'long' => $data['dest_long']]
+        );
+        $distanceInMeter = $distance * 1000;
+        $this->checkIfValidDistance($distanceInMeter);
+        $inital = $this->initalCost($transportation, $data['weight'], $distance);
+        $delivery = $this->deliveryTypeCost($data['delivery_type']);
+        $attrs = $this->AttrsCost($data);
+        $final = $this->finalCost($inital, $attrs, $delivery);
+        return [
+            'distance:m' => $distanceInMeter,
+            'inital' => $inital,
+            'delivery' => $delivery,
+            'attrs' => $attrs,
+            'final' => $final
+        ];
+    }
+
+    private function getTransportation(int $weight)
+    {
+        return (new TransportationServices())->getMatchedTransportation($weight);
+    }
+
     private function calcDistance(array $src, array $dest): int
     {
         $rad = M_PI / 180;
@@ -16,17 +47,28 @@ trait OrderCostServices
         return (int) round(
             acos(
                 sin($src['lat'] * $rad) * sin($dest['lat'] * $rad) +
-                cos($src['lat'] * $rad) * cos($dest['lat'] * $rad) *
-                cos($src['long'] * $rad - $dest['long'] * $rad)
-            ) * 6371, 2); // km
+                    cos($src['lat'] * $rad) * cos($dest['lat'] * $rad) *
+                    cos($src['long'] * $rad - $dest['long'] * $rad)
+            ) * 6371,
+            2
+        ); // km
+    }
+
+    private function checkIfValidDistance(int $distanceInMeter, int $minRange = 300, int $maxRange = 50000): void
+    {
+        throw_if(
+            $distanceInMeter < $minRange || $distanceInMeter > $maxRange,
+            'Exception',
+            __("main.Distance should be between 200 and 50000 meter, your is : $distanceInMeter")
+        );
     }
 
     private function initalCost(object $transportation, int $weight, int $distance): int
     {
         return (int) round(
             $transportation->inital_cost +
-            $weight * $transportation->cost_per_kg +
-            $distance * $transportation->cost_per_km
+                $weight * $transportation->cost_per_kg +
+                $distance * $transportation->cost_per_km
         );
     }
 
