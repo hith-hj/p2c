@@ -119,8 +119,8 @@ class OrderServices
             'delivery_type' => $data['delivery_type'],
             'customer_name' => $data['customer_name'],
             'goods_price' => $data['goods_price'],
-            'dest_long' => round((float) $data['dest_long'], 8),
-            'dest_lat' => round((float) $data['dest_lat'], 8),
+            'dest_long' => round($data['dest_long'], 8),
+            'dest_lat' => round($data['dest_lat'], 8),
             'distance' => $data['distance'],
             'weight' => $data['weight'],
             'cost' => $data['cost'],
@@ -293,7 +293,7 @@ class OrderServices
         return $order;
     }
 
-    private function chackIfValidBranchWithLocation(Branch $branch, Producer $producer): void
+    private function chackIfValidBranchWithLocation(Branch|null $branch, Producer $producer): void
     {
         throw_if($branch === null, 'Exception', __('main.branch is required'));
         throw_if($branch->producer_id !== $producer->id, 'Exception', __('main.invalid operation'));
