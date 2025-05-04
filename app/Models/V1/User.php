@@ -6,7 +6,7 @@ namespace App\Models\V1;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\CodesManager;
+use App\CodesHandler;
 use App\Enums\UserRoles;
 use App\FirebaseNotification;
 use Exception;
@@ -18,7 +18,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use CodesManager;
+    use CodesHandler;
     use FirebaseNotification;
     use HasFactory;
 

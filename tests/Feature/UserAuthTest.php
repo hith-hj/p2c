@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 use App\Models\V1\User;
 
-it('registers_a_user', function () {
-    $data = [
-        'email' => 'test@example.com',
-        'phone' => '0912312312',
-        'password' => 'password',
-        'password_confirmation' => 'password',
-        'account_type' => 'producer',
-        'firebase_token' => 'some-firebase-token',
-    ];
-    $res = $this->postJson(route('register'), $data);
-    expect($res->status())->toBe(201);
-    expect($res->json('success'))->toBe(true);
-});
-
 describe('AuthController', function () {
+
+    it('registers_a_user', function () {
+        $data = [
+            'email' => 'test@example.com',
+            'phone' => '0912312312',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'account_type' => 'producer',
+            'firebase_token' => 'some-firebase-token',
+        ];
+        $res = $this->postJson(route('register'), $data);
+        expect($res->status())->toBe(201);
+        expect($res->json('success'))->toBe(true);
+    });
 
     it('fails_to_registers_a_user', function () {
         $data = [

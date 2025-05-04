@@ -39,6 +39,9 @@ return new class() extends Migration
             $table->timestamps();
             $table->timestamp('picked_at')->nullable();
             $table->timestamp('delivered_at')->nullable();
+            $table->timestamp('dte')->nullable();
+            $table->integer('volume')->nullable();
+            $table->json('dimensions')->nullable();
         });
     }
 

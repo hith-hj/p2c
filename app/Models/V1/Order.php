@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\V1;
 
-use App\CodesManager;
-use App\FeeCalculater;
+use App\CodesHandler;
+use App\FeeCalculator;
+use App\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,9 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-    use CodesManager;
-    use FeeCalculater;
+    use CodesHandler;
+    use FeeCalculator;
     use HasFactory;
+    use OrderDteCalculator;
 
     protected $guarded = [];
 

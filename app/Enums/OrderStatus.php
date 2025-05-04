@@ -13,4 +13,9 @@ enum OrderStatus: int
     case picked = 2;
     case delivered = 3;
     case finished = 4;
+
+    public static function values()
+    {
+        return array_column(self::cases(), 'value');
+    }
 }

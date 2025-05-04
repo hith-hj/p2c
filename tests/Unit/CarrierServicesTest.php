@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Services\CarrierServices;
+use App\Http\Services\CarrierServices;
 use App\Models\V1\Carrier;
 use App\Models\V1\CarrierDetails;
 use App\Models\V1\Location;

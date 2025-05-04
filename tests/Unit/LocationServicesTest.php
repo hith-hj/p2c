@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Services\LocationServices;
+use App\Http\Services\LocationServices;
 use App\Models\V1\Branch;
 use App\Models\V1\Location;
 use Illuminate\Database\Eloquent\Relations\HasOne;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Services\FeeServices;
+use App\Http\Services\FeeServices;
 use App\Http\Resources\V1\FeeResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

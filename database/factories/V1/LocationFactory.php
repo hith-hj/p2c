@@ -19,8 +19,8 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'long' => fake()->longitude(),
-            'lat' => fake()->latitude(),
+            'long' => fake()->longitude(31.00000001, 31.55555555),
+            'lat' => fake()->latitude(31.00000001, 31.55555555),
         ];
     }
 
