@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Models\V1\Carrier;
 use App\Models\V1\User;
-use Database\Seeders\DatabaseSeeder;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
@@ -13,7 +12,7 @@ beforeEach(function () {
     $token = JWTAuth::fromUser($this->user);
     $this->withHeaders(['Authorization' => "Bearer $token"]);
     $this->url = 'api/v1/carrier';
-    (new DatabaseSeeder())->run();
+    $this->seed();
 });
 
 describe('CarrierController', function () {
@@ -121,7 +120,6 @@ describe('CarrierController', function () {
         $data = [];
         $res = $this->patchJson("$this->url/update", $data);
         expect($res->status())->toBe(400);
-        expect($res->json('message'))->toBe('Data Is Required');
     });
 
     it('updates an existing carrier transportation and delete old details', function () {

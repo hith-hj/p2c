@@ -6,7 +6,7 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Location extends Model
 {
@@ -14,9 +14,8 @@ class Location extends Model
 
     protected $guarded = [];
 
-    public function holder(): BelongsTo
+    public function holder(): MorphTo
     {
-        return $this->belongsTo($this->belongTo_type)
-            ->where('id', $this->belongTo_id);
+        return $this->morphTo(__FUNCTION__, 'belongTo_type', 'belongTo_id');
     }
 }

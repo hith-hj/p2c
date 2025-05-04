@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Services\TransportationServices;
 use App\Http\Resources\V1\TransportationResource;
+use App\Http\Services\TransportationServices;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

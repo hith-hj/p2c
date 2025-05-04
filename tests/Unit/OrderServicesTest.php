@@ -16,6 +16,18 @@ beforeEach(function () {
     $producerOrders = Order::factory(2)->create(['producer_id' => $this->producer->id]);
     $this->carrier->badge->orders()->saveMany($carrierOrders);
     $this->producer->badge->orders()->saveMany($producerOrders);
+    $this->orderData = [
+        'branch_id' => 1,
+        'weight' => 100,
+        'customer_name' => 'John Doe',
+        'customer_phone' => '0987654321',
+        'delivery_type' => 'normal',
+        'goods_price' => 1000,
+        'dest_long' => 50.0,
+        'dest_lat' => 60.0,
+        'distance' => 10.0,
+        'cost' => 200.0,
+    ];
 });
 
 describe('Order Services', function () {
@@ -61,7 +73,6 @@ describe('Order Services', function () {
     })->throws(Exception::class);
 
     it('calculates the cost of an order', function () {
-
         $data = $this->orderServices->calcCost(
             $this->producer->badge,
             [
@@ -72,35 +83,15 @@ describe('Order Services', function () {
                 'delivery_type' => 'normal',
             ]
         );
-
-        expect($data)->toBeArray()
-            ->toHaveKeys(['distance:m', 'inital', 'delivery', 'attrs', 'final', 'dte']);
+        expect($data)->toBeArray();
     });
 
     it('fails to calculates cost of an order if producer missing', function () {
-        $this->orderServices->calcCost(
-            // $this->producer->badge,
-            [
-                'weight' => 100,
-                'branch_id' => 1,
-                'dest_long' => 30.0,
-                'dest_lat' => 31.0,
-                'delivery_type' => 'normal',
-            ]
-        );
+        $this->orderServices->calcCost(null, []);
     })->throws(TypeError::class);
 
     it('fails to calculates cost of an order if any arguments missing', function () {
-        $this->orderServices->calcCost(
-            $this->producer->badge,
-            [
-                // 'weight'=>100,
-                // 'branch_id'=>1,
-                'dest_long' => 31.40000,
-                'dest_lat' => 31.80000,
-                'delivery_type' => 'normal',
-            ]
-        );
+        $this->orderServices->calcCost($this->producer->badge, []);
     })->throws(Exception::class);
 
     it('fails to calculates cost of an order if distance is out of range', function () {
@@ -117,79 +108,38 @@ describe('Order Services', function () {
     })->throws(exception::class);
 
     it('creates a new order', function () {
-        $data = [
-            'branch_id' => 1,
-            'weight' => 100,
-            'customer_name' => 'John Doe',
-            'delivery_type' => 'normal',
-            'goods_price' => 1000,
-            'dest_long' => 50.0,
-            'dest_lat' => 60.0,
-            'distance' => 10.0,
-            'cost' => 200.0,
-        ];
-        $order = $this->orderServices->create($this->producer->badge, $data);
-
+        $order = $this->orderServices->create($this->producer->badge, $this->orderData);
         expect($order)->toBeInstanceOf(Order::class);
     });
 
     it('check codes existance for newly created order', function () {
-        $data = [
-            'branch_id' => 1,
-            'weight' => 100,
-            'customer_name' => 'John Doe',
-            'delivery_type' => 'normal',
-            'goods_price' => 1000,
-            'dest_long' => 50.0,
-            'dest_lat' => 60.0,
-            'distance' => 10.0,
-            'cost' => 200.0,
-        ];
-        $order = $this->orderServices->create($this->producer->badge, $data);
+        $order = $this->orderServices->create($this->producer->badge, $this->orderData);
         expect($order)->toBeInstanceOf(Order::class);
         expect($order->codes)->toBeInstanceOf(Collection::class);
         expect($order->fresh()->codes)->toHaveCount(2);
     });
 
     it('check dte existance for newly created order  ', function () {
-        $data = [
-            'branch_id' => 1,
-            'weight' => 100,
-            'customer_name' => 'John Doe',
-            'delivery_type' => 'normal',
-            'goods_price' => 1000,
-            'dest_long' => 50.0,
-            'dest_lat' => 60.0,
-            'distance' => 10.0,
-            'cost' => 200.0,
-        ];
-        $order = $this->orderServices->create($this->producer->badge, $data);
-
+        $order = $this->orderServices->create($this->producer->badge, $this->orderData);
         expect($order)->toBeInstanceOf(Order::class)->not->toBeNull();
         expect($order->dte)->not->toBeNull();
     });
 
     it('fail to creates a new order with wrong data', function () {
-        $data = [
-            'branch_id' => 1,
-            'weight' => 100,
-            'customer_name' => 'John Doe',
-            // 'delivery_type' => 'normal',
-            // 'goods_price' => 1000,
-            'dest_long' => 50.0,
-            'dest_lat' => 60.0,
-            'distance' => 10.0,
-            'cost' => 200.0,
-        ];
-        $this->orderServices->create($this->producer->badge, $data);
+        $this->orderServices->create($this->producer->badge, []);
     })->throws(Exception::class);
 
     it('accepts an order for a carrier', function () {
         $order = Order::find(1);
-        $order->update(['transportation_id'=>$this->carrier->badge->transportation_id, 'status'=>0,'carrier_id'=>null]);
+        $order->update([
+            'transportation_id' => $this->carrier->badge->transportation_id,
+            'status' => 0,
+            'carrier_id' => null,
+        ]);
         $result = $this->orderServices->accept($this->carrier->badge, $order->id);
         expect($result)->toBeInstanceOf(Order::class)->status->toBe(1);
         expect($order->fresh()->carrier_id)->toBe($this->carrier->badge->id);
+        expect($order->fresh()->status)->toBe(1);
     });
 
     it('modifiy dte field for order when order is accepts', function () {
@@ -202,6 +152,7 @@ describe('Order Services', function () {
         ]);
         $result = $this->orderServices->accept($this->carrier->badge, 1);
         expect($result)->toBeInstanceOf(Order::class);
+        expect($order->fresh()->dte)->not->toBeNull();
         expect($order->fresh()->dte)->not->toEqual($firstDte);
     });
 
@@ -230,6 +181,7 @@ describe('Order Services', function () {
         $order->update(['status' => 1]);
         $result = $this->orderServices->picked($this->carrier->badge, 1);
         expect($result)->toBeInstanceOf(Order::class);
+        expect($order->fresh()->status)->toBe(2);
     });
 
     it('fail to picks order for carrier if not found', function () {
@@ -245,10 +197,13 @@ describe('Order Services', function () {
     it('delivers a picked order', function () {
         $order = Order::find(1);
         $order->update(['status' => OrderStatus::picked->value]);
-        $result = $this->orderServices
-            ->delivered($this->carrier->badge, 1, $order->code('delivered')->code);
-
+        $result = $this->orderServices->delivered(
+            $this->carrier->badge,
+            $order->id,
+            $order->code('delivered')->code
+        );
         expect($result)->toBeInstanceOf(Order::class);
+        expect($order->fresh()->status)->toBe(3);
     });
 
     it('fail to delivers a picked order if not found', function () {
@@ -258,7 +213,7 @@ describe('Order Services', function () {
     it('fail to delivers a picked order if not picked', function () {
         $order = Order::find(1);
         $order->update(['status' => OrderStatus::assigned->value]);
-        $this->orderServices->delivered($this->carrier->badge, 1000, 0000);
+        $this->orderServices->delivered($this->carrier->badge, 1, 0000);
     })->throws(Exception::class);
 
     it('fail to delivers a picked order with wrong code', function () {

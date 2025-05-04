@@ -23,7 +23,7 @@ class OrderResource extends JsonResource
             'producer' => $this->producer?->brand,
             'carrier' => $this->carrier?->first_name,
             'transportation' => $this->transportation?->name,
-            'customer_name' => $this->customer_name,
+            'customer' => $this->customer->only(['id', 'name', 'phone']),
             'branch' => $this->branch->only(['id', 'name']),
             'src_long' => (float) $this->src_long,
             'src_lat' => (float) $this->src_lat,

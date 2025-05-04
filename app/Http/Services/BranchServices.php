@@ -15,27 +15,24 @@ class BranchServices
 
     public function find(int $id): Branch
     {
-        $this->Required($id, __('main.branch').' ID');
-        $branch = Branch::where('id', $id)->first();
-        $this->NotFound($branch, __('main.branch'));
+        $branch = Branch::find($id);
+        $this->NotFound($branch, 'branch');
 
         return $branch;
     }
 
     public function get(int $id): Collection
     {
-        $this->Required($id, __('main.producer').' ID');
         $producer = Producer::find($id);
-        $this->NotFound($producer, __('main.producer'));
-        $this->NotFound($producer->branches, __('main.branches'));
+        $this->NotFound($producer, 'producer');
+        $this->NotFound($producer->branches, 'branches');
 
         return $producer->branches;
     }
 
     public function create(Producer $producer, array $data): Branch
     {
-        $this->Required($producer, __('main.producer'));
-        $this->Required($data, __('main.data'));
+        $this->Required($data, 'data');
         $branch = $producer->branches()->create([
             'name' => $data['name'] ?? 'Main',
             'phone' => $data['phone'],
@@ -48,15 +45,14 @@ class BranchServices
 
     public function update(Branch $branch, array $data): bool
     {
-        $this->Required($branch, __('main.branch'));
-        $this->Required($data, __('main.data'));
+        $this->Required($data, 'data');
 
         return $branch->update($data);
     }
 
     public function delete(Branch $branch): bool
     {
-        $this->Exists($branch->is_default, __('main.is default'));
+        $this->Truthy($branch->is_default, 'is default');
         $branch->location()->delete();
 
         return $branch->delete();
@@ -64,7 +60,6 @@ class BranchServices
 
     public function setBranchAsDefault(Branch $branch): bool
     {
-        $this->Required($branch, __('main.branch'));
         $default = Branch::where([
             ['producer_id', $branch->producer_id],
             ['is_default', true],

@@ -16,16 +16,15 @@ class TransportationServices
     public function all(): Collection
     {
         $transportaions = Transportation::all();
-        $this->NotFound($transportaions, __('main.transportations'));
+        $this->NotFound($transportaions, 'transportations');
 
         return $transportaions;
     }
 
     public function find(int $id): Transportation
     {
-        $this->Required($id, __('main.carrier').' ID');
-        $transportaion = Transportation::where('id', $id)->first();
-        $this->NotFound($transportaion, __('main.transportation'));
+        $transportaion = Transportation::find($id);
+        $this->NotFound($transportaion, 'transportation');
 
         return $transportaion;
     }

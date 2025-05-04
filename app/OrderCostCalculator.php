@@ -26,12 +26,13 @@ trait OrderCostCalculator
         $delivery = $this->deliveryTypeCost($data['delivery_type']);
         $attrs = $this->AttrsCost($data);
         $final = $this->finalCost($inital, $attrs, $delivery);
+
         return [
             'distance:m' => $distanceInMeter,
             'inital' => $inital,
             'delivery' => $delivery,
             'attrs' => $attrs,
-            'final' => $final
+            'final' => $final,
         ];
     }
 

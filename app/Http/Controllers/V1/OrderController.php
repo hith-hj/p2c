@@ -6,8 +6,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Enums\OrderDeliveryTypes;
 use App\Http\Controllers\Controller;
-use App\Http\Services\OrderServices;
 use App\Http\Resources\V1\OrderResource;
+use App\Http\Services\OrderServices;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -124,12 +124,13 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'branch_id' => ['required', 'exists:branches,id'],
             'customer_name' => ['required', 'string', 'max:30'],
+            'customer_phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/'],
             'delivery_type' => ['required', Rule::in(OrderDeliveryTypes::cases())],
-            'goods_price' => ['required', 'numeric'],
             'dest_long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'dest_lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
-            'weight' => ['required', 'numeric', 'min:1', 'max:5000'],
             'distance' => ['required', 'numeric', 'min:200', 'max:50000'],
+            'weight' => ['required', 'numeric', 'min:1', 'max:5000'],
+            'goods_price' => ['required', 'numeric'],
             'cost' => ['required', 'numeric'],
             'attrs' => ['sometimes', 'array', 'max:5'],
             'attrs.*' => ['required', 'exists:attrs,id'],

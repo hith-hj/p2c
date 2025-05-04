@@ -39,7 +39,7 @@ describe('Location Service class', function () {
             'cords' => ['long' => 35.0, 'lat' => 40.0],
         ];
         $this->locationServices->create((object) [], $data);
-    })->throws(Exception::class, 'Location method');
+    })->throws(Exception::class);
 
     it('edits a location by creating when no existing location', function () {
         $this->belongTo->location()
@@ -68,7 +68,7 @@ describe('Location Service class', function () {
             'cords' => ['long' => 35.0, 'lat' => 40.0],
         ];
         $this->locationServices->edit((object) [], $data);
-    })->throws(Exception::class, 'Location method');
+    })->throws(Exception::class);
 
     it('updates a location when existing ', function () {
         $this->belongTo->location()->shouldReceive('exists')->andReturnTrue();

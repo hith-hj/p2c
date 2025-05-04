@@ -31,7 +31,7 @@ trait ExceptionHandler
      */
     private function NotFound($argument, $name = '')
     {
-        return $this->empty($argument, $name, __('main.not found'));
+        return $this->empty($argument, $name, 'not found');
     }
 
     /**
@@ -43,7 +43,7 @@ trait ExceptionHandler
      */
     private function Required($argument, $name = '')
     {
-        return $this->empty($argument, $name, __('main.is required'));
+        return $this->empty($argument, $name, 'is required');
     }
 
     private function empty($argument, $name = '', $msg = 'Error'): void
@@ -54,7 +54,39 @@ trait ExceptionHandler
             empty($argument) ||
             (is_countable($argument) && count($argument) === 0)
         ) {
-            throw new Exception(sprintf('%s %s', $name, $msg));
+            throw new Exception(sprintf('%s %s', __("main.$name"), __("main.$msg")));
         }
+    }
+
+    /**
+     * throw exception if the condition is true
+     *
+     * @param  bool  $condition
+     * @param  string  $message
+     * @param  mixed  $name
+     */
+    private function Truthy($condition, $message, ...$parameters)
+    {
+        if ($condition) {
+            throw new \Exception(__("main.$message"), ...$parameters);
+        }
+
+        return $condition;
+    }
+
+    /**
+     * throw exception if the condition is false
+     *
+     * @param  bool  $condition
+     * @param  string  $message
+     * @param  mixed  $name
+     */
+    private function Falsy($condition, $message, ...$parameters)
+    {
+        if (! $condition) {
+            throw new \Exception(__("main.$message"), ...$parameters);
+        }
+
+        return $condition;
     }
 }
