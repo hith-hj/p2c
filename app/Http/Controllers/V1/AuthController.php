@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -91,7 +91,7 @@ class AuthController extends Controller
 
         $credentials = $request->only('phone', 'password');
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
+            if (! Auth::attempt($credentials)) {
                 return $this->error(msg: __('main.invalid credentials'));
             }
 

@@ -290,7 +290,7 @@ class OrderServices
                     'lat' => $data['dest_lat'],
                 ]
             ];
-            $customer = new CustomerServices()->createIfNotExists($customerInfo);
+            $customer = (new CustomerServices())->createIfNotExists($customerInfo);
             $order->customer()->associate($customer);
         }
         $order->createCode('pickup', 4);

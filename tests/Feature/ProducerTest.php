@@ -7,7 +7,7 @@ use App\Models\V1\Fee;
 use App\Models\V1\Order;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
     $this->user = User::factory()->create(['role' => 'producer']);

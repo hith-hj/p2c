@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\V1\Carrier;
 use App\Models\V1\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
     $this->user = User::factory()->create(['role' => 'carrier']);

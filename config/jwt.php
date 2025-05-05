@@ -2,17 +2,7 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of jwt-auth.
- *
- * (c) Sean Tymon <tymon148@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 return [
-
     /*
     |--------------------------------------------------------------------------
     | JWT Authentication Secret
@@ -47,7 +37,6 @@ return [
     */
 
     'keys' => [
-
         /*
         |--------------------------------------------------------------------------
         | Public Key
@@ -84,7 +73,6 @@ return [
         */
 
         'passphrase' => env('JWT_PASSPHRASE'),
-
     ],
 
     /*
@@ -103,7 +91,7 @@ return [
     |
     */
 
-    'ttl' => (int) env('JWT_TTL', 300),
+    'ttl' => (int) env('JWT_TTL', 60),
 
     /*
     |--------------------------------------------------------------------------
@@ -131,9 +119,12 @@ return [
     |
     | Specify the hashing algorithm that will be used to sign the token.
     |
+    | See here: https://github.com/namshi/jose/tree/master/src/Namshi/JOSE/Signer/OpenSSL
+    | for possible values.
+    |
     */
 
-    'algo' => env('JWT_ALGO', Tymon\JWTAuth\Providers\JWT\Provider::ALGO_HS256),
+    'algo' => env('JWT_ALGO', 'HS256'),
 
     /*
     |--------------------------------------------------------------------------
@@ -207,7 +198,7 @@ return [
     |
     */
 
-    'leeway' => env('JWT_LEEWAY', 0),
+    'leeway' => (int) env('JWT_LEEWAY', 0),
 
     /*
     |--------------------------------------------------------------------------
@@ -234,7 +225,18 @@ return [
     |
     */
 
-    'blacklist_grace_period' => env('JWT_BLACKLIST_GRACE_PERIOD', 0),
+    'blacklist_grace_period' => (int) env('JWT_BLACKLIST_GRACE_PERIOD', 0),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Show blacklisted token option
+    |--------------------------------------------------------------------------
+    |
+    | Specify if you want to show black listed token exception on the laravel logs.
+    |
+    */
+
+    'show_black_list_exception' => env('JWT_SHOW_BLACKLIST_EXCEPTION', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -256,6 +258,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Cookie key name
+    |--------------------------------------------------------------------------
+    |
+    | Specify the cookie key name that you would like to use for the cookie token.
+    |
+    */
+
+    'cookie_key_name' => 'token',
+
+    /*
+    |--------------------------------------------------------------------------
     | Providers
     |--------------------------------------------------------------------------
     |
@@ -264,7 +277,6 @@ return [
     */
 
     'providers' => [
-
         /*
         |--------------------------------------------------------------------------
         | JWT Provider
@@ -274,7 +286,7 @@ return [
         |
         */
 
-        'jwt' => Tymon\JWTAuth\Providers\JWT\Lcobucci::class,
+        'jwt' => PHPOpenSourceSaver\JWTAuth\Providers\JWT\Lcobucci::class,
 
         /*
         |--------------------------------------------------------------------------
@@ -285,7 +297,7 @@ return [
         |
         */
 
-        'auth' => Tymon\JWTAuth\Providers\Auth\Illuminate::class,
+        'auth' => PHPOpenSourceSaver\JWTAuth\Providers\Auth\Illuminate::class,
 
         /*
         |--------------------------------------------------------------------------
@@ -296,8 +308,6 @@ return [
         |
         */
 
-        'storage' => Tymon\JWTAuth\Providers\Storage\Illuminate::class,
-
+        'storage' => PHPOpenSourceSaver\JWTAuth\Providers\Storage\Illuminate::class,
     ],
-
 ];

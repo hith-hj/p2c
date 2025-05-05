@@ -6,9 +6,9 @@ namespace App\Http\Middleware\V1\Auth;
 
 use Closure;
 use Illuminate\Http\Request;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class JwtMiddleware
 {

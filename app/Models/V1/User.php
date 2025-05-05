@@ -8,18 +8,18 @@ namespace App\Models\V1;
 
 use App\CodesHandler;
 use App\Enums\UserRoles;
-use App\FirebaseNotification;
+use App\NotificationsHandler;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     use CodesHandler;
-    use FirebaseNotification;
+    use NotificationsHandler;
     use HasFactory;
 
     /**
@@ -99,9 +99,13 @@ class User extends Authenticatable implements JWTSubject
             'verified_by' => $by,
         ]);
         if ($by === 'phone') {
-            $this->notifyFCM($this);
+            $this->notifyPhone(
+                'verification code',
+                'this is your code to verify',
+                ['code'=>$this->code('verification')->code]
+            );
         } else {
-            $this->notifyEmail($this);
+            $this->notifyEmail();
         }
 
         return $this;

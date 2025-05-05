@@ -49,7 +49,7 @@ class CustomerServices
 			'password' => Hash::make($data['phone']),
 			'status' => CustomerStatus::fresh->value,
 		]);
-		new LocationServices()->create($customer, $data);
+		(new LocationServices())->create($customer, $data);
 
 		return $customer;
 	}

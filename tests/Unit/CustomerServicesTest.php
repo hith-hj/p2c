@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Services\CustomerServices;
 use App\Models\V1\Customer;
-use Illuminate\Support\Collection;
 
 beforeEach(function () {
     $this->customerServices = new CustomerServices();
