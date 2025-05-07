@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\FeeTypes;
 use App\Http\Services\FeeServices;
 use App\Models\V1\Fee;
 use App\Models\V1\User;
@@ -13,14 +14,15 @@ beforeEach(function () {
     $this->producer = User::factory()->create(['role' => 'producer']);
     $this->data = [
         'subject_id' => rand(1, 5),
-        'subject_type' => array_rand(['App\Models\V1\Order' => 1,]),
+        'subject_type' => array_rand(['App\Models\V1\Order' => 1]),
+        'type' => FeeTypes::normal->value,
         'amount' => '100',
         'delay_fee' => '20',
         'due_date' => now(),
         'status' => 0,
     ];
-    $this->carrierData = array_merge($this->data, ['belongTo_type' => get_class($this->carrier->badge),]);
-    $this->producerData = array_merge($this->data, ['belongTo_type' => get_class($this->producer->badge),]);
+    $this->carrierData = array_merge($this->data, ['belongTo_type' => get_class($this->carrier->badge)]);
+    $this->producerData = array_merge($this->data, ['belongTo_type' => get_class($this->producer->badge)]);
 });
 
 describe('Fee Services', function () {
@@ -44,14 +46,14 @@ describe('Fee Services', function () {
         $this->feeServices->get($this->producer->badge);
     })->throws(Exception::class);
 
-    it('retrieves fee by id ',function(){
-        $fee = Fee::create(['belongTo_id'=>1,...$this->producerData]);
+    it('retrieves fee by id ', function () {
+        $fee = Fee::create(['belongTo_id' => 1, ...$this->producerData]);
         $res = $this->feeServices->find($fee->id);
         expect($res)->toBeInstanceOf(Fee::class)
-        ->and($res->id)->toBe($fee->id);
+            ->and($res->id)->toBe($fee->id);
     });
 
-    it('fails to retrieves fee by invalid id',function(){
+    it('fails to retrieves fee by invalid id', function () {
         $this->feeServices->find(100);
     })->throws(Exception::class);
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
+use App\Enums\FeeTypes;
 use App\Enums\OrderDeliveryTypes;
 use App\Enums\OrderStatus;
 use App\Models\V1\Branch;
@@ -187,7 +188,7 @@ class OrderServices
         $this->Truthy($order->status !== OrderStatus::delivered->value, 'invalid order status');
         $order->update(['status' => OrderStatus::finished->value]);
         $order->codes()->delete();
-        $order->createFee($order->carrier);
+        $order->createFee($order->carrier, FeeTypes::normal->value);
 
         return $order;
     }
@@ -211,7 +212,7 @@ class OrderServices
         $this->Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
         $order->update(['status' => OrderStatus::canceld->value]);
         $order->codes()->delete();
-        $order->createFee($producer);
+        $order->createFee($producer, FeeTypes::normal->value);
 
         return $order;
     }
@@ -223,7 +224,7 @@ class OrderServices
         $this->Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
         $order->update(['status' => OrderStatus::rejected->value]);
         $order->codes()->delete();
-        $order->createFee($carrier);
+        $order->createFee($carrier, FeeTypes::reject->value);
 
         return $order;
     }
@@ -266,7 +267,7 @@ class OrderServices
             return $data;
         }
         $missing = array_diff(array_keys($requiredFields), array_keys($data));
-        $this->Falsy(empty($missing), 'fields missing: ' . implode(', ', $missing));
+        $this->Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
         foreach ($requiredFields as $key => $value) {
             settype($data[$key], $value);
         }
@@ -303,7 +304,7 @@ class OrderServices
     private function chackIfValidBranchWithLocation(?Branch $branch, Producer $producer): void
     {
         $this->Truthy($branch === null, 'branch is required');
-        $this->Truthy($branch->producer_id !== $producer->id, 'invalid operation',);
+        $this->Truthy($branch->producer_id !== $producer->id, 'invalid operation');
         $this->Truthy($branch->location === null, 'branch location is required');
     }
 }

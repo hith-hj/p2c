@@ -31,7 +31,6 @@ class Order extends Model
     {
         return $this->belongsTo(Carrier::class);
     }
-    
 
     public function customer(): BelongsTo
     {

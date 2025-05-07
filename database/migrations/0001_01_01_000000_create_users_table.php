@@ -21,7 +21,7 @@ return new class() extends Migration
             $table->timestamp('verified_at')->nullable();
             $table->string('verification_code')->nullable();
             $table->string('verified_by')->nullable();
-            $table->string('firebase_token')->nullable();
+            $table->text('firebase_token')->nullable();
             $table->string('role');
             $table->timestamps();
         });

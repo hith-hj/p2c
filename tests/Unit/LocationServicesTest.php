@@ -13,7 +13,7 @@ beforeEach(function () {
     $this->belongTo->shouldReceive('location')->andReturn(mock(HasOne::class));
 });
 
-describe('Location Service class', function () {
+describe('Location Service', function () {
 
     it('creates a location', function () {
         $this->belongTo->location()

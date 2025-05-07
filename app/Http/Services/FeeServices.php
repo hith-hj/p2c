@@ -13,9 +13,10 @@ class FeeServices
 
     public function get(object $badge)
     {
-        $this->Truthy(!method_exists($badge, 'fees'), 'fees method missing');
-        $fees =  $badge->fees;
+        $this->Truthy(! method_exists($badge, 'fees'), 'fees method missing');
+        $fees = $badge->fees;
         $this->NotFound($fees, 'Fees');
+
         return $fees;
     }
 
@@ -26,6 +27,7 @@ class FeeServices
             ->where('id', $id)
             ->first();
         $this->NotFound($fee, 'Fee');
+
         return $fee;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\OrderStatus;
 use App\Models\V1\Order;
 use App\Models\V1\User;
@@ -72,7 +74,7 @@ describe('Order Controller', function () {
 
     it('fails when fetching an order without ID', function () {
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
-            ->getJson("$this->url/find",);
+            ->getJson("$this->url/find");
         expect($res->status())->toBe(422);
     });
 
@@ -102,7 +104,7 @@ describe('Order Controller', function () {
         expect($res->status())->toBe(403);
     });
 
-    it("checks the cost of order for producer", function () {
+    it('checks the cost of order for producer', function () {
         $check = [
             'branch_id' => 1,
             'delivery_type' => 'normal',
@@ -117,13 +119,13 @@ describe('Order Controller', function () {
             ->and($res->json('payload.receipt'))->toHaveKeys(['inital', 'final', 'dte']);
     });
 
-    it("fails to checks the cost of order for producer with invalid data", function () {
+    it('fails to checks the cost of order for producer with invalid data', function () {
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
             ->postJson("$this->url/checkCost", []);
         expect($res->status())->toBe(422);
     });
 
-    it("fails to checks the cost of order for carrier", function () {
+    it('fails to checks the cost of order for carrier', function () {
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/checkCost", []);
         expect($res->status())->toBe(403);
@@ -180,7 +182,7 @@ describe('Order Controller', function () {
     it('prevent producer to cancel not pending orders', function () {
         $order = Order::factory()->create([
             'producer_id' => $this->producer->badge->id,
-            'status' => OrderStatus::assigned->value
+            'status' => OrderStatus::assigned->value,
         ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
             ->postJson("$this->url/cancel", ['order_id' => $order->id]);
@@ -193,7 +195,7 @@ describe('Order Controller', function () {
         $order = Order::factory()->create([
             'producer_id' => $this->producer->badge->id,
             'carrier_id' => 1,
-            'status' => OrderStatus::assigned->value
+            'status' => OrderStatus::assigned->value,
         ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
             ->postJson("$this->url/cancel", ['order_id' => $order->id]);
@@ -204,7 +206,7 @@ describe('Order Controller', function () {
     it('allow carrier to pickup order when assigned', function () {
         $order = Order::factory()->create([
             'carrier_id' => $this->carrier->badge->id,
-            'status' => OrderStatus::assigned->value
+            'status' => OrderStatus::assigned->value,
         ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/picked", ['order_id' => $order->id]);
@@ -216,7 +218,7 @@ describe('Order Controller', function () {
     it('prevent carrier to pickup order when status not equal assigned', function () {
         $order = Order::factory()->create([
             'carrier_id' => $this->carrier->badge->id,
-            'status' => OrderStatus::pending->value
+            'status' => OrderStatus::pending->value,
         ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/picked", ['order_id' => $order->id]);
@@ -236,7 +238,7 @@ describe('Order Controller', function () {
     it('prevent producer to pickup order', function () {
         $order = Order::factory()->create([
             'carrier_id' => $this->carrier->badge->id,
-            'status' => OrderStatus::assigned->value
+            'status' => OrderStatus::assigned->value,
         ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
             ->postJson("$this->url/picked", ['order_id' => $order->id]);
@@ -248,13 +250,13 @@ describe('Order Controller', function () {
     it('allow carrier to deliver order when picked', function () {
         $order = Order::factory()->create([
             'carrier_id' => $this->carrier->badge->id,
-            'status' => OrderStatus::picked->value
+            'status' => OrderStatus::picked->value,
         ]);
         $order->createCode('delivered', 4);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/delivered", [
                 'order_id' => $order->id,
-                'code' => $order->code('delivered')->code
+                'code' => $order->code('delivered')->code,
             ]);
         expect($res->status())->toBe(200);
 
@@ -264,14 +266,14 @@ describe('Order Controller', function () {
     it('prevent carrier to deliver order when not picked', function () {
         $order = Order::factory()->create([
             'carrier_id' => $this->carrier->badge->id,
-            'status' => OrderStatus::assigned->value
+            'status' => OrderStatus::assigned->value,
         ]);
         $order->createCode('delivered', 4);
 
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/delivered", [
                 'order_id' => $order->id,
-                'code' => $order->code('delivered')->code
+                'code' => $order->code('delivered')->code,
             ]);
         expect($res->status())->toBe(400);
 
@@ -281,18 +283,18 @@ describe('Order Controller', function () {
     it('prevent carrier to deliver order with invalid code', function () {
         $order = Order::factory()->create([
             'carrier_id' => $this->carrier->badge->id,
-            'status' => OrderStatus::picked->value
+            'status' => OrderStatus::picked->value,
         ]);
 
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/delivered", [
                 'order_id' => $order->id,
-                'code' => 000
+                'code' => 000,
             ]);
         expect($res->status())->toBe(422);
 
         expect($order->fresh()->status)->toBe(OrderStatus::picked->value);
     });
 
-    //Todo: imporelemt test for finish, force cancel, reject
+    // Todo: imporelemt test for finish, force cancel, reject
 });

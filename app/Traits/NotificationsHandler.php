@@ -6,8 +6,8 @@ namespace App\Traits;
 
 use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory as FcmFactory;
+use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Messaging\Notification;
 
 trait NotificationsHandler
 {
@@ -24,24 +24,32 @@ trait NotificationsHandler
         return match ($provider) {
             'sms' => $this->sms(),
             'fcm' => $this->fcm($title, $body, $data),
-            default => $this->fcm($this->firebase_token, $title, $body, $data),
+            default => $this->fcm($title, $body, $data),
         };
     }
 
     public function fcm($title, $body, $data)
     {
-        if($this->firebase_token === null){
+        if ($this->firebase_token === null) {
             return true;
         }
         $token = $this->firebase_token;
         $factory = (new FcmFactory())->withServiceAccount($this->getFCMCredentials());
         $messaging = $factory->createMessaging();
+        $data = [
+            'title' => $title,
+            'body' => $body,
+        ];
         $message = CloudMessage::new()
-            ->withNotification(Notification::create($title, $body))
-            ->withData($data)
+            ->withNotification($data)
+            ->withAndroidConfig($this->getFCMAndroidConfig())
             ->toToken($token);
+        if (! empty($data)) {
+            $message->withData($data);
+        }
         try {
             $res = $messaging->send($message);
+            $this->store([...$data, 'result' => $res]);
 
             return true;
         } catch (MessagingException $e) {
@@ -52,6 +60,33 @@ trait NotificationsHandler
     private function getFCMCredentials()
     {
         return storage_path('app/fcm.json');
+    }
+
+    private function getFCMAndroidConfig()
+    {
+        return AndroidConfig::fromArray([
+            'ttl' => '3600s',
+            'priority' => 'high',
+            'notification' => [
+                'icon' => 'stock_ticker_update',
+                'color' => '#f45342',
+                'sound' => 'default',
+            ],
+        ]);
+    }
+
+    public function store(array $data)
+    {
+        if (! method_exists($this, 'notifications')) {
+            return;
+        }
+
+        return $this->notifications()->create([
+            'belongTo_type' => $this::class,
+            'title' => $data['title'],
+            'payload' => serialize($data),
+            'status' => 0,
+        ]);
     }
 
     private function sms()

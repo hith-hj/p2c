@@ -15,7 +15,7 @@ beforeEach(function () {
     $this->seed();
 });
 
-describe('CarrierController', function () {
+describe('Carrier Controller', function () {
     it('retrieves all carriers', function () {
         User::factory()->count(3)->create(['role' => 'carrier']);
 

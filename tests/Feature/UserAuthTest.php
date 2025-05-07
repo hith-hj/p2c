@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\V1\User;
 
-describe('AuthController', function () {
+describe('Auth Controller', function () {
 
     it('registers_a_user', function () {
         $data = [

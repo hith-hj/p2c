@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransportationResource\Pages;
-use App\Filament\Resources\TransportationResource\RelationManagers;
 use App\Models\V1\Transportation;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class TransportationResource extends Resource
 {
@@ -47,7 +46,7 @@ class TransportationResource extends Resource
                     ->min(0)
                     ->required(),
                 Forms\Components\Select::make('category')
-                    ->options(['car','bicycle','motorcycle','pickup','truck'])
+                    ->options(['car', 'bicycle', 'motorcycle', 'pickup', 'truck'])
                     ->required(),
             ]);
     }
@@ -65,7 +64,7 @@ class TransportationResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
-                    ->options(['car','bicycle','motorcycle','pickup','truck']),
+                    ->options(['car', 'bicycle', 'motorcycle', 'pickup', 'truck']),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label(''),

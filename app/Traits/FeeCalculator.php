@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Enums\FeeTypes;
 use App\Models\V1\Fee;
 use Illuminate\Support\Carbon;
 
 trait FeeCalculator
 {
-    public function createFee(object $badge): ?Fee
+    public function createFee(object $badge, $type = FeeTypes::normal->value): ?Fee
     {
         $fee = $this->fee($this->cost);
         $delay_fee = $this->delayFee($fee);
@@ -19,6 +20,7 @@ trait FeeCalculator
                 'belongTo_type' => $badge::class,
                 'subject_id' => $this->id,
                 'subject_type' => $this::class,
+                'type' => $type,
                 'amount' => $fee,
                 'delay_fee' => $delay_fee,
                 'due_date' => $due_date,

@@ -42,7 +42,7 @@ function createOrder($holder, $baseAttrs = [], $extraAttrs = [], $fieldsToUpdate
 
     return $order;
 }
-describe('ProducerController', function () {
+describe('Producer Controller', function () {
     it('retrieves all producers', function () {
         User::factory()->count(3)->create(['role' => 'producer']);
 

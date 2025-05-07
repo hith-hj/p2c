@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProducerResource\Pages;
@@ -7,12 +9,12 @@ use App\Models\V1\Branch;
 use App\Models\V1\Producer;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
 use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists\Infolist;
-use Filament\Infolists;
 
 class ProducerResource extends Resource
 {
@@ -26,7 +28,7 @@ class ProducerResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('brand')
                     ->required()
-                    ->unique('producers','brand')
+                    ->unique('producers', 'brand')
                     ->maxLength(50),
                 Forms\Components\Checkbox::make('is_valid'),
             ]);
@@ -45,7 +47,7 @@ class ProducerResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('is_valid')
-                    ->options([ 'not validated','validated', ]),
+                    ->options(['not validated', 'validated']),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label(''),
@@ -70,7 +72,7 @@ class ProducerResource extends Resource
                 RepeatableEntry::make('branches')->schema([
                     InfoLists\Components\TextEntry::make('name'),
                     InfoLists\Components\TextEntry::make('orders')
-                    ->state(fn (Branch $branch): int =>  $branch->orders()->count()),
+                        ->state(fn (Branch $branch): int => $branch->orders()->count()),
                     InfoLists\Components\TextEntry::make('is_default'),
                     InfoLists\Components\TextEntry::make('phone'),
                     InfoLists\Components\TextEntry::make('location.lat')->label('latitude'),

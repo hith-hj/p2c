@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\BranchResource\Pages;
 
 use App\Filament\Resources\BranchResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateBranch extends CreateRecord

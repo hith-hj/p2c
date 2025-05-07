@@ -16,8 +16,10 @@ return new class() extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'notifiable_id');
-            $table->foreignIdFor(User::class, 'notifier_id');
+            $table->foreignIdFor(User::class, 'belongTo_id');
+            $table->string('belongTo_type');
+            $table->foreignId('notifier_id')->nullable();
+            $table->foreignId('notifier_type')->nullable();
             $table->smallInteger('status');
             $table->string('title');
             $table->text('payload');

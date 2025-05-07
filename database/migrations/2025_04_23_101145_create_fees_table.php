@@ -19,6 +19,7 @@ return new class() extends Migration
             $table->string('belongTo_type');
             $table->foreignId('subject_id');
             $table->string('subject_type');
+            $table->smallInteger('type');
             $table->integer('amount');
             $table->integer('delay_fee');
             $table->timestamp('due_date');

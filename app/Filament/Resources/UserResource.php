@@ -1,20 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\V1\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Infolists\Infolist;
-use Filament\Infolists;
-use Filament\Infolists\Components\RepeatableEntry;
 
 class UserResource extends Resource
 {
@@ -55,8 +53,8 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('phone')->searchable(),
                 Tables\Columns\TextColumn::make('role'),
-                Tables\Columns\TextColumn::make('verified_at')->dateTime("Y-m-d"),
-                Tables\Columns\TextColumn::make('created_at')->dateTime("Y-m-d")->sortable(),
+                Tables\Columns\TextColumn::make('verified_at')->dateTime('Y-m-d'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime('Y-m-d')->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('role')
@@ -106,5 +104,4 @@ class UserResource extends Resource
             'view' => Pages\ViewUser::route('/{record}'),
         ];
     }
-
 }

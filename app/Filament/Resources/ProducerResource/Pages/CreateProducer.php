@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ProducerResource\Pages;
 
 use App\Filament\Resources\ProducerResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateProducer extends CreateRecord

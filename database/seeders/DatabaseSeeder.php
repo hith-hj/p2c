@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\V1\Admin;
 use App\Models\V1\Attr;
 use App\Models\V1\Item;
 use App\Models\V1\Role;
@@ -11,6 +12,7 @@ use App\Models\V1\Transportaion;
 use App\Models\V1\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -40,13 +42,18 @@ class DatabaseSeeder extends Seeder
             'email' => 'carrier@maya.com',
             'phone' => '0993769515',
             'role' => 'carrier',
-            'password' => 'Mm12345@@',
+            'password' => Hash::make('Mm12345@@'),
         ]);
         User::factory()->create([
             'email' => 'producer@maya.com',
             'phone' => '0993769517',
             'role' => 'producer',
-            'password' => 'Mm12345@@',
+            'password' => Hash::make('Mm12345@@'),
+        ]);
+
+        Admin::factory()->create([
+            'name' => 'name',
+            'email' => 'admin@admin.com',
         ]);
         // Transportaion::factory(10)->create();
     }

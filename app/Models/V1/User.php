@@ -88,7 +88,8 @@ class User extends Authenticatable implements JWTSubject
 
     public function notifications(): HasMany
     {
-        return $this->hasMany(Notification::class, 'notifiable_id');
+        return $this->hasMany(Notification::class, 'belongTo_id')
+            ->where('belongTo_type', $this::class);
     }
 
     public function sendVerificationCode($by = 'phone'): static
@@ -99,10 +100,10 @@ class User extends Authenticatable implements JWTSubject
             'verified_by' => $by,
         ]);
         if ($by === 'phone') {
+            $code = $this->code('verification')->code;
             $this->notifyPhone(
                 'verification code',
-                'this is your code to verify',
-                ['code' => $this->code('verification')->code]
+                "Your code is: $code",
             );
         } else {
             $this->notifyEmail();

@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CarrierResource\Pages;
 use App\Models\V1\Carrier;
-use App\Models\V1\Transportation;
-use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists\Infolist;
-use Filament\Infolists;
-use Filament\Infolists\Components\RepeatableEntry;
-
 
 class CarrierResource extends Resource
 {
@@ -42,7 +41,7 @@ class CarrierResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('is_valid')
-                    ->options([ 'not validated','validated', ]),
+                    ->options(['not validated', 'validated']),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label(''),
@@ -92,5 +91,4 @@ class CarrierResource extends Resource
             'edit' => Pages\EditCarrier::route('/{record}/edit'),
         ];
     }
-    
 }
