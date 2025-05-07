@@ -23,13 +23,17 @@ trait NotificationsHandler
 
         return match ($provider) {
             'sms' => $this->sms(),
-            'fcm' => $this->fcm($this->firebase_token, $title, $body, $data),
+            'fcm' => $this->fcm($title, $body, $data),
             default => $this->fcm($this->firebase_token, $title, $body, $data),
         };
     }
 
-    public function fcm($token, $title, $body, $data)
+    public function fcm($title, $body, $data)
     {
+        if($this->firebase_token === null){
+            return true;
+        }
+        $token = $this->firebase_token;
         $factory = (new FcmFactory())->withServiceAccount($this->getFCMCredentials());
         $messaging = $factory->createMessaging();
         $message = CloudMessage::new()
