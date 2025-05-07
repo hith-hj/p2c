@@ -6,13 +6,13 @@ namespace App\Http\Services;
 
 use App\Enums\OrderDeliveryTypes;
 use App\Enums\OrderStatus;
-use App\ExceptionHandler;
 use App\Models\V1\Branch;
 use App\Models\V1\Carrier;
 use App\Models\V1\Order;
 use App\Models\V1\Producer;
-use App\OrderCostCalculator;
-use App\OrderDteCalculator;
+use App\Traits\ExceptionHandler;
+use App\Traits\OrderCostCalculator;
+use App\Traits\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -128,13 +128,14 @@ class OrderServices
         ]);
         $this->attachRelations($order, $data);
         $order->storeDte();
+
         return $order;
     }
 
     public function accept(Carrier $carrier, int $order_id): Order
     {
         $order = $this->find($order_id);
-        $this->Truthy($order === null, 'Not found');
+        $this->NotFound($order, 'order');
         $this->Truthy($order->carrier_id !== null, 'order is assigned');
         $this->Truthy($order->status !== OrderStatus::pending->value, 'invalid order status');
         $this->Truthy($order->transportation_id !== $carrier->transportation_id, 'transportations is not match');
@@ -146,7 +147,7 @@ class OrderServices
         ]);
         $order->update([
             'status' => OrderStatus::assigned->value,
-            'dte' => $dte['dte']->toDateTimeString()
+            'dte' => $dte['dte']->toDateTimeString(),
         ]);
 
         return $order;
@@ -155,7 +156,7 @@ class OrderServices
     public function picked(Carrier $carrier, int $order_id): Order
     {
         $order = $carrier->orders()->find($order_id);
-        $this->Truthy($order === null, 'Not found');
+        $this->NotFound($order, 'order');
         $this->Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
         $order->update([
             'status' => OrderStatus::picked->value,
@@ -168,7 +169,7 @@ class OrderServices
     public function delivered(Carrier $carrier, int $order_id, int $code): Order
     {
         $order = $carrier->orders()->find($order_id);
-        $this->Truthy($order === null, 'Not found');
+        $this->NotFound($order, 'order');
         $this->Truthy($order->status !== OrderStatus::picked->value, 'invalid order status');
         $this->Truthy($order->code('delivered')->code !== $code, 'invalid code');
         $order->update([
@@ -182,7 +183,7 @@ class OrderServices
     public function finish(Producer $producer, int $order_id): Order
     {
         $order = $producer->orders()->find($order_id);
-        $this->Truthy($order === null, 'Not found');
+        $this->NotFound($order, 'order');
         $this->Truthy($order->status !== OrderStatus::delivered->value, 'invalid order status');
         $order->update(['status' => OrderStatus::finished->value]);
         $order->codes()->delete();
@@ -194,7 +195,7 @@ class OrderServices
     public function cancel(Producer $producer, int $order_id): Order
     {
         $order = $producer->orders()->find($order_id);
-        $this->Truthy($order === null, 'Not found');
+        $this->NotFound($order, 'order');
         $this->Truthy($order->carrier_id !== null, 'order is assigned');
         $this->Truthy($order->status !== OrderStatus::pending->value, 'invalid order status');
         $order->update(['status' => OrderStatus::canceld->value]);
@@ -288,20 +289,21 @@ class OrderServices
                 'cords' => [
                     'long' => $data['dest_long'],
                     'lat' => $data['dest_lat'],
-                ]
+                ],
             ];
             $customer = (new CustomerServices())->createIfNotExists($customerInfo);
             $order->customer()->associate($customer);
         }
         $order->createCode('pickup', 4);
         $order->createCode('delivered', 4);
+
         return $order;
     }
 
-    private function chackIfValidBranchWithLocation(Branch|null $branch, Producer $producer): void
+    private function chackIfValidBranchWithLocation(?Branch $branch, Producer $producer): void
     {
         $this->Truthy($branch === null, 'branch is required');
-        $this->Truthy($branch->producer_id !== $producer->id, 'invalid operation');
+        $this->Truthy($branch->producer_id !== $producer->id, 'invalid operation',);
         $this->Truthy($branch->location === null, 'branch location is required');
     }
 }

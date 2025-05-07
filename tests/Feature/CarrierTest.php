@@ -42,7 +42,7 @@ describe('CarrierController', function () {
     it('fails to find a carrier with an invalid ID', function () {
         $res = $this->getJson("$this->url/find?carrier_id=999");
 
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('payload.errors'))->toBeArray()->not->toBeEmpty();
     });
 
@@ -56,7 +56,7 @@ describe('CarrierController', function () {
             'verified_at' => now(),
         ]);
         $token = JWTAuth::fromUser($user);
-        $this->actingAs($user)->withHeaders([
+        $this->withHeaders([
             'Authorization' => "Bearer $token",
         ]);
         $res = $this->postJson("$this->url/create", [
@@ -105,7 +105,7 @@ describe('CarrierController', function () {
         expect($base->status())->toBe(200);
         expect($base->json('payload.carrier'))->not->toBeNull();
         $res = $this->postJson("$this->url/createDetails", $data);
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('success'))->toBe(false);
     });
 

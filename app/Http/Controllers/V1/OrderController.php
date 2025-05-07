@@ -35,13 +35,13 @@ class OrderController extends Controller
                 $orderBy
             );
 
-            return $this->success(payload: [
+            return Success(payload: [
                 'page' => $page,
                 'perPage' => $perPage,
                 'orders' => OrderResource::collection($orders),
             ]);
         } catch (\Throwable $th) {
-            return $this->success(payload: ['orders' => []]);
+            return Success(payload: ['orders' => []]);
         }
     }
 
@@ -61,13 +61,13 @@ class OrderController extends Controller
                 $orderBy
             );
 
-            return $this->success(payload: [
+            return Success(payload: [
                 'page' => $page,
                 'perPage' => $perPage,
                 'orders' => OrderResource::collection($orders),
             ]);
         } catch (\Throwable $th) {
-            return $this->success(payload: ['orders' => []]);
+            return Success(payload: ['orders' => []]);
         }
     }
 
@@ -77,19 +77,9 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $order = $this->order->find($validator->safe()->integer('order_id'));
 
-        try {
-            $order = $this->order->find($validator->safe()->integer('order_id'));
-
-            return $this->success(payload: [
-                'order' => OrderResource::make($order),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: ['order' => OrderResource::make($order)]);
     }
 
     public function checkCost(Request $request): JsonResponse
@@ -106,17 +96,9 @@ class OrderController extends Controller
             'items.*' => ['required', 'exists:items,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $receipt = $this->order->calcCost(Auth::user()->badge, $validator->safe()->all());
 
-        try {
-            $receipt = $this->order->calcCost(Auth::user()->badge, $validator->safe()->all());
-
-            return $this->success(payload: ['receipt' => $receipt]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: ['receipt' => $receipt]);
     }
 
     public function create(Request $request): JsonResponse
@@ -139,20 +121,12 @@ class OrderController extends Controller
             'note' => ['sometimes', 'string', 'max:200'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $order = $this->order->create(Auth::user()->badge, $validator->safe()->all());
 
-        try {
-            $order = $this->order->create(Auth::user()->badge, $validator->safe()->all());
-
-            return $this->success(
-                msg: __('main.created'),
-                payload: ['order' => OrderResource::make($order->fresh())]
-            );
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(
+            msg: __('main.created'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 
     public function accept(Request $request): JsonResponse
@@ -161,20 +135,12 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $this->order->accept(
+            Auth::user()->badge,
+            $validator->safe()->integer('order_id')
+        );
 
-        try {
-            $order = $this->order->accept(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id')
-            );
-
-            return $this->success(msg: __('main.accepted'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.accepted'));
     }
 
     public function picked(Request $request): JsonResponse
@@ -183,22 +149,12 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $this->order->picked(
+            Auth::user()->badge,
+            $validator->safe()->integer('order_id')
+        );
 
-        try {
-            $order = $this->order->picked(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id')
-            );
-
-            return $this->success(
-                msg: __('main.picked'),
-            );
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.picked'));
     }
 
     public function delivered(Request $request): JsonResponse
@@ -208,21 +164,13 @@ class OrderController extends Controller
             'code' => ['required', 'exists:codes,code'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $this->order->delivered(
+            Auth::user()->badge,
+            $validator->safe()->integer('order_id'),
+            $validator->safe()->integer('code'),
+        );
 
-        try {
-            $order = $this->order->delivered(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id'),
-                $validator->safe()->integer('code'),
-            );
-
-            return $this->success(msg: __('main.delivered'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.delivered'));
     }
 
     public function finish(Request $request): JsonResponse
@@ -231,20 +179,12 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $this->order->finish(
+            Auth::user()->badge,
+            $validator->safe()->integer('order_id')
+        );
 
-        try {
-            $order = $this->order->finish(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id')
-            );
-
-            return $this->success(msg: __('main.finished'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.finished'));
     }
 
     public function cancel(Request $request): JsonResponse
@@ -253,20 +193,12 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
+        $this->order->cancel(
+            Auth::user()->badge,
+            $validator->safe()->integer('order_id')
+        );
 
-        try {
-            $order = $this->order->cancel(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id')
-            );
-
-            return $this->success(msg: __('main.canceled'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.canceled'));
     }
 
     public function forceCancel(Request $request): JsonResponse
@@ -274,21 +206,12 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
         ]);
+        $this->order->forceCancel(
+            Auth::user()->badge,
+            $validator->safe()->integer('order_id')
+        );
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
-
-        try {
-            $order = $this->order->forceCancel(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id')
-            );
-
-            return $this->success(msg: __('main.canceled'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.canceled'));
     }
 
     public function reject(Request $request): JsonResponse
@@ -296,20 +219,11 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
         ]);
+        $this->order->reject(
+            Auth::user()->badge,
+            $validator->safe()->integer('order_id')
+        );
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
-
-        try {
-            $order = $this->order->reject(
-                Auth::user()->badge,
-                $validator->safe()->integer('order_id')
-            );
-
-            return $this->success(msg: __('main.rejected'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.rejected'));
     }
 }

@@ -18,20 +18,16 @@ class BranchController extends Controller
 
     public function all(): JsonResponse
     {
-        return $this->error(msg: __('main.coming soon'));
+        return Error(msg: __('main.coming soon'));
     }
 
     public function get(Request $request): JsonResponse
     {
-        try {
-            return $this->success(payload: [
-                'branches' => BranchResource::collection(
-                    $this->branch->get(Auth::user()->badge?->id)
-                ),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: [
+            'branches' => BranchResource::collection(
+                $this->branch->get(Auth::user()->badge?->id)
+            ),
+        ]);
     }
 
     public function find(Request $request): JsonResponse
@@ -40,19 +36,11 @@ class BranchController extends Controller
             'branch_id' => ['sometimes', 'required', 'exists:branches,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
+        $branch = $this->branch->find($validator->safe()->integer('branch_id'));
 
-        try {
-            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
-
-            return $this->success(payload: [
-                'branche' => BranchResource::make($branch),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: [
+            'branche' => BranchResource::make($branch),
+        ]);
     }
 
     public function create(Request $request): JsonResponse
@@ -65,19 +53,11 @@ class BranchController extends Controller
             'cords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
+        $branch = $this->branch->create(Auth::user()->badge, $validator->safe()->all());
 
-        try {
-            $branch = $this->branch->create(Auth::user()->badge, $validator->safe()->all());
-
-            return $this->success(payload: [
-                'branch' => BranchResource::make($branch),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: [
+            'branch' => BranchResource::make($branch),
+        ]);
     }
 
     public function update(Request $request): JsonResponse
@@ -88,22 +68,14 @@ class BranchController extends Controller
             'phone' => ['sometimes', 'required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
+        $branch = $this->branch->find($validator->safe()->integer('branch_id'));
+        if ($branch->producer_id !== Auth::user()->badge->id) {
+            return Error(msg: __('main.unauthorized'), code: 403);
         }
 
-        try {
-            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
-            if ($branch->producer_id !== Auth::user()->badge->id) {
-                return $this->error(msg: __('main.unauthorized'), code: 403);
-            }
+        $this->branch->update($branch, $validator->safe()->except(['branch_id']));
 
-            $this->branch->update($branch, $validator->safe()->except(['branch_id']));
-
-            return $this->success(msg: __('main.updated'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.updated'));
     }
 
     public function delete(Request $request): JsonResponse
@@ -112,22 +84,14 @@ class BranchController extends Controller
             'branch_id' => ['required', 'exists:branches,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
+        $branch = $this->branch->find($validator->safe()->integer('branch_id'));
+        if ($branch->producer_id !== Auth::user()->badge->id) {
+            return Error(msg: __('main.unauthorized'), code: 403);
         }
 
-        try {
-            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
-            if ($branch->producer_id !== Auth::user()->badge->id) {
-                return $this->error(msg: __('main.unauthorized'), code: 403);
-            }
+        $this->branch->delete($branch);
 
-            $this->branch->delete($branch);
-
-            return $this->success(msg: __('main.deleted'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.deleted'));
     }
 
     public function setDefault(Request $request): JsonResponse
@@ -136,21 +100,13 @@ class BranchController extends Controller
             'branch_id' => ['required', 'exists:branches,id'],
         ]);
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
+        $branch = $this->branch->find($validator->safe()->integer('branch_id'));
+        if ($branch->producer_id !== Auth::user()->badge->id) {
+            return Error(msg: __('main.unauthorized'), code: 403);
         }
 
-        try {
-            $branch = $this->branch->find($validator->safe()->integer('branch_id'));
-            if ($branch->producer_id !== Auth::user()->badge->id) {
-                return $this->error(msg: __('main.unauthorized'), code: 403);
-            }
+        $this->branch->setBranchAsDefault($branch);
 
-            $this->branch->setBranchAsDefault($branch);
-
-            return $this->success(msg: __('main.is default'));
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(msg: __('main.is default'));
     }
 }

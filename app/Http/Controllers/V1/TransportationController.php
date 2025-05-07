@@ -17,13 +17,9 @@ class TransportationController extends Controller
 
     public function all(Request $request): JsonResponse
     {
-        try {
-            return $this->success(payload: [
-                'Transportaions' => TransportationResource::collection($this->trans->all()),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: [
+            'transportations' => TransportationResource::collection($this->trans->all()),
+        ]);
     }
 
     public function find(Request $request): JsonResponse
@@ -31,19 +27,10 @@ class TransportationController extends Controller
         $validator = Validator::make($request->all(), [
             'transportation_id' => ['required', 'exists:transportations,id'],
         ]);
+        $trans = $this->trans->find($validator->safe()->integer('transportation_id'));
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
-
-        try {
-            $trans = $this->trans->find($validator->safe()->integer('transportation_id'));
-
-            return $this->success(payload: [
-                'Transportaions' => TransportationResource::make($trans),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: [
+            'transportation' => TransportationResource::make($trans),
+        ]);
     }
 }

@@ -70,7 +70,7 @@ describe('ProducerController', function () {
     it('fails to find a producer with an invalid ID', function () {
         $res = $this->getJson("$this->url/find?producer_id=999");
 
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('payload.errors'))->toBeArray()->not->toBeEmpty();
     });
 
@@ -203,7 +203,7 @@ describe('ProducerController', function () {
 
     it('prevent producer to create order with bad info', function () {
         $res = $this->postJson('/api/v1/order/create', []);
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('payload.errors'))->not->toBeNull();
     });
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use App\ExceptionHandler;
 use App\Models\V1\Transportation;
+use App\Traits\ExceptionHandler;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -23,10 +23,10 @@ class TransportationServices
 
     public function find(int $id): Transportation
     {
-        $transportaion = Transportation::find($id);
-        $this->NotFound($transportaion, 'transportation');
+        $transportation = Transportation::find($id);
+        $this->NotFound($transportation, 'transportation');
 
-        return $transportaion;
+        return $transportation;
     }
 
     public function getMatchedTransportation(int $weight): Transportation

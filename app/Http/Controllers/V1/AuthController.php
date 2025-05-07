@@ -26,11 +26,6 @@ class AuthController extends Controller
             'account_type' => ['required', Rule::in(['producer', 'carrier'])],
             'firebase_token' => ['required'],
         ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
-
         $user = User::create([
             'email' => $validator->safe()->input('email'),
             'phone' => $validator->safe()->input('phone'),
@@ -43,13 +38,13 @@ class AuthController extends Controller
             $by = $validator->safe()->input('by') ?? 'phone';
             $user->sendVerificationCode($by);
 
-            return $this->success(
+            return Success(
                 payload: ['code' => $user->code('verification')?->code],
                 msg: __('main.registerd'),
                 code: 201
             );
         } catch (\Exception $e) {
-            return $this->error(msg: $e->getMessage());
+            return Error(msg: $e->getMessage());
         }
     }
 
@@ -59,22 +54,17 @@ class AuthController extends Controller
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
             'code' => ['required', 'numeric', 'exists:codes,code'],
         ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
-
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
         if ($user->code('verification')->code !== $validator->safe()->integer('code')) {
-            return $this->error(msg: __('main.invalid code'));
+            return Error(msg: __('main.invalid code'));
         }
 
         try {
             $user->verify();
 
-            return $this->success(msg: __('main.verified'));
+            return Success(msg: __('main.verified'));
         } catch (\Exception $e) {
-            return $this->error(msg: $e->getMessage());
+            return Error(msg: $e->getMessage());
         }
     }
 
@@ -84,37 +74,32 @@ class AuthController extends Controller
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
             'password' => ['required', 'string', 'min:8'],
         ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
-
-        $credentials = $request->only('phone', 'password');
+        $credentials = $validator->safe()->only('phone', 'password');
         try {
             if (! Auth::attempt($credentials)) {
-                return $this->error(msg: __('main.invalid credentials'));
+                return Error(msg: __('main.invalid credentials'));
             }
 
             $user = Auth::user();
             if ($user->verified_at === null || $user->verification_code !== null) {
-                return $this->error(msg: __('main.unverified'), code: 401);
+                return Error(msg: __('main.unverified'), code: 401);
             }
 
             $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
             $user = UserResource::make($user);
 
-            return $this->success(payload: ['user' => $user, 'token' => $token]);
+            return Success(payload: ['user' => $user, 'token' => $token]);
         } catch (JWTException) {
-            return $this->error(msg: __('main.token error 1'), code: 500);
+            return Error(msg: __('main.token error 1'), code: 500);
         }
     }
 
     public function refreshToken()
     {
         try {
-            return $this->success(payload: ['token' => Auth::refresh()]);
+            return Success(payload: ['token' => Auth::refresh()]);
         } catch (\Exception $exception) {
-            return $this->error(msg: $exception->getMessage().' , Login again');
+            return Error(msg: $exception->getMessage().' , Login again');
         }
     }
 
@@ -122,20 +107,20 @@ class AuthController extends Controller
     {
         try {
             if (! $user = JWTAuth::parseToken()->authenticate()) {
-                return $this->error(msg: 'User not found', code: 404);
+                return Error(msg: 'User not found', code: 404);
             }
         } catch (JWTException) {
-            return $this->error(msg: __('main.invalid token'), code: 400);
+            return Error(msg: __('main.invalid token'), code: 400);
         }
 
-        return $this->success(payload: ['user' => UserResource::make($user)]);
+        return Success(payload: ['user' => UserResource::make($user)]);
     }
 
     public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());
 
-        return $this->success(msg: __('main.logout'));
+        return Success(msg: __('main.logout'));
     }
 
     public function forgetPassword(Request $request)
@@ -143,18 +128,13 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
         ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
-
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         // if there is a previous code from registeration or other what to do
 
         $user->sendVerificationCode();
 
-        return $this->success(
+        return Success(
             payload: ['code' => $user->verification_code],
             msg: __('main.code sent'),
             code: 201
@@ -167,20 +147,15 @@ class AuthController extends Controller
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
-
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         if (is_null($user->verified_at)) {
-            return $this->error(msg: __('main.verify account'), code: 401);
+            return Error(msg: __('main.verify account'), code: 401);
         }
 
         $user->update(['password' => Hash::make($validator->safe()->input('password'))]);
 
-        return $this->success(msg: __('main.updated'));
+        return Success(msg: __('main.updated'));
     }
 
     public function resendCode(Request $request)
@@ -188,20 +163,15 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
         ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
-
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         if (is_null($user->verification_code)) {
-            return $this->error(msg: __('main.invalid operation'), code: 403);
+            return Error(msg: __('main.invalid operation'), code: 403);
         }
 
         $user->sendVerificationCode();
 
-        return $this->success(
+        return Success(
             payload: ['code' => $user->verification_code],
             msg: __('main.code sent')
         );
@@ -213,23 +183,18 @@ class AuthController extends Controller
             'old_password' => ['required', 'string', 'min:8'],
             'new_password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
-
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
-
         $user = Auth::user();
         if (! Hash::check($validator->safe()->input('old_password'), $user->password)) {
-            return $this->error(msg: __('main.invalid password'));
+            return Error(msg: __('main.invalid password'));
         }
 
         if ($user->password === Hash::make($validator->safe()->input('new_password'))) {
-            return $this->error(msg: __('main.passwords are equals'));
+            return Error(msg: __('main.passwords are equals'));
         }
 
         $user->update(['password' => Hash::make($validator->safe()->input('new_password'))]);
 
-        return $this->success(msg: __('main.updated'));
+        return Success(msg: __('main.updated'));
     }
 
     public function deleteUser()
@@ -239,6 +204,6 @@ class AuthController extends Controller
         $user->badge()?->delete();
         $user->delete();
 
-        return $this->success(msg: __('main.deleted'));
+        return Success(msg: __('main.deleted'));
     }
 }

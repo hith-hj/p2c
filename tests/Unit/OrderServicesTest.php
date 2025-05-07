@@ -38,7 +38,7 @@ describe('Order Services', function () {
     });
 
     it('fail to retrieves all bending orders for Carrier when no order exists', function () {
-        Order::all()->delete();
+        Order::truncate();
         $this->orderServices->all();
     })->throws(Exception::class);
 
@@ -48,7 +48,7 @@ describe('Order Services', function () {
     });
 
     it('fail to retrieves orders for specific producer when no order exists', function () {
-        Order::all()->delete();
+        Order::truncate();
         $this->orderServices->get($this->producer->badge);
     })->throws(Exception::class);
 
@@ -58,7 +58,7 @@ describe('Order Services', function () {
     });
 
     it('fail to retrieves orders for specific carrier when no order exists', function () {
-        Order::all()->delete();
+        Order::truncate();
         $this->orderServices->get($this->carrier->badge);
     })->throws(Exception::class);
 

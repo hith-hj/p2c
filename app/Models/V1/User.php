@@ -6,9 +6,9 @@ namespace App\Models\V1;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\CodesHandler;
 use App\Enums\UserRoles;
-use App\NotificationsHandler;
+use App\Traits\CodesHandler;
+use App\Traits\NotificationsHandler;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,8 +19,8 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     use CodesHandler;
-    use NotificationsHandler;
     use HasFactory;
+    use NotificationsHandler;
 
     /**
      * The attributes that are mass assignable.
@@ -102,7 +102,7 @@ class User extends Authenticatable implements JWTSubject
             $this->notifyPhone(
                 'verification code',
                 'this is your code to verify',
-                ['code'=>$this->code('verification')->code]
+                ['code' => $this->code('verification')->code]
             );
         } else {
             $this->notifyEmail();

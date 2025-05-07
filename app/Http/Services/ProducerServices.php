@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use App\ExceptionHandler;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
+use App\Traits\ExceptionHandler;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
 

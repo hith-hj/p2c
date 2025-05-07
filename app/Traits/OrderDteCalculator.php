@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Traits;
 
 use App\Enums\OrderDeliveryTypes;
 use Carbon\Carbon;

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use App\DocumentHandler;
-use App\ExceptionHandler;
 use App\Models\V1\Carrier;
 use App\Models\V1\CarrierDetails;
 use App\Models\V1\Location;
 use App\Models\V1\User;
+use App\Traits\DocumentHandler;
+use App\Traits\ExceptionHandler;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
 
@@ -64,7 +64,7 @@ class CarrierServices
 
     public function create(Auth $user, array $data): Carrier
     {
-        $this->Truthy($user->badge !== null, 'carrier');
+        $this->Exists($user->badge, 'carrier');
         $this->NotFound($data, 'data');
 
         return $user->badge()->create([
@@ -94,7 +94,7 @@ class CarrierServices
 
     public function createDocuments(Carrier $carrier, array $data): bool
     {
-        $this->Truthy($carrier->documents()->count() > 0, 'carrier documents exists');
+        $this->Truthy($carrier->documents()->count() > 0, 'documents exists');
         $this->Required($data, 'documents');
         $this->multible($data, $carrier->id, get_class($carrier));
 

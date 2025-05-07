@@ -13,25 +13,25 @@ class LabelController extends Controller
 {
     public function carBrands(): JsonResponse
     {
-        return $this->success(payload: [
+        return Success(payload: [
             'Kia', 'Hyundai', 'Ford', 'Mazda', 'Bmw', 'Mercedes',
         ]);
     }
 
     public function carColors(): JsonResponse
     {
-        return $this->success(payload: [
+        return Success(payload: [
             'red', 'blue', 'gray', 'black', 'white', 'silver',
         ]);
     }
 
     public function items(): JsonResponse
     {
-        return $this->success(payload: ['items' => Item::all()]);
+        return Success(payload: ['items' => Item::all()]);
     }
 
     public function attrs(): JsonResponse
     {
-        return $this->success(payload: ['attrs' => Attr::all()]);
+        return Success(payload: ['attrs' => Attr::all()]);
     }
 }

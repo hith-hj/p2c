@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use App\ExceptionHandler;
 use App\Models\V1\Branch;
 use App\Models\V1\Producer;
+use App\Traits\ExceptionHandler;
 use Illuminate\Support\Collection;
 
 class BranchServices

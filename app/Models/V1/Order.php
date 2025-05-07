@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\V1;
 
-use App\CodesHandler;
-use App\FeeCalculator;
-use App\OrderDteCalculator;
+use App\Traits\CodesHandler;
+use App\Traits\FeeCalculator;
+use App\Traits\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Traits;
 
 use App\Models\V1\Document;
 
