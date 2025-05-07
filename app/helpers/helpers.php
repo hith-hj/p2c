@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App;
-
 use Illuminate\Http\JsonResponse;
 
-trait ApiRes
-{
-    public function success(
-        array $payload = [],
+if (! function_exists('Success')) {
+    function Success(
         string $msg = 'Success',
+        array $payload = [],
         int $code = 200
     ): JsonResponse {
         $response = [
@@ -23,10 +20,12 @@ trait ApiRes
 
         return response()->json($response, $code);
     }
+}
 
-    public function error(
-        array $payload = [],
+if (! function_exists('Error')) {
+    function Error(
         string $msg = 'Error',
+        array $payload = [],
         int $code = 400
     ): JsonResponse {
         $response = [

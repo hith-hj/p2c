@@ -8,10 +8,11 @@
     "require": {
         "php": "^8.2",
         "filament/filament": "^3.3",
+        "kreait/laravel-firebase": "^6.0",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "tymon/jwt-auth": "^2.1"
+        "php-open-source-saver/jwt-auth": "^2.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -28,7 +29,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files":[
+            "app/helpers/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -56,7 +60,11 @@
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
         ],
+<<<<<<< HEAD
         "check": [
+=======
+        "check":[
+>>>>>>> cbc70e44999db51dad0ac6912d11e5c33e6cd9fa
             "./vendor/bin/pint"
         ]
     },

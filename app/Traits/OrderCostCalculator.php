@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Traits;
 
 use App\Http\Services\TransportationServices;
 use App\Models\V1\Attr;
@@ -26,12 +26,13 @@ trait OrderCostCalculator
         $delivery = $this->deliveryTypeCost($data['delivery_type']);
         $attrs = $this->AttrsCost($data);
         $final = $this->finalCost($inital, $attrs, $delivery);
+
         return [
             'distance:m' => $distanceInMeter,
             'inital' => $inital,
             'delivery' => $delivery,
             'attrs' => $attrs,
-            'final' => $final
+            'final' => $final,
         ];
     }
 

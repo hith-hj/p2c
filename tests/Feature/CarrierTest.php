@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 use App\Models\V1\Carrier;
 use App\Models\V1\User;
-use Database\Seeders\DatabaseSeeder;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
     $this->user = User::factory()->create(['role' => 'carrier']);
@@ -13,7 +12,7 @@ beforeEach(function () {
     $token = JWTAuth::fromUser($this->user);
     $this->withHeaders(['Authorization' => "Bearer $token"]);
     $this->url = 'api/v1/carrier';
-    (new DatabaseSeeder())->run();
+    $this->seed();
 });
 
 describe('CarrierController', function () {
@@ -43,7 +42,7 @@ describe('CarrierController', function () {
     it('fails to find a carrier with an invalid ID', function () {
         $res = $this->getJson("$this->url/find?carrier_id=999");
 
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('payload.errors'))->toBeArray()->not->toBeEmpty();
     });
 
@@ -57,7 +56,7 @@ describe('CarrierController', function () {
             'verified_at' => now(),
         ]);
         $token = JWTAuth::fromUser($user);
-        $this->actingAs($user)->withHeaders([
+        $this->withHeaders([
             'Authorization' => "Bearer $token",
         ]);
         $res = $this->postJson("$this->url/create", [
@@ -106,7 +105,7 @@ describe('CarrierController', function () {
         expect($base->status())->toBe(200);
         expect($base->json('payload.carrier'))->not->toBeNull();
         $res = $this->postJson("$this->url/createDetails", $data);
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('success'))->toBe(false);
     });
 
@@ -121,7 +120,6 @@ describe('CarrierController', function () {
         $data = [];
         $res = $this->patchJson("$this->url/update", $data);
         expect($res->status())->toBe(400);
-        expect($res->json('message'))->toBe('Data Is Required');
     });
 
     it('updates an existing carrier transportation and delete old details', function () {

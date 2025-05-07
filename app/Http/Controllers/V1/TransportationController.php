@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Services\TransportationServices;
 use App\Http\Resources\V1\TransportationResource;
+use App\Http\Services\TransportationServices;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,13 +17,9 @@ class TransportationController extends Controller
 
     public function all(Request $request): JsonResponse
     {
-        try {
-            return $this->success(payload: [
-                'Transportaions' => TransportationResource::collection($this->trans->all()),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: [
+            'transportations' => TransportationResource::collection($this->trans->all()),
+        ]);
     }
 
     public function find(Request $request): JsonResponse
@@ -31,19 +27,10 @@ class TransportationController extends Controller
         $validator = Validator::make($request->all(), [
             'transportation_id' => ['required', 'exists:transportations,id'],
         ]);
+        $trans = $this->trans->find($validator->safe()->integer('transportation_id'));
 
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => [$validator->errors()]]);
-        }
-
-        try {
-            $trans = $this->trans->find($validator->safe()->integer('transportation_id'));
-
-            return $this->success(payload: [
-                'Transportaions' => TransportationResource::make($trans),
-            ]);
-        } catch (\Throwable $th) {
-            return $this->error(msg: $th->getMessage());
-        }
+        return Success(payload: [
+            'transportation' => TransportationResource::make($trans),
+        ]);
     }
 }

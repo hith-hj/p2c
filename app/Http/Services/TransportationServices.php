@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use App\ExceptionHandler;
 use App\Models\V1\Transportation;
+use App\Traits\ExceptionHandler;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -16,18 +16,17 @@ class TransportationServices
     public function all(): Collection
     {
         $transportaions = Transportation::all();
-        $this->NotFound($transportaions, __('main.transportations'));
+        $this->NotFound($transportaions, 'transportations');
 
         return $transportaions;
     }
 
     public function find(int $id): Transportation
     {
-        $this->Required($id, __('main.carrier').' ID');
-        $transportaion = Transportation::where('id', $id)->first();
-        $this->NotFound($transportaion, __('main.transportation'));
+        $transportation = Transportation::find($id);
+        $this->NotFound($transportation, 'transportation');
 
-        return $transportaion;
+        return $transportation;
     }
 
     public function getMatchedTransportation(int $weight): Transportation

@@ -23,8 +23,8 @@ class OrderResource extends JsonResource
             'producer' => $this->producer?->brand,
             'carrier' => $this->carrier?->first_name,
             'transportation' => $this->transportation?->name,
-            'customer_name' => $this->customer_name,
-            'branch' => $this->branch->only(['id', 'name']),
+            'customer' => $this->customer?->only(['id', 'name', 'phone']),
+            'branch' => $this->branch?->only(['id', 'name']),
             'src_long' => (float) $this->src_long,
             'src_lat' => (float) $this->src_lat,
             'dest_long' => (float) $this->dest_long,
@@ -41,8 +41,8 @@ class OrderResource extends JsonResource
             'delivered_at' => $this->delivered_at,
             'dte' => $this->dte,
             'note' => $this->note,
-            'attrs' => $this->attrs->select(['id', 'name']),
-            'items' => $this->items->select(['id', 'name']),
+            'attrs' => $this->attrs?->select(['id', 'name']),
+            'items' => $this->items?->select(['id', 'name']),
             'codes' => $this->when(
                 Auth::user()->badge->id === $this->producer_id &&
                 Auth::user()->role === UserRoles::Producer->value,

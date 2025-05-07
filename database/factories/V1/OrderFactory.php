@@ -23,7 +23,6 @@ class OrderFactory extends Factory
         return [
             'branch_id' => fake()->uuid(),
             'transportation_id' => fake()->uuid(),
-            'customer_name' => 'customer_name',
             'delivery_type' => fake()->randomElement(OrderDeliveryTypes::values()),
             'goods_price' => fake()->numberBetween(100, 500),
             'src_long' => fake()->longitude(),

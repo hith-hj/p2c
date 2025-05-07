@@ -30,7 +30,7 @@ describe('AuthController', function () {
             'firebase_token' => '',
         ];
         $res = $this->postJson(route('register'), $data);
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('success'))->toBe(false);
     });
 
@@ -56,7 +56,7 @@ describe('AuthController', function () {
             'phone' => $user->phone,
             'code' => 00000,
         ]);
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('payload.errors'))->not->toBeNull();
     });
 
@@ -90,7 +90,7 @@ describe('AuthController', function () {
             'phone' => '0912345678',
             'password' => 'wrongpassword',
         ]);
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(422);
         expect($res->json('payload.errors'))->not->toBeNull();
     });
 

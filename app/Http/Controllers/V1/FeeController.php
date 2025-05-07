@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Services\FeeServices;
 use App\Http\Resources\V1\FeeResource;
+use App\Http\Services\FeeServices;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,15 +18,9 @@ class FeeController extends Controller
 
     public function all(): JsonResponse
     {
-        try {
-            $fees = Auth::user()->badge->fees()->withOut(['subject'])->get();
+        $fees = $this->fee->get(Auth::user()->badge);
 
-            return $this->success(payload: [
-                'fees' => FeeResource::collection($fees),
-            ]);
-        } catch (\Exception $e) {
-            return $this->error(msg: $e->getMessage());
-        }
+        return Success(payload: ['fees' => FeeResource::collection($fees)]);
     }
 
     public function find(Request $request): JsonResponse
@@ -34,21 +28,9 @@ class FeeController extends Controller
         $validator = Validator::make($request->all(), [
             'fee_id' => ['required', 'exists:fees,id'],
         ]);
-        if ($validator->fails()) {
-            return $this->error(payload: ['errors' => $validator->errors()]);
-        }
 
-        try {
-            $fee = Auth::user()
-                ->badge
-                ->fees()
-                ->with(['subject', 'holder'])
-                ->where('id', $validator->safe()->integer('fee_id'))
-                ->first();
+        $fee = $this->fee->find($validator->safe()->integer('fee_id'));
 
-            return $this->success(payload: ['fee' => FeeResource::make($fee)]);
-        } catch (\Exception $e) {
-            return $this->error(msg: $e->getMessage());
-        }
+        return Success(payload: ['fee' => FeeResource::make($fee)]);
     }
 }
