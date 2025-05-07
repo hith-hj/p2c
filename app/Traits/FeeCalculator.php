@@ -16,7 +16,7 @@ trait FeeCalculator
         $due_date = $this->dueDate();
         if (! $this->feeExists($badge) && method_exists($badge, 'fees')) {
             $record = $badge->fees()->create([
-                'belongTo_type' => get_class($badge),
+                'belongTo_type' => $badge::class,
                 'subject_id' => $this->id,
                 'subject_type' => $this::class,
                 'amount' => $fee,
@@ -54,7 +54,7 @@ trait FeeCalculator
     {
         return $badge->fees()->where([
             ['subject_id', $this->id],
-            ['subject_type', get_class($this)],
+            ['subject_type', $this::class],
         ])->exists();
     }
 }

@@ -24,7 +24,7 @@ class Carrier extends Model
     public function location(): HasOne
     {
         return $this->hasOne(Location::class, 'belongTo_id')
-            ->where('belongTo_type', get_class($this));
+            ->where('belongTo_type', $this::class);
     }
 
     public function user(): BelongsTo
@@ -40,13 +40,13 @@ class Carrier extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class, 'belongTo_id')
-            ->where('belongTo_type', get_class($this));
+            ->where('belongTo_type', $this::class);
     }
 
     public function profileImage(): HasOne
     {
         return $this->hasOne(Document::class, 'belongTo_id')
-            ->where([['belongTo_type', get_class($this)], ['doc_type', 'profile']]);
+            ->where([['belongTo_type', $this::class], ['doc_type', 'profile']]);
     }
 
     public function orders(): HasMany
@@ -57,7 +57,7 @@ class Carrier extends Model
     public function fees(): HasMany
     {
         return $this->hasMany(Fee::class, 'belongTo_id')
-            ->where('belongTo_type', get_class($this));
+            ->where('belongTo_type', $this::class);
     }
 
     public function validate(bool $state): bool

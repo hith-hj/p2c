@@ -96,7 +96,7 @@ class CarrierServices
     {
         $this->Truthy($carrier->documents()->count() > 0, 'documents exists');
         $this->Required($data, 'documents');
-        $this->multible($data, $carrier->id, get_class($carrier));
+        $this->multible($data, $carrier->id, $carrier::class);
 
         return true;
     }

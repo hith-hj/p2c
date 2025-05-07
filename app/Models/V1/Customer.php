@@ -24,6 +24,6 @@ class Customer extends Model
     public function location(): HasOne
     {
         return $this->hasOne(Location::class, 'belongTo_id')
-            ->where('belongTo_type', get_class($this));
+            ->where('belongTo_type', $this::class);
     }
 }
