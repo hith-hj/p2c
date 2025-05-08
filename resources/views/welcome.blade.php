@@ -17,7 +17,7 @@
 <body class="bg-red-600 scroll-smooth transition duration-700 ease-in-out">
 
     <!-- Navbar (Overlay on Content) -->
-    <nav id="nav" class="fixed top-0 left-0 w-full bg-red-600 text-white py-3 z-50">
+    <nav id="nav" class="fixed top-0 left-0 w-full text-white py-3 z-50">
         <div class="container mx-auto flex justify-center items-center px-8">
             <!-- <div>theme</div> -->
             <ul class="flex space-x-8 text-lg font-medium">
