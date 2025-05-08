@@ -57,7 +57,8 @@
     </nav>
 
     <!-- Hero Section (Full-Screen with Navbar Offset) -->
-    <section id="home" class="h-screen flex flex-col justify-center items-center text-center bg-gradient-to-b from-red-600 to-zinc-200 text-white px-6">
+    <section id="home" class="h-screen flex flex-col justify-center items-center
+        text-center bg-gradient-to-b from-red-600 to-zinc-200 text-white px-6">
         <h1 class="text-6xl font-bold">Seamless Shipping Connections</h1>
         <p class="mt-6 text-xl">Join P2C today and experience the future of local shipping—where reliability meets innovation!</p>
         <div class="mt-8 space-x-6">
@@ -73,12 +74,12 @@
             P2C simplifies logistics by connecting producers with customer through reliable carriers.
         </p>
         <div class="mt-10 flex justify-center space-x-10">
-            <div class="w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md">
-                <h3 class="text-2xl font-semibold">For Producers</h3>
-                <p class="mt-4">Register, list shipments, and effortlessly connect with available carriers.</p>
+            <div class="w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md hover:ring-4 hover:ring-red-400">
+                <h3 class="text-2xl font-semibold">Producers</h3>
+                <p class="mt-4">Register, list deliveries, and effortlessly watch your goods goes to the customers.</p>
             </div>
-            <div class="w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md">
-                <h3 class="text-2xl font-semibold">For Carriers</h3>
+            <div class="w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md hover:ring-4 hover:ring-red-400">
+                <h3 class="text-2xl font-semibold">Carriers</h3>
                 <p class="mt-4">Download the app, accept deliveries, and start earning today.</p>
             </div>
         </div>
@@ -88,7 +89,7 @@
     <section id="producer" class="py-28 bg-gradient-to-b from-white to-zinc-200 text-center px-10">
         <h2 class="text-5xl font-bold text-gray-900">For Producers</h2>
         <p class="mt-6 text-lg text-gray-700">
-            Expand Your Reach – Connect with trusted carriers and get your shipments delivered efficiently. Seamless Registration – Sign up through the website or mobile app and start listing shipments. Effortless Shipping Management – Monitor deliveries, optimize shipping costs, and enhance customer satisfaction.
+            Expand Your Reach with trusted carriers and get your shipments delivered efficiently. Seamless Registration, Sign up through the website or mobile app and start listing shipments. Effortless Shipping Management – Monitor deliveries, optimize shipping costs, and enhance customer satisfaction.
         </p>
         <div class="mt-10 space-x-6">
             <a href="#" class="bg-red-600 text-white px-8 py-4 rounded shadow-lg
@@ -103,7 +104,10 @@
     <section id="carrier" class="py-28 bg-gradient-to-b from-zinc-200 to-white text-dark text-center px-10">
         <h2 class="text-5xl font-bold">For Carriers</h2>
         <p class="mt-6 text-lg text-gray-600">
-            Earn Money on Your Terms – Whether full-time or part-time, P2C lets carriers maximize their earnings. 📲 App-Based Operations – Download the app, accept deliveries, and track shipments easily. 🔒 Safe & Reliable Transactions – Work with verified producers and grow your delivery network.
+            Earn Money on Your Terms  Whether full-time or part-time.
+            P2C lets you maximize your earnings.
+            Download the app, accept deliveries, and start making money.
+            Work with verified producers and grow your delivery network.
         </p>
         <a href="#" class="mt-10 inline-block bg-red-600 text-white px-8 py-4 rounded shadow-lg
         hover:bg-white hover:text-red-600">
@@ -142,13 +146,13 @@
         </div>
     </section>
 
-    <section id="about" class="h-screen flex flex-col justify-center items-center text-center bg-gradient-to-b from-red-600 to-zinc-200 text-white px-6">
-        <h1 class="text-6xl font-bold">About P2C</h1>
-        <p class="mt-6 text-xl">P2C is a revolutionary local shipping platform designed to bridge the gap between producers and customers through carriers, ensuring reliable, and effortless deliveries. Whether you're a producer looking to expand your customer reach or a carrier seeking flexible earning opportunities, P2C simplifies the entire process with smart solutions.</p>
-        <div class="mt-8 space-x-6">
-            <a href="#about" class="bg-gray-100 text-gray-900 px-8 py-4 rounded shadow-lg
-            hover:bg-red-600 hover:text-gray-100">About</a>
-        </div>
+    <section id="about" class="h-screen flex flex-col justify-center items-center text-center bg-gradient-to-b
+        from-red-600 to-zinc-200 text-white px-6">
+        <h1 class="text-6xl font-bold">About</h1>
+        <p class="mt-6 text-xl">
+            P2C is a revolutionary local shipping platform designed to bridge the gap between producers and customers through carriers, ensuring reliable, and effortless deliveries. Whether you're a producer looking to expand your customer reach or a carrier seeking flexible earning opportunities, P2C simplifies the entire process with smart solutions.
+        </p>
+        <div class="mt-8 space-x-6"></div>
     </section>
 
     <!-- Footer & Contact -->
@@ -157,10 +161,11 @@
         <form class="mt-10">
             <input type="text" class="p-4 rounded text-zinc border shadow-lg w-1/3" placeholder="Your Name">
             <input type="email" class="p-4 rounded text-zinc border shadow-lg w-1/3 ml-6" placeholder="Your Email">
-            <button class="bg-red-600 text-white px-8 py-4 rounded ml-6 hover:bg-white hover:text-red-600">Submit</button>
-
+            <button class="bg-red-600 text-white px-8 py-4 rounded ml-6 shadow-lg hover:bg-white hover:text-red-600">
+                Submit
+            </button>
         </form>
-        <p class="mt-8">Follow us on social media for updates!</p>
+        <!-- <p class="mt-8">Follow us on social media for updates!</p> -->
     </footer>
 
     <!-- Back to Top Button -->
