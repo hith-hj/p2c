@@ -35,7 +35,7 @@ class CarrierResource extends Resource
                 Tables\Columns\TextColumn::make('id')->searchable(),
                 Tables\Columns\TextColumn::make('user_id')->searchable(),
                 Tables\Columns\TextColumn::make('first_name')->searchable()->sortable(),
-                Tables\Columns\CheckBoxColumn::make('is_valid'),
+                Tables\Columns\CheckboxColumn::make('is_valid'),
                 Tables\Columns\TextColumn::make('orders_count')->counts('orders'),
                 Tables\Columns\TextColumn::make('transportation.name'),
             ])

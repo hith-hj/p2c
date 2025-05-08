@@ -41,7 +41,7 @@ class ProducerResource extends Resource
                 Tables\Columns\TextColumn::make('id')->searchable(),
                 Tables\Columns\TextColumn::make('user_id')->searchable(),
                 Tables\Columns\TextColumn::make('brand')->searchable(),
-                Tables\Columns\CheckBoxColumn::make('is_valid'),
+                Tables\Columns\CheckboxColumn::make('is_valid'),
                 Tables\Columns\TextColumn::make('branches_count')->counts('branches'),
                 Tables\Columns\TextColumn::make('orders_count')->counts('orders'),
             ])
