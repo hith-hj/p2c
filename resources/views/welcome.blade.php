@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,26 +10,22 @@
         html {
             scroll-behavior: smooth !important;
         }
+
         body {
             padding-top: 1rem;
         }
     </style>
 </head>
+
 <body class="bg-red-600 scroll-smooth transition duration-700 ease-in-out">
 
     <!-- Navbar (Overlay on Content) -->
     <nav id="nav" class="fixed top-0 left-0 w-full text-white py-3 z-50">
-        <div class="container mx-auto flex justify-center items-center px-8">
-            <!-- <div>theme</div> -->
+        <div class="container mx-auto justify-center px-8 hidden md:flex">
             <ul class="flex space-x-8 text-lg font-medium">
                 <li>
                     <a href="#home" class="hover:underline hover:underline-offset-8">
                         Home
-                    </a>
-                </li>
-                <li>
-                    <a href="#how-it-works" class="hover:underline hover:underline-offset-8">
-                        How It Works
                     </a>
                 </li>
                 <li>
@@ -47,23 +44,51 @@
                     </a>
                 </li>
                 <li>
+                    <a href="#about" class="hover:underline hover:underline-offset-8">
+                        About
+                    </a>
+                </li>
+                <li>
                     <a href="#contact" class="hover:underline hover:underline-offset-8">
                         Contact
                     </a>
                 </li>
             </ul>
-            <!-- <div>lang</div> -->
+        </div>
+        <div class="container items-center m-auto px-8 md:hidden">
+            <div class="container mx-auto flex justify-between px-4">
+                <div class="items-center">
+                    <span class="text-2xl font-bold">P2C</span>
+                </div>
+                <button id="mobileMenuButton" class="text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden bg-primary dark:bg-backgroundDark text-center bg-red-600 text-white">
+                <ul class="px-2 pt-2 pb-4 space-y-1">
+                    <li><a href="#home" class="block px-2 py-1 hover:underline">Home</a></li>
+                    <li><a href="#how-it-works" class="block px-2 py-1 hover:underline">How It Works</a></li>
+                    <li><a href="#producer" class="block px-2 py-1 hover:underline">Producers</a></li>
+                    <li><a href="#carrier" class="block px-2 py-1 hover:underline">Carriers</a></li>
+                    <li><a href="#testimonials" class="block px-2 py-1 hover:underline">Testimonials</a></li>
+                    <li><a href="#contact" class="block px-2 py-1 hover:underline">Contact</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
+
+
 
     <!-- Hero Section (Full-Screen with Navbar Offset) -->
     <section id="home" class="h-screen flex flex-col justify-center items-center
         text-center bg-gradient-to-b from-red-600 to-zinc-200 text-white px-6">
         <h1 class="text-6xl font-bold">Seamless Shipping Connections</h1>
-        <p class="mt-6 text-xl">Join P2C today and experience the future of local shipping—where reliability meets innovation!</p>
+        <p class="mt-6 text-xl">Join P2C today and experience the future of local shipping where reliability meets innovation!</p>
         <div class="mt-8 space-x-6">
-            <a href="#about" class="bg-red-600 text-gray-100 px-8 py-4 rounded shadow-lg
-            hover:bg-white hover:text-red-600">About</a>
+            <a href="#how-it-works" class="bg-red-600 text-gray-100 px-8 py-4 rounded shadow-lg
+            hover:bg-white hover:text-red-600">How it works</a>
         </div>
     </section>
 
@@ -73,13 +98,13 @@
         <p class="mt-6 text-lg">
             P2C simplifies logistics by connecting producers with customer through reliable carriers.
         </p>
-        <div class="mt-10 flex justify-center space-x-10">
-            <div class="w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md hover:ring-4 hover:ring-red-400">
-                <h3 class="text-2xl font-semibold">Producers</h3>
+        <div class="mt-10 flex justify-center flex-col md:flex-row gap-2">
+            <div class="w-full md:w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md hover:ring-4 hover:ring-red-400">
+                <h3 class="text-2xl font-semibold">For Producers</h3>
                 <p class="mt-4">Register, list deliveries, and effortlessly watch your goods goes to the customers.</p>
             </div>
-            <div class="w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md hover:ring-4 hover:ring-red-400">
-                <h3 class="text-2xl font-semibold">Carriers</h3>
+            <div class="w-full md:w-1/3 p-8 bg-red-700 text-white rounded-lg shadow-md hover:ring-4 hover:ring-red-400">
+                <h3 class="text-2xl font-semibold">For Carriers</h3>
                 <p class="mt-4">Download the app, accept deliveries, and start earning today.</p>
             </div>
         </div>
@@ -87,14 +112,15 @@
 
     <!-- Producer Section -->
     <section id="producer" class="py-28 bg-gradient-to-b from-white to-zinc-200 text-center px-10">
-        <h2 class="text-5xl font-bold text-gray-900">For Producers</h2>
+        <h2 class="text-5xl font-bold text-gray-900">Producers</h2>
         <p class="mt-6 text-lg text-gray-700">
             Expand Your Reach with trusted carriers and get your shipments delivered efficiently. Seamless Registration, Sign up through the website or mobile app and start listing shipments. Effortless Shipping Management – Monitor deliveries, optimize shipping costs, and enhance customer satisfaction.
         </p>
-        <div class="mt-10 space-x-6">
-            <a href="#" class="bg-red-600 text-white px-8 py-4 rounded shadow-lg
-            hover:bg-white hover:text-red-600">Register</a>
-            <a href="#" class="bg-zinc-800 text-white px-8 py-4 rounded shadow-lg hover:bg-zinc-500">
+        <div class="mt-10 flex justify-center flex-col md:flex-row gap-2">
+            <a href="#" class="bg-red-600 text-white px-8 py-4 rounded shadow-lg hover:bg-white hover:text-red-600">
+                Register
+            </a>
+            <a href="#" class="bg-zinc-800 text-white px-8 py-4 rounded shadow-lg hover:bg-white hover:text-red-600">
                 Download App
             </a>
         </div>
@@ -102,9 +128,9 @@
 
     <!-- Carrier Section -->
     <section id="carrier" class="py-28 bg-gradient-to-b from-zinc-200 to-white text-dark text-center px-10">
-        <h2 class="text-5xl font-bold">For Carriers</h2>
+        <h2 class="text-5xl font-bold">Carriers</h2>
         <p class="mt-6 text-lg text-gray-600">
-            Earn Money on Your Terms  Whether full-time or part-time.
+            Earn Money on Your Terms Whether full-time or part-time.
             P2C lets you maximize your earnings.
             Download the app, accept deliveries, and start making money.
             Work with verified producers and grow your delivery network.
@@ -156,12 +182,14 @@
     </section>
 
     <!-- Footer & Contact -->
-    <footer id="contact" class="py-16 bg-gradient-to-b from-zinc-200 to-white text-dark text-center px-10">
+    <footer id="contact" class="py-16 bg-gradient-to-b from-zinc-200 to-white text-dark text-center px-10 items-center">
         <h2 class="text-3xl font-bold">Get in Touch</h2>
-        <form class="mt-10">
-            <input type="text" class="p-4 rounded text-zinc border shadow-lg w-1/3" placeholder="Your Name">
-            <input type="email" class="p-4 rounded text-zinc border shadow-lg w-1/3 ml-6" placeholder="Your Email">
-            <button class="bg-red-600 text-white px-8 py-4 rounded ml-6 shadow-lg hover:bg-white hover:text-red-600">
+        <!-- <form class="mt-10 flex flex-col md:flex-row mf:flex-wrap justify-center gap-2"> -->
+        <form class="mt-10 grid gap-2">
+            <input type="text" class="p-4 rounded border shadow-lg col-span-2 md:col-span-1 " placeholder="Your Name">
+            <input type="text" class="p-4 rounded border shadow-lg col-span-2 md:col-span-1" placeholder="Your Email">
+            <input type="text" class="p-4 rounded border shadow-lg col-span-2" placeholder="Your Message">
+            <button type="submit" class="px-8 py-4 rounded shadow-lg text-white col-span-2 bg-red-600 hover:bg-white hover:text-red-600">
                 Submit
             </button>
         </form>
@@ -172,6 +200,12 @@
     <button id="backToTop" class="hidden fixed bottom-6 right-6 bg-red-600 text-white py-1 px-3 rounded shadow-lg hover:bg-red-600">^</button>
 
     <script>
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
         // Testimonials Slider
         let slides = document.querySelectorAll("#testimonialSlider p");
         let index = 0;
@@ -185,18 +219,21 @@
         const backToTop = document.getElementById("backToTop");
         const nav = document.getElementById("nav");
         window.addEventListener("scroll", () => {
-            if(window.scrollY > 200 ){
+            if (window.scrollY > 200) {
                 backToTop.classList.remove("hidden");
-                nav.classList.add('bg-red-600','shadow-lg');
-            }else{
+                nav.classList.add('bg-red-600', 'shadow-lg');
+            } else {
                 backToTop.classList.add("hidden");
-                nav.classList.remove('bg-red-600','shadow-lg');
+                nav.classList.remove('bg-red-600', 'shadow-lg');
             }
         });
         backToTop.addEventListener("click", () => {
-            document.getElementById("home").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("home").scrollIntoView({
+                behavior: "smooth"
+            });
         });
     </script>
 
 </body>
+
 </html>
