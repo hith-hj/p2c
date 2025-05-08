@@ -82,7 +82,7 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            if (Hash::check($validator->safe()->input('password'), $user->password)) {
+            if (!Hash::check($validator->safe()->input('password'), $user->password)) {
                 return Error(msg: __('main.incorrect password'));
             }
 
@@ -140,7 +140,7 @@ class AuthController extends Controller
         $user->sendVerificationCode();
 
         return Success(
-            payload: ['code' => $user->verification_code],
+            payload: ['code' => $user->code('verification')->code],
             msg: __('main.code sent'),
             code: 201
         );
