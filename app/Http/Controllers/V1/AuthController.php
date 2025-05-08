@@ -7,7 +7,6 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\UserResource;
 use App\Models\V1\User;
-use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -83,8 +82,8 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            if(Hash::check($validator->safe()->input('password'),$user->password)){
-                return Error(msg: __('main.incorrect password') );
+            if (Hash::check($validator->safe()->input('password'), $user->password)) {
+                return Error(msg: __('main.incorrect password'));
             }
 
             if ($user->verified_at === null || $user->verification_code !== null) {
