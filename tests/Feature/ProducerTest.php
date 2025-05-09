@@ -234,7 +234,7 @@ describe('Producer Controller', function () {
     });
 
     it('checks if fee is stored for producer when force cancel order ', function () {
-        $order = createOrder($this->user->badge, $this->createOrderData, ['status' => 1]);
+        $order = createOrder($this->user->badge, $this->createOrderData, ['status' => 1,'carrier_id'=>22]);
 
         $res = $this->postJson("/api/v1/order/forceCancel?order_id=$order->id");
         expect($res->status())->toBe(200);
@@ -260,12 +260,10 @@ describe('Producer Controller', function () {
         $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
         expect($res->status())->toBe(200);
         expect($order->fresh()->status)->not->toBe(3);
-        expect($order->codes()->count())->toBe(0);
     });
 
     it('prevent producer to finish order when not delivered', function () {
         $order = createOrder($this->user->badge, $this->createOrderData);
-
         $res = $this->postJson("/api/v1/order/finish?order_id=$order->id");
         expect($res->status())->toBe(400);
         expect($order->fresh()->status)->not->toBe(3);

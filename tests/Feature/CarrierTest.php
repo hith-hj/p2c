@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Enums\OrderStatus;
 use App\Models\V1\Carrier;
+use App\Models\V1\Order;
 use App\Models\V1\User;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
@@ -179,5 +181,75 @@ describe('Carrier Controller', function () {
         expect($user->location)->not->toBeNull();
         expect($user->location->long)->toBe(32.99876543);
         expect($user->location->lat)->toBe(33.99876543);
+    });
+
+    it('allow carrier to accept order when bending', function () {
+        $order = Order::factory()->create(['transportation_id' => $this->user->badge->transportation_id]);
+        $res = $this->postJson("/api/v1/order/accept?order_id=$order->id");
+        expect($res->status())->toBe(200);
+        expect($order->fresh()->status)->toBe(OrderStatus::assigned->value);
+    });
+
+    it('prevent carrier to accept order when not bending', function () {
+        $order = Order::factory()->create([
+            'transportation_id' => $this->user->badge->transportation_id,
+            'status'=>1
+        ]);
+        $res = $this->postJson("/api/v1/order/accept?order_id=$order->id");
+        expect($res->status())->toBe(400);
+    });
+
+    it('prevent carrier to accept order when assigned', function () {
+        $order = Order::factory()->create([
+            'transportation_id' => $this->user->badge->transportation_id,
+            'carrier_id'=>20
+        ]);
+        $res = $this->postJson("/api/v1/order/accept?order_id=$order->id");
+        expect($res->status())->toBe(400);
+    });
+
+    it('allow carrier to pick order when accepted', function () {
+        $order = Order::factory()->create([
+            'carrier_id' => $this->user->badge->id,
+            'transportation_id' => $this->user->badge->transportation_id,
+            'status' => 1,
+        ]);
+        $res = $this->postJson("/api/v1/order/picked?order_id=$order->id");
+        expect($res->status())->toBe(200);
+        expect($order->fresh()->status)->toBe(OrderStatus::picked->value);
+    });
+
+    it('prevent carrier to pick order when not assigned', function () {
+        $order = Order::factory()->create([
+            'carrier_id' => $this->user->badge->id,
+            'transportation_id' => $this->user->badge->transportation_id,
+            'status' => 0,
+        ]);
+        $res = $this->postJson("/api/v1/order/picked?order_id=$order->id");
+        expect($res->status())->toBe(400);
+    });
+
+    it('prevent carrier to pick order when not his', function () {
+        $order = Order::factory()->create([
+            'transportation_id' => $this->user->badge->transportation_id,
+            'status' => 0,
+        ]);
+        $res = $this->postJson("/api/v1/order/picked?order_id=$order->id");
+        expect($res->status())->toBe(400);
+    });
+
+    it('allow carrier to deliver order when picked', function () {
+        $order = Order::factory()->create([
+            'carrier_id' => $this->user->badge->id,
+            'transportation_id' => $this->user->badge->transportation_id,
+            'status' => 2,
+        ]);
+        $res = $this->postJson(
+            "/api/v1/order/delivered?order_id=$order->id",
+            ['code' => $order->code('delivered')->code]
+        );
+        expect($res->status())->toBe(200);
+        expect($order->fresh()->status)->toBe(OrderStatus::delivered->value);
+        expect($order->codes()->count())->toBe(0);
     });
 });

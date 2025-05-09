@@ -142,18 +142,18 @@ describe('Order Services', function () {
         expect($order->fresh()->status)->toBe(1);
     });
 
-    it('modifiy dte field for order when order is accepts', function () {
+    it('modifiy dte field for order when order is accepted', function () {
         $order = Order::find(1);
-        $firstDte = $order->dte;
         $order->update([
             'status' => 0,
             'carrier_id' => null,
             'transportation_id' => $this->carrier->badge->transportation_id,
         ]);
-        $result = $this->orderServices->accept($this->carrier->badge, 1);
+        sleep(1);
+        $result = $this->orderServices->accept($this->carrier->badge, $order->id);
         expect($result)->toBeInstanceOf(Order::class);
         expect($order->fresh()->dte)->not->toBeNull();
-        expect($order->fresh()->dte)->not->toEqual($firstDte);
+        expect($order->fresh()->dte)->not->toEqual($order->dte);
     });
 
     it('fail to accepts an order for a carrier if order is assigned', function () {

@@ -15,7 +15,7 @@ trait FeeCalculator
         $fee = $this->fee($this->cost);
         $delay_fee = $this->delayFee($fee);
         $due_date = $this->dueDate();
-        if (! $this->feeExists($badge) && method_exists($badge, 'fees')) {
+        if (method_exists($badge, 'fees') && ! $this->feeExists($badge)) {
             $record = $badge->fees()->create([
                 'belongTo_type' => $badge::class,
                 'subject_id' => $this->id,

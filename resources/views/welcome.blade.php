@@ -67,13 +67,13 @@
                 </button>
             </div>
             <div id="mobileMenu" class="hidden md:hidden bg-primary dark:bg-backgroundDark text-center bg-red-600 text-white">
-                <ul class="px-2 pt-2 pb-4 space-y-1">
-                    <li><a href="#home" class="block px-2 py-1 hover:underline">Home</a></li>
-                    <li><a href="#how-it-works" class="block px-2 py-1 hover:underline">How It Works</a></li>
-                    <li><a href="#producer" class="block px-2 py-1 hover:underline">Producers</a></li>
-                    <li><a href="#carrier" class="block px-2 py-1 hover:underline">Carriers</a></li>
-                    <li><a href="#testimonials" class="block px-2 py-1 hover:underline">Testimonials</a></li>
-                    <li><a href="#contact" class="block px-2 py-1 hover:underline">Contact</a></li>
+                <ul class="flex space-x-8 text-lg font-medium">
+                    <li><a href="#home" class="block px-2 py-1 hover:underline hover:underline-offset-8">Home</a></li>
+                    <li><a href="#how-it-works" class="block px-2 py-1 hover:underline hover:underline-offset-8">How It Works</a></li>
+                    <li><a href="#producer" class="block px-2 py-1 hover:underline hover:underline-offset-8">Producers</a></li>
+                    <li><a href="#carrier" class="block px-2 py-1 hover:underline hover:underline-offset-8">Carriers</a></li>
+                    <li><a href="#testimonials" class="block px-2 py-1 hover:underline hover:underline-offset-8">Testimonials</a></li>
+                    <li><a href="#contact" class="block px-2 py-1 hover:underline hover:underline-offset-8">Contact</a></li>
                 </ul>
             </div>
         </div>

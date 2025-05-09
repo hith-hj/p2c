@@ -48,12 +48,12 @@ trait CodesHandler
 
     private function generate(string $type, int $length): int
     {
-        $codes = $this->codes;
+        $codes = $this->codes();
         for ($i = 0; $i < 10; $i++) {
             $code = $this->number($length);
             if (
                 mb_strlen((string) $code) === $length &&
-                ! $codes->where([['type', $type], ['code', $code]])->first()
+                ! $codes->where([['type', $type], ['code', $code]])->exists()
             ) {
                 break;
             }
