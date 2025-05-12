@@ -31,7 +31,7 @@ class AuthController extends Controller
             'phone' => $validator->safe()->input('phone'),
             'password' => Hash::make($validator->safe()->input('password')),
             'role' => $validator->safe()->input('account_type'),
-            'firebase_token' => $validator->safe()->input('firebase') ?? null,
+            'firebase_token' => $validator->safe()->input('firebase_token') ?? null,
         ]);
 
         try {
