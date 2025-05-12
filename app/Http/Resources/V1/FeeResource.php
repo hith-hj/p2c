@@ -24,7 +24,7 @@ class FeeResource extends JsonResource
             'subject_type' => class_basename($this->subject_type),
             'amount' => (int) $this->amount,
             'delay_fee' => (int) $this->delay_fee,
-            'type' => FeeTypes::from($this->type),
+            'type' => FeeTypes::from($this->type)->name,
             'due_date' => $this->due_date,
             'created_at' => $this->created_at,
             'subject' => $this->when(
