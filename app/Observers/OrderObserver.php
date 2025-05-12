@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Observers;
 
 use App\Enums\FeeTypes;
@@ -42,7 +44,7 @@ class OrderObserver
 
     private function delivered(Order $order): void
     {
-        if($order->delivered_at !== null){
+        if ($order->delivered_at !== null) {
             $order->codes()->delete();
             // $order->customer->notifiPhone();
         }

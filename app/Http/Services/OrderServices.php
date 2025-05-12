@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use App\Enums\FeeTypes;
 use App\Enums\OrderDeliveryTypes;
 use App\Enums\OrderStatus;
 use App\Models\V1\Branch;
@@ -186,6 +185,7 @@ class OrderServices
         $this->NotFound($order, 'order');
         $this->Truthy($order->status !== OrderStatus::delivered->value, 'invalid order status');
         $order->update(['status' => OrderStatus::finished->value]);
+
         return $order;
     }
 
@@ -223,19 +223,22 @@ class OrderServices
 
     private function applyFilters(object $query, array $filters, array $allowedFilters = []): object
     {
-        return $query->when(! empty($filters), function (Builder $filter) use ($filters, $allowedFilters) {
-            foreach ($filters as $key => $value) {
-                if (! in_array($key, array_keys($allowedFilters))) {
-                    return;
-                }
-                if (is_numeric($value)) {
-                    $value = (int) $value;
-                }
-                if (in_array($value, $allowedFilters[$key])) {
-                    $filter->where($key, $value);
+        return $query->when(
+            ! empty($filters),
+            function (Builder $filter) use ($filters, $allowedFilters) {
+                foreach ($filters as $key => $value) {
+                    if (! in_array($key, array_keys($allowedFilters))) {
+                        return;
+                    }
+                    if (is_numeric($value)) {
+                        $value = (int) $value;
+                    }
+                    if (in_array($value, $allowedFilters[$key])) {
+                        $filter->where($key, $value);
+                    }
                 }
             }
-        });
+        );
     }
 
     private function applyOrderBy(object $query, array $orderBy, array $allowedOrderBy = []): object
@@ -287,6 +290,7 @@ class OrderServices
             $customer = (new CustomerServices())->createIfNotExists($customerInfo);
             $order->customer()->associate($customer);
         }
+
         return $order;
     }
 

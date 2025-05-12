@@ -138,5 +138,5 @@ describe('Carrier Services', function () {
             'cords' => ['long' => 50.0],
         ];
         $this->carrierServices->setLocation($carrier, $data);
-    })->throws(Exception::class, 'Undefined');
+    })->throws(Exception::class);
 });

@@ -234,7 +234,7 @@ describe('Producer Controller', function () {
     });
 
     it('checks if fee is stored for producer when force cancel order ', function () {
-        $order = createOrder($this->user->badge, $this->createOrderData, ['status' => 1,'carrier_id'=>22]);
+        $order = createOrder($this->user->badge, $this->createOrderData, ['status' => 1, 'carrier_id' => 22]);
 
         $res = $this->postJson("/api/v1/order/forceCancel?order_id=$order->id");
         expect($res->status())->toBe(200);

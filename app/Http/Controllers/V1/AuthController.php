@@ -82,7 +82,7 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            if (!Hash::check($validator->safe()->input('password'), $user->password)) {
+            if (! Hash::check($validator->safe()->input('password'), $user->password)) {
                 return Error(msg: __('main.incorrect password'));
             }
 
