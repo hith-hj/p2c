@@ -116,6 +116,7 @@ describe('Carrier Controller', function () {
         $res = $this->patchJson("$this->url/update", $data);
         expect($res->status())->toBe(200);
         expect($this->user->badge->fresh()->first_name)->toBe('Edited');
+        expect($this->user->badge->fresh()->details)->toBeNull();
     });
 
     it('prevent carrier update details with empty data', function () {

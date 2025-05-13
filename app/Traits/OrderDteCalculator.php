@@ -22,7 +22,7 @@ trait OrderDteCalculator
         if ($order === null) {
             $order = $this;
         }
-        $order = $this->checkOrder($order, ['created_at', 'delivery_type', 'distance']);
+        $order = $this->checkOrderFieldsExists($order, ['created_at', 'delivery_type', 'distance']);
         $delivery_type = $order->delivery_type;
         $distance_In_Km = $order->distance / 1000;
         $dte = $this->getCreatedAt($order);
@@ -41,7 +41,7 @@ trait OrderDteCalculator
         ];
     }
 
-    private function checkOrder(object|array $order, $requiredFields = []): object
+    private function checkOrderFieldsExists(object|array $order, $requiredFields = []): object
     {
         if (is_array($order)) {
             $order = (object) $order;
@@ -52,7 +52,7 @@ trait OrderDteCalculator
                 $missing[] = $field;
             }
         }
-        throw_if(! empty($missing), 'Exception', __('main. Edt fields missing').implode(', ', $missing));
+        throw_if(! empty($missing), __('main.Order missing fields: ').implode(', ', $missing));
 
         return $order;
     }
@@ -94,9 +94,9 @@ trait OrderDteCalculator
     private function getDeliveryTimePerKm(string $deliveryType, float $distance = 1): int
     {
         $base = match ($deliveryType) {
-            OrderDeliveryTypes::normal->value => 2,
-            OrderDeliveryTypes::urgent->value => 1,
-            OrderDeliveryTypes::express->value => 0.5,
+            OrderDeliveryTypes::normal->value => config('settings.normal_delivery_time_per_km', 2),
+            OrderDeliveryTypes::urgent->value => config('settings.urgent_delivery_time_per_km', 1),
+            OrderDeliveryTypes::express->value => config('settings.express_delivery_time_per_km', 0.5),
             default => 3,
         };
 

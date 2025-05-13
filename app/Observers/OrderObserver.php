@@ -26,19 +26,29 @@ class OrderObserver
     public function updated(Order $order): void
     {
         match ($order->status) {
+            OrderStatus::assigned->value => $this->assigned($order),
             OrderStatus::picked->value => $this->picked($order),
             OrderStatus::delivered->value => $this->delivered($order),
             OrderStatus::finished->value => $this->finished($order),
             OrderStatus::rejected->value => $this->rejected($order),
-            OrderStatus::canceld->value => $this->canceld($order),
+            OrderStatus::canceled->value => $this->canceled($order),
             default => true,
         };
+    }
+
+    public function assigned(Order $order)
+    {
+        // $order->producer->notify(
+        //     'Order Accepted',
+        //     'Your Order has been accepted',
+        //     ['order_id' => $order->id]
+        // );
     }
 
     private function picked(Order $order): void
     {
         // if($order->picked_at !== null){
-        //     $order->customer->notifiPhone();
+        //     $order->customer->notify();
         // }
     }
 
@@ -46,28 +56,48 @@ class OrderObserver
     {
         if ($order->delivered_at !== null) {
             $order->codes()->delete();
-            // $order->customer->notifiPhone();
+            // $order->producer->notify(
+            //     'Order deliverd',
+            //     'Your Order has been delliver',
+            //     ['order_id' => $order->id]
+            // );
+            // $order->customer->notify();
         }
     }
 
     private function finished(Order $order): void
     {
-        $order->createFee($order->carrier, FeeTypes::normal->value);
+        $order->carrier->createFee($order, FeeTypes::normal->value);
+        // $order->carrier->notify(
+        //     'Order Finished',
+        //     'Your Order has been finished',
+        //     ['order_id' => $order->id]
+        // );
     }
 
-    private function canceld(Order $order): void
+    private function canceled(Order $order): void
     {
         $order->codes()->delete();
+        // $order->customer->notify();
+        // $order->carrier->notify(
+        //     'Order canceled',
+        //     'Your Order has been canceled',
+        //     ['order_id' => $order->id]
+        // );
         if ($order->carrier_id !== null) {
-            $order->createFee($order->producer, FeeTypes::cancel->value);
-            // $order->customer->notifiPhone();
+            $order->producer->createFee($order, FeeTypes::cancel->value);
         }
     }
 
     private function rejected(Order $order): void
     {
         $order->codes()->delete();
-        $order->createFee($order->carrier, FeeTypes::reject->value);
-        // $order->customer->notifiPhone();
+        $order->carrier->createFee($order, FeeTypes::reject->value);
+        // $order->producer->notify(
+        //     'Order rejected',
+        //     'Your Order has been rejected',
+        //     ['order_id' => $order->id]
+        // );
+        // $order->customer->notify();
     }
 }

@@ -6,20 +6,17 @@ namespace App\Models\V1;
 
 use App\Observers\OrderObserver;
 use App\Traits\CodesHandler;
-use App\Traits\FeeCalculator;
 use App\Traits\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ObservedBy([OrderObserver::class])]
 class Order extends Model
 {
     use CodesHandler;
-    use FeeCalculator;
     use HasFactory;
     use OrderDteCalculator;
 
@@ -60,9 +57,8 @@ class Order extends Model
         return $this->belongsTo(Transportation::class);
     }
 
-    public function fees(): HasMany
+    public function getFeeSource()
     {
-        return $this->hasMany(Fee::class, 'belongTo_id')
-            ->where('belongTo_type', $this::class);
+        return $this->cost;
     }
 }

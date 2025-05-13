@@ -78,8 +78,8 @@ describe('Order Services', function () {
             [
                 'weight' => 100,
                 'branch_id' => 1,
-                'dest_long' => 31.40000,
-                'dest_lat' => 31.0000,
+                'dest_long' => 31.121212,
+                'dest_lat' => 31.212121,
                 'delivery_type' => 'normal',
             ]
         );

@@ -79,7 +79,7 @@ class CarrierController extends Controller
 
         $carrier = $this->carrier->find(Auth::user()->badge->id);
         $details = $this->carrier->createDetails($carrier, $validator->safe()->all());
-        if ($carrier->documents()->exists()) {
+        if ($carrier->images()->exists()) {
             $carrier->validate(true);
         }
 
@@ -88,7 +88,7 @@ class CarrierController extends Controller
         );
     }
 
-    public function createDocuments(Request $request): JsonResponse
+    public function createImages(Request $request): JsonResponse
     {
         if (Auth::user()->badge === null) {
             return Error(msg: __('main.carrier').' '.__('main.not found'));
@@ -100,7 +100,7 @@ class CarrierController extends Controller
         ]);
 
         $carrier = $this->carrier->find(Auth::user()->badge->id);
-        $this->carrier->createDocuments($carrier, $validator->safe()->input('images'));
+        $this->carrier->createImages($carrier, $validator->safe()->input('images'));
         if ($carrier->details()->exists()) {
             $carrier->validate(true);
         }

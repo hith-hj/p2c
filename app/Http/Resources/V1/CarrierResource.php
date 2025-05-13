@@ -17,9 +17,9 @@ class CarrierResource extends JsonResource
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
-        $collection = $this->documents;
-        $docs = $collection->filter(fn ($item): bool => $item->doc_type === 'document');
-        $profile = $collection->filter(fn ($item): bool => $item->doc_type === 'profile');
+        $collection = $this->images;
+        $docs = $collection->filter(fn ($item): bool => $item->type === 'document');
+        $profile = $collection->filter(fn ($item): bool => $item->type === 'profile');
 
         return [
             'id' => $this->id,
@@ -33,7 +33,7 @@ class CarrierResource extends JsonResource
             'details' => $this->details,
             'documents' => $docs->pluck('url')->map(fn ($url) => asset($url)),
             'profile_image' => $profile->pluck('url')->map(fn ($url) => asset($url)),
-            'is_filled' => (int) (! $this->documents->isEmpty() && $this->details !== null && $this->transportation !== null),
+            'is_filled' => (int) (! $this->images->isEmpty() && $this->details !== null && $this->transportation !== null),
         ];
     }
 }

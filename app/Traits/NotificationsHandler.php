@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Models\V1\Notification;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory as FcmFactory;
 use Kreait\Firebase\Messaging\AndroidConfig;
@@ -11,7 +13,13 @@ use Kreait\Firebase\Messaging\CloudMessage;
 
 trait NotificationsHandler
 {
-    public function notifyPhone(
+    private string $title = '';
+
+    private string $body = '';
+
+    private array $data = [];
+
+    public function notify(
         string $title = '',
         string $body = '',
         array $data = [],
@@ -20,15 +28,19 @@ trait NotificationsHandler
         if (app()->environment('testing')) {
             return true;
         }
+        $this->title = $title;
+        $this->body = $body;
+        $this->data = $data;
 
         return match ($provider) {
+            'fcm' => $this->fcm(),
             'sms' => $this->sms(),
-            'fcm' => $this->fcm($title, $body, $data),
-            default => $this->fcm($title, $body, $data),
+            'email' => $this->email(),
+            default => $this->fcm(),
         };
     }
 
-    public function fcm($title, $body, $data)
+    public function fcm()
     {
         if ($this->firebase_token === null) {
             return true;
@@ -36,25 +48,49 @@ trait NotificationsHandler
         $token = $this->firebase_token;
         $factory = (new FcmFactory())->withServiceAccount($this->getFCMCredentials());
         $messaging = $factory->createMessaging();
-        $data = [
-            'title' => $title,
-            'body' => $body,
-        ];
-        $message = CloudMessage::new()
-            ->withNotification($data)
-            ->withAndroidConfig($this->getFCMAndroidConfig())
-            ->toToken($token);
+        $notification = ['title' => $this->title, 'body' => $this->body];
+        $message = CloudMessage::new()->withNotification($notification)
+            ->withAndroidConfig($this->getFCMAndroidConfig())->toToken($token);
         if (! empty($data)) {
             $message->withData($data);
         }
         try {
             $res = $messaging->send($message);
-            $this->store([...$data, 'result' => $res]);
+            $this->store(['result' => $res]);
 
             return true;
         } catch (MessagingException $e) {
             return false;
         }
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class, 'belongTo_id')
+            ->withAttributes(['belongTo_type' => $this::class]);
+    }
+
+    private function store(array $extra)
+    {
+        if (! method_exists($this, 'notifications')) {
+            return;
+        }
+
+        return $this->notifications()->create([
+            'title' => $this->title,
+            'payload' => serialize(['body' => $this->body, 'data' => $this->data, 'extra' => $extra]),
+            'status' => 0,
+        ]);
+    }
+
+    private function sms()
+    {
+        return true;
+    }
+
+    private function email()
+    {
+        return true;
     }
 
     private function getFCMCredentials()
@@ -73,29 +109,5 @@ trait NotificationsHandler
                 'sound' => 'default',
             ],
         ]);
-    }
-
-    public function store(array $data)
-    {
-        if (! method_exists($this, 'notifications')) {
-            return;
-        }
-
-        return $this->notifications()->create([
-            'belongTo_type' => $this::class,
-            'title' => $data['title'],
-            'payload' => serialize($data),
-            'status' => 0,
-        ]);
-    }
-
-    private function sms()
-    {
-        return true;
-    }
-
-    public function notifyEmail()
-    {
-        return true;
     }
 }

@@ -6,7 +6,6 @@ namespace App\Http\Services;
 
 use App\Models\V1\Transportation;
 use App\Traits\ExceptionHandler;
-use Exception;
 use Illuminate\Support\Collection;
 
 class TransportationServices
@@ -34,9 +33,7 @@ class TransportationServices
         $maxCapacity = Transportation::max('capacity');
         // todo : get transportation based on the dimension of object
         // volume = width * height* length (cubic volume)
-        if ($weight > $maxCapacity) {
-            throw new Exception("Max Capacity Currently is $maxCapacity");
-        }
+        throw_if($weight > $maxCapacity, "Max Capacity Currently is $maxCapacity");
 
         return Transportation::orderBy('capacity')
             ->where('capacity', '>=', $weight)

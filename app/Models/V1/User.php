@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\V1;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use App\Enums\UserRoles;
 use App\Traits\CodesHandler;
 use App\Traits\NotificationsHandler;
-use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
@@ -77,19 +73,13 @@ class User extends Authenticatable implements JWTSubject
         return match ($this->role) {
             UserRoles::Producer->value => $this->hasOne(Producer::class),
             UserRoles::Carrier->value => $this->hasOne(Carrier::class),
-            default => throw new Exception("Invalid role: $this->role ")
+            default => throw new \Exception("Invalid role: $this->role ")
         };
     }
 
     public function settings(): HasOne
     {
         return $this->hasOne(Setting::class);
-    }
-
-    public function notifications(): HasMany
-    {
-        return $this->hasMany(Notification::class, 'belongTo_id')
-            ->where('belongTo_type', $this::class);
     }
 
     public function sendVerificationCode($by = 'phone'): static
@@ -99,15 +89,12 @@ class User extends Authenticatable implements JWTSubject
             'verified_at' => null,
             'verified_by' => $by,
         ]);
-        if ($by === 'phone') {
-            $code = $this->code('verification')->code;
-            $this->notifyPhone(
-                'verification code',
-                "Your code is: $code",
-            );
-        } else {
-            $this->notifyEmail();
-        }
+        $code = $this->code('verification')->code;
+        $this->notify(
+            title: 'verification code',
+            body: "Your code is: $code",
+            provider: $by
+        );
 
         return $this;
     }

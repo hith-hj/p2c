@@ -8,14 +8,12 @@ use App\Models\V1\Carrier;
 use App\Models\V1\CarrierDetails;
 use App\Models\V1\Location;
 use App\Models\V1\User;
-use App\Traits\DocumentHandler;
 use App\Traits\ExceptionHandler;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
 
 class CarrierServices
 {
-    use DocumentHandler;
     use ExceptionHandler;
 
     public function all(): Collection
@@ -50,7 +48,7 @@ class CarrierServices
             'fees',
             'details',
             'location',
-            'documents',
+            'images',
         ]);
     }
 
@@ -92,11 +90,11 @@ class CarrierServices
         ]);
     }
 
-    public function createDocuments(Carrier $carrier, array $data): bool
+    public function createImages(Carrier $carrier, array $data): bool
     {
         $this->Truthy($carrier->documents()->count() > 0, 'documents exists');
         $this->Required($data, 'documents');
-        $this->multible($data, $carrier->id, $carrier::class);
+        $carrier->multibleFile($data);
 
         return true;
     }
@@ -111,7 +109,7 @@ class CarrierServices
     public function delete(Carrier $carrier): bool
     {
         $carrier->details()->delete();
-        $carrier->documents()->delete();
+        $carrier->images()->delete();
         $carrier->delete();
 
         return true;

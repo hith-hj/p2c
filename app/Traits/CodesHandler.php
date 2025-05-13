@@ -12,15 +12,13 @@ trait CodesHandler
     public function codes(): HasMany
     {
         return $this->hasMany(Code::class, 'belongTo_id')
-            ->where('belongTo_type', $this::class);
+            ->withAttributes(['belongTo_type' => $this::class]);
     }
 
     public function code(string $type): Code
     {
         $code = $this->codes()->where('type', $type)->first();
-        if ($code === null) {
-            throw new \Exception("$type Code not Found");
-        }
+        throw_if($code === null, "$type Code not Found");
 
         return $code;
     }
@@ -29,7 +27,6 @@ trait CodesHandler
     {
         $code = $this->generate($type, $length);
         $this->codes()->create([
-            'belongTo_type' => $this::class,
             'type' => $type,
             'code' => $code,
         ]);
@@ -62,11 +59,8 @@ trait CodesHandler
         return (int) $code;
     }
 
-    private function number(int $length): int
+    private function number(int $length = 5): int
     {
-        if ($length === null || $length <= 0) {
-            throw new \Exception('Code length is not valid');
-        }
         $number = '';
         for ($i = 0; $i < $length; $i++) {
             $number .= mt_rand(0, 9);

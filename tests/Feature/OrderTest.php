@@ -87,7 +87,6 @@ describe('Order Controller', function () {
     it('create an order for producer', function () {
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
             ->postJson("$this->url/create", $this->postOrderData);
-
         expect($res->status())->toBe(200)
             ->and($res->json('payload'))->toHaveKey('order');
     });
@@ -176,7 +175,7 @@ describe('Order Controller', function () {
             ->postJson("$this->url/cancel", ['order_id' => $order->id]);
         expect($res->status())->toBe(200);
 
-        expect($order->fresh()->status)->toBe(OrderStatus::canceld->value);
+        expect($order->fresh()->status)->toBe(OrderStatus::canceled->value);
     });
 
     it('prevent producer to cancel not pending orders', function () {

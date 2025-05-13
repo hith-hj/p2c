@@ -195,7 +195,7 @@ class OrderServices
         $this->NotFound($order, 'order');
         $this->Truthy($order->carrier_id !== null, 'order is assigned');
         $this->Truthy($order->status !== OrderStatus::pending->value, 'invalid order status');
-        $order->update(['status' => OrderStatus::canceld->value]);
+        $order->update(['status' => OrderStatus::canceled->value]);
         $order->codes()->delete();
 
         return $order;
@@ -206,7 +206,7 @@ class OrderServices
         $order = $producer->orders()->find($order_id);
         $this->Truthy($order === null, 'Not found');
         $this->Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
-        $order->update(['status' => OrderStatus::canceld->value]);
+        $order->update(['status' => OrderStatus::canceled->value]);
 
         return $order;
     }

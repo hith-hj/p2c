@@ -13,11 +13,11 @@ return new class() extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('belongTo_id');
             $table->string('belongTo_type');
-            $table->string('doc_type');
+            $table->string('type');
             $table->string('url');
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class() extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists('images');
     }
 };

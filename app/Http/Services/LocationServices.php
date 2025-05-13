@@ -29,7 +29,6 @@ class LocationServices
         ]);
 
         return $belongTo->location()->create([
-            'belongTo_type' => $belongTo::class,
             'long' => round($data['cords']['long'], 8),
             'lat' => round($data['cords']['lat'], 8),
         ]);

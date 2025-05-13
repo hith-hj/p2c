@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-use function Pest\Laravel\{get, post, put, delete};
-use App\Models\V1\Admin;
 use App\Filament\Resources\UserResource;
+use App\Models\V1\Admin;
 use App\Models\V1\User;
+
+use function Pest\Laravel\delete;
+use function Pest\Laravel\post;
+use function Pest\Laravel\put;
 
 beforeEach(function () {
     $this->actingAs(Admin::factory()->create(), 'admin');

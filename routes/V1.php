@@ -84,7 +84,7 @@ Route::group(
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::post('createDetails', 'createDetails');
-            Route::post('createDocuments', 'createDocuments');
+            Route::post('createImages', 'createImages');
             Route::post('setLocation', 'setLocation');
             Route::patch('update', 'update');
             Route::delete('delete', 'delete');
@@ -98,13 +98,6 @@ Route::group(
 Route::group(
     ['prefix' => 'transportation', 'controller' => TransportationController::class],
     function (): void {
-        // Route::middleware([UserChecks::class . ':carrier'])->group(function () {
-        //     Route::get('/', 'get');
-        //     Route::post('create', 'create');
-        //     Route::patch('update', 'update');
-        //     Route::delete('delete', 'delete');
-        // });
-
         Route::get('all', 'all');
         Route::get('find', 'find');
     }

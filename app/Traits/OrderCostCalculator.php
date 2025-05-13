@@ -15,13 +15,13 @@ trait OrderCostCalculator
         Branch $branch,
         array $data
     ): array {
-        $transportation = $this->getTransportation($data['weight']);
         $distance = $this->calcDistance(
             src: ['lat' => $branch->location->lat, 'long' => $branch->location->long],
             dest: ['lat' => $data['dest_lat'], 'long' => $data['dest_long']]
         );
         $distanceInMeter = $distance * 1000;
         $this->checkIfValidDistance($distanceInMeter);
+        $transportation = $this->getTransportation($data['weight']);
         $inital = $this->initalCost($transportation, $data['weight'], $distance);
         $delivery = $this->deliveryTypeCost($data['delivery_type']);
         $attrs = $this->AttrsCost($data);
@@ -55,12 +55,13 @@ trait OrderCostCalculator
         ); // km
     }
 
-    private function checkIfValidDistance(int $distanceInMeter, int $minRange = 300, int $maxRange = 50000): void
+    private function checkIfValidDistance(int $distanceInMeter): void
     {
+        $minRange = config('settings.min_order_distance', 300);
+        $maxRange = config('settings.max_order_distance', 50000);
         throw_if(
             $distanceInMeter < $minRange || $distanceInMeter > $maxRange,
-            'Exception',
-            __("main.Distance should be between 200 and 50000 meter, your is : $distanceInMeter")
+            __("main.Distance should be between $minRange and $maxRange meter, your is : $distanceInMeter")
         );
     }
 
@@ -89,8 +90,9 @@ trait OrderCostCalculator
         return (int) floor($final);
     }
 
-    private function AttrsCost(array $data, string $calcType = 'totla'): int|array
+    private function AttrsCost(array $data): int|array
     {
+        $calcType = config('settings.order_attrs_calculation_type', 'totla');
         if (! isset($data['attrs']) || $data['attrs'] === []) {
             return 0;
         }
@@ -104,8 +106,9 @@ trait OrderCostCalculator
         };
     }
 
-    private function ItemsCost(array $items, string $calcType = 'totla'): int|array
+    private function ItemsCost(array $items): int|array
     {
+        $calcType = config('settings.order_items_calculation_type', 'totla');
         if ($items === []) {
             return 0;
         }
@@ -113,19 +116,19 @@ trait OrderCostCalculator
         $query = Item::whereIn('id', $items);
 
         return match ($calcType) {
-            default => $query->sum('extra_cost_percent'),
-            'total' => $query->sum('extra_cost_percent'),
             'byone' => $query->pluck('extra_cost_percent')->toArray(),
+            'total' => $query->sum('extra_cost_percent'),
+            default => $query->sum('extra_cost_percent'),
         };
     }
 
-    private function deliveryTypeCost(string $delivery_type, int $percent = 20): int
+    private function deliveryTypeCost(string $delivery_type): int
     {
         if ($delivery_type === 'urgent') {
-            return $percent;
+            return config('settings.urgent_order_cost', 20);
         }
         if ($delivery_type === 'express') {
-            return $percent * 15 / 10;
+            return config('settings.express_order_cost', 35);
         }
 
         return 0;

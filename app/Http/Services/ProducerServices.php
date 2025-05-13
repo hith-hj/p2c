@@ -81,7 +81,6 @@ class ProducerServices
     public function delete(Producer $producer): bool
     {
         $producer->branches()->delete();
-        // $producer->orders()->delete();
         $producer->delete();
 
         return true;
