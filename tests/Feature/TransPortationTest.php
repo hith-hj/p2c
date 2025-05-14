@@ -26,7 +26,7 @@ describe('Transportation controller', function () {
     it('fails to returns transportations when there is none', function () {
         Transportation::truncate();
         $res = $this->getJson("$this->url/all");
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(404);
     });
 
     it('finds a specific transportation', function () {

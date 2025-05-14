@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 trait ExceptionHandler
 {
     /**
@@ -29,7 +31,15 @@ trait ExceptionHandler
      */
     private function NotFound($argument, $name = '')
     {
-        return $this->empty($argument, $name, 'not found');
+        // return $this->empty($argument, $name, 'not found');
+        if (
+            ! $argument ||
+            $argument === null ||
+            empty($argument) ||
+            (is_countable($argument) && count($argument) === 0)
+        ) {
+            throw new NotFoundHttpException(sprintf('%s %s', __("main.$name"), __("main.not found")));
+        }
     }
 
     /**
@@ -41,18 +51,14 @@ trait ExceptionHandler
      */
     private function Required($argument, $name = '')
     {
-        return $this->empty($argument, $name, 'is required');
-    }
-
-    private function empty($argument, $name = '', $msg = 'Error'): void
-    {
+        // return $this->empty($argument, $name, 'is required');
         if (
             ! $argument ||
             $argument === null ||
             empty($argument) ||
             (is_countable($argument) && count($argument) === 0)
         ) {
-            throw new \Exception(sprintf('%s %s', __("main.$name"), __("main.$msg")));
+            throw new \Exception(sprintf('%s %s', __("main.$name"), __("main.is required")));
         }
     }
 

@@ -236,7 +236,7 @@ describe('Carrier Controller', function () {
             'status' => 0,
         ]);
         $res = $this->postJson("/api/v1/order/picked?order_id=$order->id");
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(404);
     });
 
     it('allow carrier to deliver order when picked', function () {

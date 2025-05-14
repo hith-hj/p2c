@@ -229,7 +229,7 @@ describe('Order Controller', function () {
         $order = Order::factory()->create(['carrier_id' => 15, 'status' => OrderStatus::assigned->value]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/picked", ['order_id' => $order->id]);
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(404);
 
         expect($order->fresh()->status)->toBe(OrderStatus::assigned->value);
     });

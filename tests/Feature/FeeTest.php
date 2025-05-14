@@ -35,7 +35,7 @@ describe('Fee controller', function () {
 
     it('fails to returns fees when there is none', function () {
         $res = $this->getJson("$this->url/all");
-        expect($res->status())->toBe(400);
+        expect($res->status())->toBe(404);
     });
 
     it('finds a specific Fee', function () {
