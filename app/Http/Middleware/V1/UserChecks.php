@@ -24,13 +24,6 @@ class UserChecks
             ], 401);
         }
 
-        if ($request->user()->role !== $role) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Un Authorized action',
-            ], 403);
-        }
-
         if ($request->user()->verified_at === null) {
             return response()->json([
                 'success' => false,
@@ -38,14 +31,11 @@ class UserChecks
             ], 401);
         }
 
-        if (
-            $isValid &&
-            ($request->user()->badge === null || $request->user()->badge->is_valid === 0)
-        ) {
+        if ($request->user()->role !== $role) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid account',
-            ], 401);
+                'message' => 'Un Authorized action',
+            ], 403);
         }
 
         return $next($request);

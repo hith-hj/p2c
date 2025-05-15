@@ -77,7 +77,7 @@ class CarrierController extends Controller
             'color' => ['required', 'string'],
         ]);
 
-        $carrier = $this->carrier->find(Auth::user()->badge->id);
+        $carrier = Auth::user()->badge;
         $details = $this->carrier->createDetails($carrier, $validator->safe()->all());
         if ($carrier->images()->exists()) {
             $carrier->validate(true);
@@ -119,6 +119,9 @@ class CarrierController extends Controller
         ]);
 
         $carrier = Auth::user()->badge;
+        if($carrier === null){
+            return Error(msg: 'missing carrier');
+        }
         if ($validator->safe()->exists('transportation_id')) {
             if ($carrier->details()->exists()) {
                 $carrier->details()->delete();
@@ -139,20 +142,28 @@ class CarrierController extends Controller
 
     public function delete(Request $request): JsonResponse
     {
-        $this->carrier->delete(Auth::user()->badge);
+        $carrier = Auth::user()->badge;
+        if($carrier === null){
+            return Error(msg: 'missing carrier');
+        }
+        $this->carrier->delete($carrier);
 
         return Success(msg: __('main.deleted'));
     }
 
     public function setLocation(Request $request)
     {
+        $carrier = Auth::user()->badge;
+        if($carrier === null){
+            return Error(msg: 'missing carrier');
+        }
         $validator = Validator::make($request->all(), [
             'cords' => ['required', 'array', 'size:2'],
             'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
             'cords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
         ]);
 
-        $this->carrier->setLocation(Auth::user()->badge, $validator->safe()->all());
+        $this->carrier->setLocation($carrier, $validator->safe()->all());
 
         return Success(msg: __('main.Location updated'));
     }
