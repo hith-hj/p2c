@@ -38,7 +38,7 @@ trait ImagesHandler
                 $doc_type = $key;
             }
 
-            $this->uploadFile($file, $doc_type);
+            $this->uploadImage($file, $doc_type);
         }
 
         return true;

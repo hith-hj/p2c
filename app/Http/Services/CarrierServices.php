@@ -94,7 +94,7 @@ class CarrierServices
     {
         $this->Truthy($carrier->images()->count() > 0, 'images exists');
         $this->Required($data, 'images');
-        $carrier->multibleFile($data);
+        $carrier->multibleImage($data);
 
         return true;
     }
