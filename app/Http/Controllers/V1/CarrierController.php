@@ -99,7 +99,7 @@ class CarrierController extends Controller
             'images.*' => ['required', 'image', 'max:2048'],
         ]);
 
-        $carrier = $this->carrier->find(Auth::user()->badge->id);
+        $carrier = Auth::user()->badge;
         $this->carrier->createImages($carrier, $validator->safe()->input('images'));
         if ($carrier->details()->exists()) {
             $carrier->validate(true);
@@ -118,7 +118,7 @@ class CarrierController extends Controller
             'transportation_id' => ['sometimes', 'exists:transportations,id'],
         ]);
 
-        $carrier = $this->carrier->find(Auth::user()->badge->id);
+        $carrier = Auth::user()->badge;
         if ($validator->safe()->exists('transportation_id')) {
             if ($carrier->details()->exists()) {
                 $carrier->details()->delete();

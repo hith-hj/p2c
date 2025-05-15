@@ -53,7 +53,7 @@ class ProducerServices
 
     public function create(Auth $user, array $data): Producer
     {
-        $this->Truthy($user->badge !== null, 'producer');
+        $this->Exists($user->badge, 'producer');
         $this->NotFound($data, 'data');
         $producer = $user->badge()->create([
             'brand' => $data['brand'],
