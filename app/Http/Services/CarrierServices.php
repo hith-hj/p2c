@@ -92,8 +92,8 @@ class CarrierServices
 
     public function createImages(Carrier $carrier, array $data): bool
     {
-        $this->Truthy($carrier->documents()->count() > 0, 'documents exists');
-        $this->Required($data, 'documents');
+        $this->Truthy($carrier->images()->count() > 0, 'images exists');
+        $this->Required($data, 'images');
         $carrier->multibleFile($data);
 
         return true;
