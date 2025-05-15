@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware\V1;
 
 use Closure;
@@ -28,6 +30,7 @@ class BadgeChecks
                 'message' => 'invalid badge',
             ], 403);
         }
+
         return $next($request);
     }
 }

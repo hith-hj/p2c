@@ -38,7 +38,7 @@ trait ExceptionHandler
             empty($argument) ||
             (is_countable($argument) && count($argument) === 0)
         ) {
-            throw new NotFoundHttpException(sprintf('%s %s', __("main.$name"), __("main.not found")));
+            throw new NotFoundHttpException(sprintf('%s %s', __("main.$name"), __('main.not found')));
         }
     }
 
@@ -58,7 +58,7 @@ trait ExceptionHandler
             empty($argument) ||
             (is_countable($argument) && count($argument) === 0)
         ) {
-            throw new \Exception(sprintf('%s %s', __("main.$name"), __("main.is required")));
+            throw new \Exception(sprintf('%s %s', __("main.$name"), __('main.is required')));
         }
     }
 

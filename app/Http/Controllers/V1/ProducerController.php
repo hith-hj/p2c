@@ -73,7 +73,7 @@ class ProducerController extends Controller
             'brand' => ['required', 'string', 'unique:producers,brand'],
         ]);
         $producer = Auth::user()->badge;
-        if($producer === null){
+        if ($producer === null) {
             return Error(msg: 'missing producer');
         }
         $this->producer->update($producer, $validator->safe()->only(['brand']));
@@ -87,7 +87,7 @@ class ProducerController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $producer = Auth::user()->badge;
-        if($producer === null){
+        if ($producer === null) {
             return Error(msg: 'missing producer');
         }
         $this->producer->delete($producer);

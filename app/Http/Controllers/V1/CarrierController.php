@@ -119,7 +119,7 @@ class CarrierController extends Controller
         ]);
 
         $carrier = Auth::user()->badge;
-        if($carrier === null){
+        if ($carrier === null) {
             return Error(msg: 'missing carrier');
         }
         if ($validator->safe()->exists('transportation_id')) {
@@ -143,7 +143,7 @@ class CarrierController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $carrier = Auth::user()->badge;
-        if($carrier === null){
+        if ($carrier === null) {
             return Error(msg: 'missing carrier');
         }
         $this->carrier->delete($carrier);
@@ -154,7 +154,7 @@ class CarrierController extends Controller
     public function setLocation(Request $request)
     {
         $carrier = Auth::user()->badge;
-        if($carrier === null){
+        if ($carrier === null) {
             return Error(msg: 'missing carrier');
         }
         $validator = Validator::make($request->all(), [
