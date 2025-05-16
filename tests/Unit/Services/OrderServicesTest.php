@@ -7,6 +7,7 @@ use App\Http\Services\OrderServices;
 use App\Models\V1\Order;
 use App\Models\V1\User;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 beforeEach(function () {
     $this->orderServices = new OrderServices();
@@ -40,7 +41,7 @@ describe('Order Services', function () {
     it('fail to retrieves all bending orders for Carrier when no order exists', function () {
         Order::truncate();
         $this->orderServices->all();
-    })->throws(Exception::class);
+    })->throws(NotFoundHttpException::class);
 
     it('retrieves orders for a specific producer', function () {
         $result = $this->orderServices->get($this->producer->badge);
@@ -50,7 +51,17 @@ describe('Order Services', function () {
     it('fail to retrieves orders for specific producer when no order exists', function () {
         Order::truncate();
         $this->orderServices->get($this->producer->badge);
+    })->throws(NotFoundHttpException::class);
+
+    it('fail to retrieves orders for specific producer with invalid badge', function () {
+        Order::truncate();
+        $this->orderServices->get((object) []);
     })->throws(Exception::class);
+
+    it('fail to retrieves orders for null badge', function () {
+        Order::truncate();
+        $this->orderServices->get();
+    })->throws(TypeError::class);
 
     it('retrieves orders for a specific carrier', function () {
         $result = $this->orderServices->get($this->carrier->badge);
@@ -60,7 +71,7 @@ describe('Order Services', function () {
     it('fail to retrieves orders for specific carrier when no order exists', function () {
         Order::truncate();
         $this->orderServices->get($this->carrier->badge);
-    })->throws(Exception::class);
+    })->throws(NotFoundHttpException::class);
 
     it('retrieves an order by ID', function () {
         $order = Order::factory()->create();
@@ -70,7 +81,15 @@ describe('Order Services', function () {
 
     it('fail to retrieves an order by invalid ID', function () {
         $this->orderServices->find(9999);
-    })->throws(Exception::class);
+    })->throws(NotFoundHttpException::class);
+
+    it('fail to retrieves an order by invalid ID type', function () {
+        $this->orderServices->find('9999');
+    })->throws(TypeError::class);
+
+    it('fail to retrieves an order by Null ID', function () {
+        $this->orderServices->find();
+    })->throws(TypeError::class);
 
     it('calculates the cost of an order', function () {
         $data = $this->orderServices->calcCost(
@@ -93,6 +112,10 @@ describe('Order Services', function () {
     it('fails to calculates cost of an order if any arguments missing', function () {
         $this->orderServices->calcCost($this->producer->badge, []);
     })->throws(Exception::class);
+
+    it('fails to calculates cost of an order if Producer badge is invalid ', function () {
+        $this->orderServices->calcCost((object) [], []);
+    })->throws(TypeError::class);
 
     it('fails to calculates cost of an order if distance is out of range', function () {
         $this->orderServices->calcCost(
@@ -129,6 +152,10 @@ describe('Order Services', function () {
         $this->orderServices->create($this->producer->badge, []);
     })->throws(Exception::class);
 
+    it('fail to creates a new order with invalid Producer badge', function () {
+        $this->orderServices->create((object) [], []);
+    })->throws(TypeError::class);
+
     it('accepts an order for a carrier', function () {
         $order = Order::find(1);
         $order->update([
@@ -160,6 +187,10 @@ describe('Order Services', function () {
         $this->orderServices->accept($this->carrier->badge, 1);
     })->throws(Exception::class);
 
+    it('fail to accepts an order for a carrier if badge is null', function () {
+        $this->orderServices->accept((object) [], 1);
+    })->throws(TypeError::class);
+
     it('fail to accepts an order for a carrier if order status not bending', function () {
         Order::find(1)->update([
             'status' => 1,
@@ -188,6 +219,10 @@ describe('Order Services', function () {
         $this->orderServices->accept($this->carrier->badge, 100);
     })->throws(Exception::class);
 
+    it('fail to picks order for carrier with invalid badge', function () {
+        $this->orderServices->accept((object) [], 100);
+    })->throws(TypeError::class);
+
     it('fail to pick an order for a carrier if not assigned', function () {
         $order = Order::find(1);
         $order->update(['status' => 0, 'carrier_id' => null]);
@@ -209,6 +244,10 @@ describe('Order Services', function () {
     it('fail to delivers a picked order if not found', function () {
         $this->orderServices->delivered($this->carrier->badge, 1000, 0000);
     })->throws(Exception::class);
+
+    it('fail to delivers a picked order with invalid badge', function () {
+        $this->orderServices->delivered((object) [], 1000, 0000);
+    })->throws(TypeError::class);
 
     it('fail to delivers a picked order if not picked', function () {
         $order = Order::find(1);

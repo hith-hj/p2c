@@ -58,6 +58,12 @@ describe('Producer Controller', function () {
         expect($res->json('payload.producer'))->toBeArray()->not->toBeEmpty();
     });
 
+    it('fails to retrieves authenticated user producer if not exists', function () {
+        $this->user->badge->delete();
+        $res = $this->getJson($this->url);
+        expect($res->status())->toBe(404);
+    });
+
     it('finds a specific producer', function () {
         $user = User::factory()->create(['role' => 'producer']);
         expect($user->badge)->not->toBeNull();
@@ -110,10 +116,22 @@ describe('Producer Controller', function () {
         expect($this->user->badge->fresh()->brand)->toBe('New Brand');
     });
 
+    it('fails to update a producer with invalid badge', function () {
+        $this->user->badge->delete();
+        $res = $this->patchJson("$this->url/update", ['brand' => 'New Brand']);
+        expect($res->status())->toBe(400);
+    });
+
     it('deletes a producer', function () {
         $res = $this->deleteJson("$this->url/delete");
         expect($res->status())->toBe(200);
         expect(Producer::find($this->user->id))->toBeNull();
+    });
+
+    it('fails to deletes a producer with invalid badge', function () {
+        $this->user->badge->delete();
+        $res = $this->deleteJson("$this->url/delete");
+        expect($res->status())->toBe(400);
     });
 
     it('can create new branch for borducer', function () {
@@ -127,7 +145,7 @@ describe('Producer Controller', function () {
         expect($res->json('payload.branch'))->not->toBeNull();
     });
 
-    it('can update branch for borducer', function () {
+    it('allow producer to update branch', function () {
         $data = [
             'name' => 'branch',
             'phone' => '0934555312',
@@ -190,7 +208,13 @@ describe('Producer Controller', function () {
     it('prevent invalid producer from create new order', function () {
         $this->user->badge->update(['is_valid' => false]);
         $res = $this->postJson('/api/v1/order/create', $this->createOrderData);
-        expect($res->status())->toBeIn([400, 401]);
+        expect($res->status())->toBe(403);
+    });
+
+    it('prevent producer from create new order with invalid badge', function () {
+        $this->user->badge->delete();
+        $res = $this->postJson('/api/v1/order/create', $this->createOrderData);
+        expect($res->status())->toBe(403);
     });
 
     it('check if codes is created when new order is created', function () {

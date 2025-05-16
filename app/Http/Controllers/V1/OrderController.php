@@ -20,29 +20,25 @@ class OrderController extends Controller
 
     public function all(Request $request): JsonResponse
     {
-        try {
-            $page = $request->filled('page') ? $request->integer('page') : 1;
-            $perPage = $request->filled('perPage') ? $request->integer('perPage') : 10;
-            $filters = $request->filled('filters') ? $request->array('filters') : [];
-            $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
-            // todo : get orders based on carrier location
-            // volume = width * height* length (cubic volume)
+        $page = $request->filled('page') ? $request->integer('page') : 1;
+        $perPage = $request->filled('perPage') ? $request->integer('perPage') : 10;
+        $filters = $request->filled('filters') ? $request->array('filters') : [];
+        $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
+        // todo : get orders based on carrier location
+        // volume = width * height* length (cubic volume)
 
-            $orders = $this->order->all(
-                $page,
-                $perPage,
-                $filters,
-                $orderBy
-            );
+        $orders = $this->order->all(
+            $page,
+            $perPage,
+            $filters,
+            $orderBy
+        );
 
-            return Success(payload: [
-                'page' => $page,
-                'perPage' => $perPage,
-                'orders' => OrderResource::collection($orders),
-            ]);
-        } catch (\Throwable $th) {
-            return Success(payload: ['orders' => []]);
-        }
+        return Success(payload: [
+            'page' => $page,
+            'perPage' => $perPage,
+            'orders' => OrderResource::collection($orders),
+        ]);
     }
 
     public function get(Request $request): JsonResponse
@@ -52,23 +48,19 @@ class OrderController extends Controller
         $filters = $request->filled('filters') ? $request->array('filters') : [];
         $orderBy = $request->filled('orderBy') ? $request->array('orderBy') : [];
 
-        try {
-            $orders = $this->order->get(
-                Auth::user()->badge,
-                $page,
-                $perPage,
-                $filters,
-                $orderBy
-            );
+        $orders = $this->order->get(
+            Auth::user()->badge,
+            $page,
+            $perPage,
+            $filters,
+            $orderBy
+        );
 
-            return Success(payload: [
-                'page' => $page,
-                'perPage' => $perPage,
-                'orders' => OrderResource::collection($orders),
-            ]);
-        } catch (\Throwable $th) {
-            return Success(payload: ['orders' => []]);
-        }
+        return Success(payload: [
+            'page' => $page,
+            'perPage' => $perPage,
+            'orders' => OrderResource::collection($orders),
+        ]);
     }
 
     public function find(Request $request): JsonResponse

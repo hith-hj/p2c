@@ -35,7 +35,7 @@ class OrderServices
         $this->applyOrderBy($orders, $orderBy, ['cost', 'distance', 'weight']);
         $orders->paginate(perPage: $perPage, page: $page);
         $orders = $orders->get();
-        $this->Truthy($orders->isEmpty(), 'orders');
+        $this->NotFound($orders, 'orders');
 
         return $orders;
     }
@@ -47,13 +47,14 @@ class OrderServices
         array $filters = [],
         array $orderBy = []
     ): Collection {
+        throw_if(! in_array(class_basename($badge), ['Carrier', 'Producer']), 'invalid badge');
         $orders = $badge->orders();
         $orders->with(['attrs', 'items', 'producer', 'carrier', 'transportation', 'branch', 'customer']);
         $this->applyFilters($orders, $filters, ['status' => OrderStatus::values()]);
         $this->applyOrderBy($orders, $orderBy, ['cost', 'distance', 'weight']);
         $orders->paginate(perPage: $perPage, page: $page);
         $orders = $orders->get();
-        $this->Truthy($orders->isEmpty(), 'orders');
+        $this->NotFound($orders, 'orders');
 
         return $orders;
     }
@@ -61,12 +62,12 @@ class OrderServices
     public function find(int $id): Order
     {
         $order = Order::find($id);
-        $this->Truthy($order === null, 'order');
+        $this->NotFound($order, 'order');
 
         return $order;
     }
 
-    public function calcCost(Producer $producer, array $data): array
+    public function calcCost(Producer $producer, array $data = []): array
     {
         $data = $this->checkAndCastData($data, [
             'weight' => 'int',
@@ -95,7 +96,7 @@ class OrderServices
         ];
     }
 
-    public function create(Producer $producer, array $data): Order
+    public function create(Producer $producer, array $data = []): Order
     {
         $data = $this->checkAndCastData($data, [
             'customer_phone' => 'string',
@@ -221,7 +222,7 @@ class OrderServices
         return $order;
     }
 
-    private function applyFilters(object $query, array $filters, array $allowedFilters = []): object
+    private function applyFilters(object $query, array $filters = [], array $allowedFilters = []): object
     {
         return $query->when(
             ! empty($filters),
@@ -241,7 +242,7 @@ class OrderServices
         );
     }
 
-    private function applyOrderBy(object $query, array $orderBy, array $allowedOrderBy = []): object
+    private function applyOrderBy(object $query, array $orderBy = [], array $allowedOrderBy = []): object
     {
         return $query->when(
             ! empty($orderBy) && count($orderBy) === 1,
@@ -255,7 +256,7 @@ class OrderServices
         );
     }
 
-    private function checkAndCastData(array $data, $requiredFields = []): array
+    private function checkAndCastData(array $data = [], $requiredFields = []): array
     {
         $this->Truthy(empty($data), 'data is empty');
         if (empty($requiredFields)) {
@@ -270,8 +271,9 @@ class OrderServices
         return $data;
     }
 
-    private function attachRelations(Order $order, array $data): Order
+    private function attachRelations(Order $order, array $data = []): Order
     {
+        $this->Required($order, 'order');
         if (isset($data['attrs']) && ! empty($data['attrs'])) {
             $order->attrs()->attach($data['attrs']);
         }
@@ -294,9 +296,10 @@ class OrderServices
         return $order;
     }
 
-    private function chackIfValidBranchWithLocation(?Branch $branch, Producer $producer): void
+    private function chackIfValidBranchWithLocation(?Branch $branch, ?Producer $producer): void
     {
-        $this->Truthy($branch === null, 'branch is required');
+        $this->Required($branch, 'branch');
+        $this->Required($producer, 'producer');
         $this->Truthy($branch->producer_id !== $producer->id, 'invalid operation');
         $this->Truthy($branch->location === null, 'branch location is required');
     }

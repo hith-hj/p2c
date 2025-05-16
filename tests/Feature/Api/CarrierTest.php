@@ -32,6 +32,12 @@ describe('Carrier Controller', function () {
         expect($res->json('payload.carrier'))->toBeArray()->not->toBeEmpty();
     });
 
+    it('fails to retrieves authenticated user carrier if not exists', function () {
+        $this->user->badge->delete();
+        $res = $this->getJson($this->url);
+        expect($res->status())->toBe(404);
+    });
+
     it('finds a specific carrier', function () {
         $user = User::factory()->create(['role' => 'carrier']);
         expect($user->badge)->not->toBeNull();
@@ -43,6 +49,13 @@ describe('Carrier Controller', function () {
 
     it('fails to find a carrier with an invalid ID', function () {
         $res = $this->getJson("$this->url/find?carrier_id=999");
+
+        expect($res->status())->toBe(422);
+        expect($res->json('payload.errors'))->toBeArray()->not->toBeEmpty();
+    });
+
+    it('fails to find a carrier with an empty ID', function () {
+        $res = $this->getJson("$this->url/find?carrier_id=");
 
         expect($res->status())->toBe(422);
         expect($res->json('payload.errors'))->toBeArray()->not->toBeEmpty();
@@ -111,12 +124,32 @@ describe('Carrier Controller', function () {
         expect($res->json('success'))->toBe(false);
     });
 
+    it('prevent carrier to create details with invalid badge', function () {
+        $this->user->badge->delete();
+        $data = [
+            'plate_number' => '3387622',
+            'brand' => 'Kia',
+            'model' => '2500',
+            'year' => '2010',
+            'color' => 'red',
+        ];
+        $res = $this->postJson("$this->url/createDetails", $data);
+        expect($res->status())->toBe(400);
+    });
+
     it('updates an existing carrier', function () {
         $data = ['first_name' => 'Edited', 'last_name' => 'Carrier'];
         $res = $this->patchJson("$this->url/update", $data);
         expect($res->status())->toBe(200);
         expect($this->user->badge->fresh()->first_name)->toBe('Edited');
         expect($this->user->badge->fresh()->details)->toBeNull();
+    });
+
+    it('fails to update existing carrier with invalid badge', function () {
+        $this->user->badge->delete();
+        $data = ['first_name' => 'Edited', 'last_name' => 'Carrier'];
+        $res = $this->patchJson("$this->url/update", $data);
+        expect($res->status())->toBe(400);
     });
 
     it('prevent carrier update details with empty data', function () {
@@ -150,6 +183,12 @@ describe('Carrier Controller', function () {
         expect(Carrier::find($this->user->id))->toBeNull();
     });
 
+    it('fails to deletes a carrier if not exists', function () {
+        $this->user->badge->delete();
+        $res = $this->deleteJson("$this->url/delete");
+        expect($res->status())->toBe(400);
+    });
+
     it('allow carrier to set location', function () {
         $location = [
             'cords' => [
@@ -165,6 +204,18 @@ describe('Carrier Controller', function () {
         expect($user->location)->not->toBeNull();
         expect($user->location->long)->toBe(32.000000);
         expect($user->location->lat)->toBe(33.000000);
+    });
+
+    it('fails to allow carrier to set location with invalid badge', function () {
+        $location = [
+            'cords' => [
+                'long' => '32.000000',
+                'lat' => '33.000000',
+            ],
+        ];
+        $user = $this->user->badge->delete();
+        $res = $this->postJson("$this->url/setLocation", $location);
+        expect($res->status())->toBe(400);
     });
 
     it('make sure that location is rounded to 8 digits after point', function () {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Middleware\V1\Localization;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -41,6 +42,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
                     $e instanceof NotFoundHttpException => Error(
                         msg: 'Resource Not found.',
+                        code: Response::HTTP_NOT_FOUND
+                    ),
+
+                    $e instanceof ModelNotFoundException => Error(
+                        msg: "{$e->getModel()} id {$e->getIds()} Not found.",
                         code: Response::HTTP_NOT_FOUND
                     ),
 
