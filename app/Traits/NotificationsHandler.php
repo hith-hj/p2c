@@ -52,9 +52,9 @@ trait NotificationsHandler
         $factory = (new FcmFactory())->withServiceAccount($this->getFCMCredentials());
         $messaging = $factory->createMessaging();
         $notification = ['title' => $this->title, 'body' => $this->body];
-        $message = CloudMessage::new()
-            ->withAndroidConfig($this->getFCMAndroidConfig())->toToken($token)
+        $message = CloudMessage::new()->toToken($token)
             ->withNotification(FcmNotification::fromArray($notification))
+            ->withAndroidConfig($this->getFCMAndroidConfig())
             ->withData(MessageData::fromArray($this->data));
 
         try {

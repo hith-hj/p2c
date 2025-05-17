@@ -50,7 +50,7 @@ Route::withoutMiddleware(JwtMiddleware::class)->group(function (): void {
 Route::group(
     ['prefix' => 'producer', 'controller' => ProducerController::class],
     function (): void {
-        Route::middleware([UserChecks::class.':producer'])->group(function (): void {
+        Route::middleware([UserChecks::class . ':producer'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::patch('update', 'update');
@@ -65,7 +65,7 @@ Route::group(
 Route::group(
     ['prefix' => 'branch', 'controller' => BranchController::class],
     function (): void {
-        Route::middleware([UserChecks::class.':producer', BadgeChecks::class])
+        Route::middleware([UserChecks::class . ':producer', BadgeChecks::class])
             ->group(function (): void {
                 Route::get('/', 'get');
                 Route::post('create', 'create');
@@ -82,7 +82,7 @@ Route::group(
 Route::group(
     ['prefix' => 'carrier', 'controller' => CarrierController::class],
     function (): void {
-        Route::middleware([UserChecks::class.':carrier'])->group(function (): void {
+        Route::middleware([UserChecks::class . ':carrier'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::post('createDetails', 'createDetails');
@@ -106,9 +106,13 @@ Route::group(
 );
 
 Route::group(
-    ['prefix' => 'order', 'controller' => OrderController::class],
+    [
+        'prefix' => 'order',
+        'controller' => OrderController::class,
+        'middleware' => [BadgeChecks::class]
+    ],
     function (): void {
-        Route::middleware([UserChecks::class.':producer', BadgeChecks::class])
+        Route::middleware([UserChecks::class . ':producer'])
             ->group(function (): void {
                 Route::post('checkCost', 'checkCost');
                 Route::post('create', 'create');
@@ -116,7 +120,7 @@ Route::group(
                 Route::post('forceCancel', 'forceCancel');
                 Route::post('finish', 'finish');
             });
-        Route::middleware([UserChecks::class.':carrier', BadgeChecks::class])
+        Route::middleware([UserChecks::class . ':carrier'])
             ->group(function (): void {
                 Route::get('all', 'all');
                 Route::post('accept', 'accept');

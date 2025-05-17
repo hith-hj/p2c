@@ -39,7 +39,6 @@ class AuthController extends Controller
             $user->sendVerificationCode($by);
 
             return Success(
-                // payload: ['code' => $user->code('verification')?->code],
                 msg: __('main.registerd'),
                 code: 201
             );
@@ -140,7 +139,6 @@ class AuthController extends Controller
         $user->sendVerificationCode();
 
         return Success(
-            // payload: ['code' => $user->code('verification')->code],
             msg: __('main.code sent'),
             code: 201
         );
@@ -177,7 +175,6 @@ class AuthController extends Controller
         $user->sendVerificationCode();
 
         return Success(
-            // payload: ['code' => $user->verification_code],
             msg: __('main.code sent')
         );
     }

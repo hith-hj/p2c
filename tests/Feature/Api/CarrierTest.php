@@ -289,6 +289,7 @@ describe('Carrier Controller', function () {
             'transportation_id' => $this->user->badge->transportation_id,
             'status' => 0,
         ]);
+        sleep(1);
         $res = $this->postJson("/api/v1/order/picked?order_id=$order->id");
         expect($res->status())->toBe(404);
     });
