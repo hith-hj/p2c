@@ -154,6 +154,12 @@ describe('Order Services', function () {
         expect($order->dte)->not->toBeNull();
     });
 
+    it('check customer existance for newly created order', function () {
+        $order = $this->orderServices->create($this->producer->badge, $this->orderData);
+        expect($order)->toBeInstanceOf(Order::class)->not->toBeNull();
+        expect($order->fresh()->customer)->not->toBeNull();
+    });
+
     it('fail to creates a new order with wrong data', function () {
         $this->orderServices->create($this->producer->badge, []);
     })->throws(Exception::class);

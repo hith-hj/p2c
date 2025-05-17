@@ -290,7 +290,7 @@ class OrderServices
                 ],
             ];
             $customer = (new CustomerServices())->createIfNotExists($customerInfo);
-            $order->customer()->associate($customer);
+            $order->customer()->associate($customer)->save();
         }
 
         return $order;

@@ -21,8 +21,8 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'producer_id'=>fake()->randomElement([1,2,3,4]),
-            'carrier_id'=>fake()->randomElement([1,2,3,4]),
+            'producer_id' => fake()->randomElement([1, 2, 3, 4]),
+            'carrier_id' => fake()->randomElement([1, 2, 3, 4]),
             'branch_id' => fake()->uuid(),
             'transportation_id' => fake()->uuid(),
             'delivery_type' => fake()->randomElement(OrderDeliveryTypes::values()),

@@ -11,6 +11,9 @@
             scroll-behavior: smooth !important;
         }
     </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
 </head>
 
 <body class="bg-red-600 scroll-smooth transition duration-300 ease-in-out p-[2px]">
@@ -197,7 +200,7 @@
     </section>
 
     <!-- Contact -->
-    <footer id="contact" class="md:h-screen py-16 px-10 bg-white text-black text-center flex flex-col justify-around md:flex-row">
+    <section id="contact" class="md:h-screen py-16 px-10 bg-white text-black text-center flex flex-col justify-around md:flex-row">
         <div class="w-full">
             <h2 class="text-3xl font-bold">Contact Us</h2>
             <form class="mt-5 grid gap-2 text-start">
@@ -219,7 +222,7 @@
             </form>
         </div>
         <div class="w-full mt-4 md:mt-0">
-            <h2 class="text-3xl font-bold">Location & Links</h2>
+            <h2 class="text-3xl font-bold">Links</h2>
             <div class="grid grid-cols-2 mt-10">
                 <div class="col-span-1">
                     <h4 class="font-semibold mb-4">Socials</h4>
@@ -231,7 +234,7 @@
                     </ul>
                 </div>
                 <div class="col-span-1">
-                    <h4 class="font-semibold mb-4">Navs</h4>
+                    <h4 class="font-semibold mb-4">Links</h4>
                     <ul class="w-full">
                         <li>one</li>
                         <li>two</li>
@@ -241,10 +244,20 @@
                 </div>
             </div>
         </div>
+    </section>
+
+    <footer d="footer" class="md:h-screen bg-white
+    text-black text-center flex flex-col md:flex-row">
+        <h2 class="text-3xl font-bold">Location</h2>
+        <div class="w-full">
+            <div id="map" class="w-full"></div>
+        </div>
     </footer>
 
     <!-- Back to Top Button -->
-    <button id="backToTop" class="hidden fixed bottom-6 right-6 bg-red-600 text-white px-2 py-1 font-extrabold rounded-[10px] shadow-lg
+    <button id="backToTop"
+    class="hidden fixed bottom-6 right-6 px-2 py-1 bg-red-600
+    text-white font-extrabold rounded-[10px] shadow-lg
     hover:bg-white hover:text-red-600 hover:inset-ring-3 hover:inset-ring-red-600">^</button>
 
     <script>
@@ -253,13 +266,15 @@
         let slider = document.querySelector(".slider");
         let i = 0;
         setInterval(() => {
-            if (i === 0) {
-                slider.classList.remove("bg-[url(imgs/" + images[images.length - 1] + ")]");
-            } else {
-                slider.classList.remove("bg-[url(imgs/" + images[i - 1] + ")]");
+            if (slider !== null) {
+                if (i === 0) {
+                    slider.classList.remove("bg-[url(imgs/" + images[images.length - 1] + ")]");
+                } else {
+                    slider.classList.remove("bg-[url(imgs/" + images[i - 1] + ")]");
+                }
+                slider.classList.add("bg-[url(imgs/" + images[i] + ")]");
+                i = i === images.length ? 0 : (i + 1) % images.length;
             }
-            slider.classList.add("bg-[url(imgs/" + images[i] + ")]");
-            i = i === images.length ? 0 : (i + 1) % images.length;
         }, 3000);
 
         // Mobile Menu Toggle
@@ -294,6 +309,36 @@
                 behavior: "smooth"
             });
         });
+    </script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+
+    <script>
+        // Initialize the map
+        const map = L.map('map')
+
+        // Get the tile layer from OpenStreetMaps
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+            // Specify the maximum zoom of the map
+            maxZoom: 19,
+
+            // Set the attribution for OpenStreetMaps
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Set the view of the map
+        // with the latitude, longitude and the zoom value
+        map.setView([33.516328, 36.316458], 13);
+
+        // Set the map view to the user's location
+        // Uncomment below to set map according to user location
+        // map.locate({setView: true, maxZoom: 16});
+
+        // Show a market at the position of the Eiffel Tower
+        let eiffelMarker = L.marker([33.516328, 36.316458]).addTo(map);
+
+        // Bind popup to the marker with a popup
+        eiffelMarker.bindPopup("Syria").openPopup();
     </script>
 
 </body>

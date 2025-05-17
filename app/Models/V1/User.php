@@ -94,7 +94,7 @@ class User extends Authenticatable implements JWTSubject
         $this->notify(
             title: 'verification code',
             body: "Your code is: $code",
-            data:['type'=>NotificationTypes::verification->value,'code'=>$code],
+            data: ['type' => NotificationTypes::verification->value, 'code' => $code],
             provider: $by,
         );
 

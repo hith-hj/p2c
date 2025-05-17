@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums;
 
-enum NotificationTypes : int
+enum NotificationTypes: int
 {
     case normal = 0;
     case verification = 1;

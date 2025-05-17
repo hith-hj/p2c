@@ -176,7 +176,7 @@ describe('Order Controller', function () {
     it('allow producer to cancel pending orders', function () {
         $order = Order::factory()->create([
             'producer_id' => $this->producer->badge->id,
-            'carrier_id' => null
+            'carrier_id' => null,
         ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
             ->postJson("$this->url/cancel", ['order_id' => $order->id]);

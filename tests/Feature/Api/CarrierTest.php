@@ -238,7 +238,7 @@ describe('Carrier Controller', function () {
     it('allow carrier to accept order when bending', function () {
         $order = Order::factory()->create([
             'transportation_id' => $this->user->badge->transportation_id,
-            'carrier_id'=>null,
+            'carrier_id' => null,
         ]);
         $res = $this->postJson("/api/v1/order/accept?order_id=$order->id");
         expect($res->status())->toBe(200);
@@ -286,10 +286,10 @@ describe('Carrier Controller', function () {
 
     it('prevent carrier to pick order when not his', function () {
         $order = Order::factory()->create([
+            'carrier_id' => 2,
             'transportation_id' => $this->user->badge->transportation_id,
             'status' => 0,
         ]);
-        sleep(1);
         $res = $this->postJson("/api/v1/order/picked?order_id=$order->id");
         expect($res->status())->toBe(404);
     });
