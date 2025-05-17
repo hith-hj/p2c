@@ -79,13 +79,13 @@ class OrderObserver
     private function canceled(Order $order): void
     {
         $order->codes()->delete();
-        $order->carrier->notify(
-            'Order canceled',
-            'Your Order has been canceled',
-            ['type' => NotificationTypes::order->value, 'order' => $order->id],
-        );
         // $order->customer->notify();
-        if ($order->carrier_id !== null) {
+        if ($order->carrier !== null) {
+            $order->carrier->notify(
+                'Order canceled',
+                'Your Order has been canceled',
+                ['type' => NotificationTypes::order->value, 'order' => $order->id],
+            );
             $order->producer->createFee($order, FeeTypes::cancel->value);
         }
     }

@@ -13,8 +13,14 @@ beforeEach(function () {
     $this->orderServices = new OrderServices();
     $this->carrier = User::factory()->create(['role' => 'carrier']);
     $this->producer = User::factory()->create(['role' => 'producer']);
-    $carrierOrders = Order::factory(2)->create(['carrier_id' => $this->carrier->id]);
-    $producerOrders = Order::factory(2)->create(['producer_id' => $this->producer->id]);
+    $carrierOrders = Order::factory(2)->create([
+        'carrier_id' => $this->carrier->badge->id,
+        'producer_id' => $this->producer->badge->id,
+    ]);
+    $producerOrders = Order::factory(2)->create([
+        'carrier_id' => $this->carrier->badge->id,
+        'producer_id' => $this->producer->badge->id,
+    ]);
     $this->carrier->badge->orders()->saveMany($carrierOrders);
     $this->producer->badge->orders()->saveMany($producerOrders);
     $this->orderData = [
@@ -34,8 +40,8 @@ beforeEach(function () {
 describe('Order Services', function () {
 
     it('retrieves all orders with bending status', function () {
-        $result = $this->orderServices->all();
-        expect($result)->toBeInstanceOf(Collection::class)->toHaveCount(4);
+        $res = $this->orderServices->all();
+        expect($res)->toBeInstanceOf(Collection::class)->toHaveCount(4);
     });
 
     it('fail to retrieves all bending orders for Carrier when no order exists', function () {
@@ -44,8 +50,8 @@ describe('Order Services', function () {
     })->throws(NotFoundHttpException::class);
 
     it('retrieves orders for a specific producer', function () {
-        $result = $this->orderServices->get($this->producer->badge);
-        expect($result)->toBeInstanceOf(Collection::class)->toHaveCount(2);
+        $res = $this->orderServices->get($this->producer->badge);
+        expect($res)->toBeInstanceOf(Collection::class)->toHaveCount(4);
     });
 
     it('fail to retrieves orders for specific producer when no order exists', function () {
@@ -64,8 +70,8 @@ describe('Order Services', function () {
     })->throws(TypeError::class);
 
     it('retrieves orders for a specific carrier', function () {
-        $result = $this->orderServices->get($this->carrier->badge);
-        expect($result)->toBeInstanceOf(Collection::class)->toHaveCount(2);
+        $res = $this->orderServices->get($this->carrier->badge);
+        expect($res)->toBeInstanceOf(Collection::class)->toHaveCount(4);
     });
 
     it('fail to retrieves orders for specific carrier when no order exists', function () {
@@ -75,8 +81,8 @@ describe('Order Services', function () {
 
     it('retrieves an order by ID', function () {
         $order = Order::factory()->create();
-        $result = $this->orderServices->find($order->id);
-        expect($result)->toBeInstanceOf(Order::class)->id->toBe($order->id);
+        $res = $this->orderServices->find($order->id);
+        expect($res)->toBeInstanceOf(Order::class)->id->toBe($order->id);
     });
 
     it('fail to retrieves an order by invalid ID', function () {
@@ -163,8 +169,8 @@ describe('Order Services', function () {
             'status' => 0,
             'carrier_id' => null,
         ]);
-        $result = $this->orderServices->accept($this->carrier->badge, $order->id);
-        expect($result)->toBeInstanceOf(Order::class)->status->toBe(1);
+        $res = $this->orderServices->accept($this->carrier->badge, $order->id);
+        expect($res)->toBeInstanceOf(Order::class)->status->toBe(1);
         expect($order->fresh()->carrier_id)->toBe($this->carrier->badge->id);
         expect($order->fresh()->status)->toBe(1);
     });
@@ -177,8 +183,8 @@ describe('Order Services', function () {
             'transportation_id' => $this->carrier->badge->transportation_id,
         ]);
         sleep(1);
-        $result = $this->orderServices->accept($this->carrier->badge, $order->id);
-        expect($result)->toBeInstanceOf(Order::class);
+        $res = $this->orderServices->accept($this->carrier->badge, $order->id);
+        expect($res)->toBeInstanceOf(Order::class);
         expect($order->fresh()->dte)->not->toBeNull();
         expect($order->fresh()->dte)->not->toEqual($order->dte);
     });
@@ -210,8 +216,8 @@ describe('Order Services', function () {
     it('picks an assigned order', function () {
         $order = Order::find(1);
         $order->update(['status' => 1]);
-        $result = $this->orderServices->picked($this->carrier->badge, 1);
-        expect($result)->toBeInstanceOf(Order::class);
+        $res = $this->orderServices->picked($this->carrier->badge, 1);
+        expect($res)->toBeInstanceOf(Order::class);
         expect($order->fresh()->status)->toBe(2);
     });
 
@@ -232,12 +238,12 @@ describe('Order Services', function () {
     it('delivers a picked order', function () {
         $order = Order::find(1);
         $order->update(['status' => OrderStatus::picked->value]);
-        $result = $this->orderServices->delivered(
+        $res = $this->orderServices->delivered(
             $this->carrier->badge,
             $order->id,
             $order->code('delivered')->code
         );
-        expect($result)->toBeInstanceOf(Order::class);
+        expect($res)->toBeInstanceOf(Order::class);
         expect($order->fresh()->status)->toBe(3);
     });
 

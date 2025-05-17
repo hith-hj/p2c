@@ -16,23 +16,6 @@ beforeEach(function () {
     $this->producerToken = JWTAuth::fromUser($this->producer);
     $this->url = 'api/v1/order';
     $this->seed();
-    $this->createOrderData = [
-        'branch_id' => 1,
-        'customer_id' => 1,
-        'delivery_type' => 'normal',
-        'goods_price' => 100000,
-        'src_long' => 33.524680,
-        'src_lat' => 36.317824,
-        'dest_long' => 33.524680,
-        'dest_lat' => 36.317824,
-        'weight' => 2,
-        'distance' => 690,
-        'cost' => 1709,
-    ];
-    $this->postOrderData = array_merge($this->createOrderData, [
-        'customer_name' => 'teffst',
-        'customer_phone' => '0987654321',
-    ]);
 });
 
 describe('Order Controller', function () {
@@ -86,7 +69,25 @@ describe('Order Controller', function () {
 
     it('create an order for producer', function () {
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
-            ->postJson("$this->url/create", $this->postOrderData);
+            ->postJson(
+                "$this->url/create",
+                [
+                    'branch_id' => 1,
+                    'customer_id' => 1,
+                    'delivery_type' => 'normal',
+                    'goods_price' => 100000,
+                    'src_long' => 33.524680,
+                    'src_lat' => 36.317824,
+                    'dest_long' => 33.524680,
+                    'dest_lat' => 36.317824,
+                    'weight' => 2,
+                    'distance' => 690,
+                    'cost' => 1709,
+                    'customer_name' => 'teffst',
+                    'customer_phone' => '0987654321',
+                ]
+            );
+        // dd($res);
         expect($res->status())->toBe(200)
             ->and($res->json('payload'))->toHaveKey('order');
     });
@@ -131,7 +132,10 @@ describe('Order Controller', function () {
     });
 
     it('allow carrier to accept order when pending', function () {
-        $order = Order::factory()->create(['transportation_id' => $this->carrier->badge->transportation_id]);
+        $order = Order::factory()->create([
+            'transportation_id' => $this->carrier->badge->transportation_id,
+            'carrier_id' => null,
+        ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->carrierToken"])
             ->postJson("$this->url/accept", ['order_id' => $order->id]);
         expect($res->status())->toBe(200);
@@ -170,7 +174,10 @@ describe('Order Controller', function () {
     });
 
     it('allow producer to cancel pending orders', function () {
-        $order = Order::factory()->create(['producer_id' => $this->producer->badge->id]);
+        $order = Order::factory()->create([
+            'producer_id' => $this->producer->badge->id,
+            'carrier_id' => null
+        ]);
         $res = $this->withHeaders(['Authorization' => "Bearer $this->producerToken"])
             ->postJson("$this->url/cancel", ['order_id' => $order->id]);
         expect($res->status())->toBe(200);

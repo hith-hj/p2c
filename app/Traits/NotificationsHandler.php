@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use App\Models\V1\Notification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\App;
 use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory as FcmFactory;
 use Kreait\Firebase\Messaging\AndroidConfig;
@@ -25,7 +26,7 @@ trait NotificationsHandler
         array $data = [],
         string $provider = 'fcm'
     ) {
-        if (app()->environment('testing')) {
+        if (App::environment('testing')) {
             return true;
         }
         $this->title = $title;
