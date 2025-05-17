@@ -52,8 +52,8 @@ trait NotificationsHandler
         $notification = ['title' => $this->title, 'body' => $this->body];
         $message = CloudMessage::new()->withNotification($notification)
             ->withAndroidConfig($this->getFCMAndroidConfig())->toToken($token);
-        if (! empty($data)) {
-            $message->withData($data);
+        if (! empty($this->data)) {
+            $message->withData($this->data);
         }
         try {
             $res = $messaging->send($message);
