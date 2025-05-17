@@ -170,7 +170,7 @@ class AuthController extends Controller
         ]);
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
-        if (is_null($user->verification_code)) {
+        if (is_null($user->code('verification')->code)) {
             return Error(msg: __('main.invalid operation'), code: 403);
         }
 
