@@ -11,6 +11,8 @@ use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory as FcmFactory;
 use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\MessageData;
+use Kreait\Firebase\Messaging\Notification as FcmNotification;
 
 trait NotificationsHandler
 {
@@ -50,11 +52,11 @@ trait NotificationsHandler
         $factory = (new FcmFactory())->withServiceAccount($this->getFCMCredentials());
         $messaging = $factory->createMessaging();
         $notification = ['title' => $this->title, 'body' => $this->body];
-        $message = CloudMessage::new()->withNotification($notification)
-            ->withAndroidConfig($this->getFCMAndroidConfig())->toToken($token);
-        if (! empty($this->data)) {
-            $message->withData($this->data);
-        }
+        $message = CloudMessage::new()
+            ->withAndroidConfig($this->getFCMAndroidConfig())->toToken($token)
+            ->withNotification(FcmNotification::fromArray($notification))
+            ->withData(MessageData::fromArray($this->data));
+
         try {
             $res = $messaging->send($message);
             $this->store(['result' => $res]);
