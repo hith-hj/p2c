@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Enums\FeeTypes;
+use App\Enums\NotificationTypes;
 use App\Enums\OrderStatus;
 use App\Models\V1\Order;
 
@@ -38,11 +39,11 @@ class OrderObserver
 
     public function assigned(Order $order)
     {
-        // $order->producer->notify(
-        //     'Order Accepted',
-        //     'Your Order has been accepted',
-        //     ['order_id' => $order->id]
-        // );
+        $order->producer->notify(
+            'Order Accepted',
+            'Your Order has been accepted',
+            ['type' => NotificationTypes::order->value, 'order' => $order->id],
+        );
     }
 
     private function picked(Order $order): void
@@ -56,11 +57,11 @@ class OrderObserver
     {
         if ($order->delivered_at !== null) {
             $order->codes()->delete();
-            // $order->producer->notify(
-            //     'Order deliverd',
-            //     'Your Order has been delliver',
-            //     ['order_id' => $order->id]
-            // );
+            $order->producer->notify(
+                'Order deliverd',
+                'Your Order has been delliver',
+                ['type' => NotificationTypes::order->value, 'order' => $order->id],
+            );
             // $order->customer->notify();
         }
     }
@@ -68,22 +69,22 @@ class OrderObserver
     private function finished(Order $order): void
     {
         $order->carrier->createFee($order, FeeTypes::normal->value);
-        // $order->carrier->notify(
-        //     'Order Finished',
-        //     'Your Order has been finished',
-        //     ['order_id' => $order->id]
-        // );
+        $order->carrier->notify(
+            'Order Finished',
+            'Your Order has been finished',
+            ['type' => NotificationTypes::order->value, 'order' => $order->id],
+        );
     }
 
     private function canceled(Order $order): void
     {
         $order->codes()->delete();
+        $order->carrier->notify(
+            'Order canceled',
+            'Your Order has been canceled',
+            ['type' => NotificationTypes::order->value, 'order' => $order->id],
+        );
         // $order->customer->notify();
-        // $order->carrier->notify(
-        //     'Order canceled',
-        //     'Your Order has been canceled',
-        //     ['order_id' => $order->id]
-        // );
         if ($order->carrier_id !== null) {
             $order->producer->createFee($order, FeeTypes::cancel->value);
         }
@@ -93,11 +94,11 @@ class OrderObserver
     {
         $order->codes()->delete();
         $order->carrier->createFee($order, FeeTypes::reject->value);
-        // $order->producer->notify(
-        //     'Order rejected',
-        //     'Your Order has been rejected',
-        //     ['order_id' => $order->id]
-        // );
+        $order->producer->notify(
+            'Order rejected',
+            'Your Order has been rejected',
+            ['type' => NotificationTypes::order->value, 'order' => $order->id],
+        );
         // $order->customer->notify();
     }
 }

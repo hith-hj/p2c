@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\V1;
 
+use App\Enums\NotificationTypes;
 use App\Enums\UserRoles;
 use App\Traits\CodesHandler;
 use App\Traits\NotificationsHandler;
@@ -93,7 +94,8 @@ class User extends Authenticatable implements JWTSubject
         $this->notify(
             title: 'verification code',
             body: "Your code is: $code",
-            provider: $by
+            data:['type'=>NotificationTypes::verification->value,'code'=>$code],
+            provider: $by,
         );
 
         return $this;
