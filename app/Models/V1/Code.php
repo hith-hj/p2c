@@ -11,7 +11,10 @@ class Code extends Model
 {
     protected $guarded = [];
 
-    protected $casts = ['code' => 'integer'];
+    protected function casts(): array
+    {
+        return ['code' => 'integer'];
+    }
 
     public function holder(): MorphTo
     {

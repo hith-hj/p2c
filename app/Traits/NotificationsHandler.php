@@ -28,12 +28,14 @@ trait NotificationsHandler
         array $data = [],
         string $provider = 'fcm'
     ) {
-        if (App::environment('testing')) {
-            return true;
-        }
         $this->title = $title;
         $this->body = $body;
         $this->data = $data;
+        if (App::environment('testing', 'local')) {
+            $this->store(['result' => 'testing notification']);
+
+            return true;
+        }
 
         return match ($provider) {
             'fcm' => $this->fcm(),
@@ -81,7 +83,12 @@ trait NotificationsHandler
 
         return $this->notifications()->create([
             'title' => $this->title,
-            'payload' => serialize(['body' => $this->body, 'data' => $this->data, 'extra' => $extra]),
+            'body' => $this->body,
+            'type' => $this->data['type'],
+            'payload' => json_encode([
+                ...$this->data,
+                ...$extra,
+            ]),
             'status' => 0,
         ]);
     }

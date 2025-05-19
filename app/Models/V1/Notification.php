@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace App\Models\V1;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Notification extends Model
 {
+    use HasFactory;
+
     protected $guarded = [];
 
-    public function user(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(User::class, 'notifiable_id');
+        return [
+            'payload' => 'json',
+        ];
     }
 
-    public function viewed(): bool
+    public function reciver(): MorphTo
     {
-        return $this->update(['status' => 1]);
+        return $this->morphTo(__FUNCTION__, 'belongTo_type', 'belongTo_id');
     }
 }

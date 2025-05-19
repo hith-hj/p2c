@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Models\V1\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,12 +15,12 @@ return new class() extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'belongTo_id');
+            $table->foreignId('belongTo_id');
             $table->string('belongTo_type');
-            $table->foreignId('notifier_id')->nullable();
-            $table->foreignId('notifier_type')->nullable();
             $table->smallInteger('status');
+            $table->smallInteger('type');
             $table->string('title');
+            $table->string('body');
             $table->text('payload');
             $table->timestamps();
         });

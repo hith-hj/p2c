@@ -7,6 +7,7 @@ use App\Http\Controllers\V1\BranchController;
 use App\Http\Controllers\V1\CarrierController;
 use App\Http\Controllers\V1\FeeController;
 use App\Http\Controllers\V1\LabelController;
+use App\Http\Controllers\V1\NotificationController;
 use App\Http\Controllers\V1\OrderController;
 use App\Http\Controllers\V1\ProducerController;
 use App\Http\Controllers\V1\TransportationController;
@@ -143,5 +144,18 @@ Route::group(
     function (): void {
         Route::get('all', 'all');
         Route::get('find', 'find');
+    }
+);
+Route::group(
+    [
+        'controller' => NotificationController::class,
+        'middleware' => [BadgeChecks::class],
+        'prefix' => 'notification',
+    ],
+    function (): void {
+        Route::get('all', 'all');
+        Route::get('find', 'find');
+        Route::post('viewed', 'viewed');
+        Route::post('multipleViewed', 'multipleViewed');
     }
 );
