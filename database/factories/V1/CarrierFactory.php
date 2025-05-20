@@ -24,7 +24,7 @@ class CarrierFactory extends Factory
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'rate' => fake()->numberBetween(1, 10),
-            'is_valid' => fake()->randomElement([true, false]),
+            'is_valid' => true,
         ];
     }
 }

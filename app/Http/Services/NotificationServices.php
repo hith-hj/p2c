@@ -16,7 +16,7 @@ class NotificationServices
     {
         $this->Truthy(! method_exists($user, 'notifications'), 'missing notifications()');
         $notis = $user->notifications;
-        if (method_exists($user, 'badge') &&  method_exists($user->badge, 'notifications')) {
+        if (method_exists($user, 'badge') && method_exists($user->badge, 'notifications')) {
             $notis->concat($user->badge->notifications);
         }
         $this->NotFound($notis, 'notifications');
@@ -43,6 +43,7 @@ class NotificationServices
     public function multipleViewed(array $ids): bool|int
     {
         $this->Required($ids, 'Ids');
+
         return Notification::whereIn('id', $ids)->update(['status' => 1]);
     }
 }

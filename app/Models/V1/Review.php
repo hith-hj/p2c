@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +14,7 @@ class Review extends Model
 
     protected $guarded = [];
 
-    public function belongTo():MorphTo
+    public function belongTo(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'belongTo_id', 'belongTo_type');
     }

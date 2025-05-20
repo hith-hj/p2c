@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(
     [
         'prefix' => 'auth',
-        'controller' => AuthController::class
+        'controller' => AuthController::class,
     ],
     function (): void {
         Route::withoutMiddleware([JwtMiddleware::class])->group(function (): void {
@@ -45,7 +45,7 @@ Route::withoutMiddleware(JwtMiddleware::class)->group(function (): void {
     Route::group(
         [
             'prefix' => 'label',
-            'controller' => LabelController::class
+            'controller' => LabelController::class,
         ],
         function (): void {
             Route::get('carBrands', 'carBrands');
@@ -60,10 +60,10 @@ Route::group(
     [
         'prefix' => 'producer',
         'controller' => ProducerController::class,
-        'middleware' => [UserChecks::class]
+        'middleware' => [UserChecks::class],
     ],
     function (): void {
-        Route::middleware([RoleChecks::class . ':producer'])->group(function (): void {
+        Route::middleware([RoleChecks::class.':producer'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::patch('update', 'update');
@@ -79,10 +79,10 @@ Route::group(
     [
         'prefix' => 'branch',
         'controller' => BranchController::class,
-        'middleware' => [UserChecks::class]
+        'middleware' => [UserChecks::class],
     ],
     function (): void {
-        Route::middleware([RoleChecks::class . ':producer', BadgeChecks::class])
+        Route::middleware([RoleChecks::class.':producer', BadgeChecks::class])
             ->group(function (): void {
                 Route::get('/', 'get');
                 Route::post('create', 'create');
@@ -100,10 +100,10 @@ Route::group(
     [
         'prefix' => 'carrier',
         'controller' => CarrierController::class,
-        'middleware' => [UserChecks::class]
+        'middleware' => [UserChecks::class],
     ],
     function (): void {
-        Route::middleware([RoleChecks::class . ':carrier'])->group(function (): void {
+        Route::middleware([RoleChecks::class.':carrier'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::post('createDetails', 'createDetails');
@@ -122,7 +122,7 @@ Route::group(
     [
         'prefix' => 'transportation',
         'controller' => TransportationController::class,
-        'middleware' => [UserChecks::class]
+        'middleware' => [UserChecks::class],
     ],
     function (): void {
         Route::get('all', 'all');
@@ -137,7 +137,7 @@ Route::group(
         'middleware' => [UserChecks::class, BadgeChecks::class],
     ],
     function (): void {
-        Route::middleware([RoleChecks::class . ':producer'])
+        Route::middleware([RoleChecks::class.':producer'])
             ->group(function (): void {
                 Route::post('checkCost', 'checkCost');
                 Route::post('create', 'create');
@@ -145,7 +145,7 @@ Route::group(
                 Route::post('forceCancel', 'forceCancel');
                 Route::post('finish', 'finish');
             });
-        Route::middleware([RoleChecks::class . ':carrier'])
+        Route::middleware([RoleChecks::class.':carrier'])
             ->group(function (): void {
                 Route::get('all', 'all');
                 Route::post('accept', 'accept');
@@ -189,12 +189,10 @@ Route::group(
     [
         'prefix' => 'review',
         'controller' => ReviewController::class,
-        'middleware' => [UserChecks::class],
+        'middleware' => [UserChecks::class, BadgeChecks::class],
     ],
     function (): void {
         Route::get('all', 'all');
-        Route::get('find', 'find');
-        Route::post('viewed', 'viewed');
-        Route::post('multipleViewed', 'multipleViewed');
+        Route::post('create', 'create');
     }
 );

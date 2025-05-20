@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware\V1;
 
 use Closure;
@@ -21,6 +23,7 @@ class RoleChecks
                 'message' => 'Un Authorized action',
             ], 403);
         }
+
         return $next($request);
     }
 }

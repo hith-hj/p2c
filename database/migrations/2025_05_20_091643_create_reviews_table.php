@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class() extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('reviewer_id');
+            $table->string('reviewer_type');
             $table->foreignId('belongTo_id');
             $table->string('belongTo_type');
-            $table->foreignId('reviewer_id')->nullable();
-            $table->string('reviewer_type')->nullable();
             $table->text('content')->nullable();
-            $table->smallInteger('rate')->nullable();
+            $table->smallInteger('rate')->default(0);
             $table->timestamps();
         });
     }

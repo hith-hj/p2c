@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories\V1;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,12 +19,12 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'belongTo_id'=>1,
-            'belongTo_type'=>'carrier',
-            'reviewer_id'=>1,
-            'reviewer_type'=>'producer',
-            'content'=>fake()->words(4),
-            'rate'=>fake()->numberBetween(1,10),
+            'belongTo_id' => 1,
+            'belongTo_type' => 'carrier',
+            'reviewer_id' => 1,
+            'reviewer_type' => 'producer',
+            'content' => fake()->words(4),
+            'rate' => fake()->numberBetween(1, 10),
         ];
     }
 }
