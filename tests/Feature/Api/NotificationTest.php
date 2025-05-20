@@ -24,7 +24,7 @@ describe('notification controller test', function () {
     });
 
     it('returns all notifications for authenticated user', function () {
-        Notification::factory()->for($this->user, 'reciver')->count(3)->create();
+        Notification::factory()->for($this->user, 'belongTo')->count(3)->create();
         $res = $this->getJson("$this->url/all");
         expect($res->status())->toBe(200);
         expect($res->json('payload.notifications'))->toHaveCount(3);

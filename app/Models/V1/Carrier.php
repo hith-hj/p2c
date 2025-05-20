@@ -6,7 +6,7 @@ namespace App\Models\V1;
 
 use App\Traits\FeesHandler;
 use App\Traits\ImagesHandler;
-use App\Traits\NotificationsHandler;
+use App\Traits\ReviewsHandler;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,7 +18,7 @@ class Carrier extends Model
     use FeesHandler;
     use HasFactory;
     use ImagesHandler;
-    use NotificationsHandler;
+    use ReviewsHandler;
 
     protected $guarded = [];
 

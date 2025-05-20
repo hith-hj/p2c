@@ -39,7 +39,7 @@ class OrderObserver
 
     public function assigned(Order $order)
     {
-        $order->producer->notify(
+        $order->producer->user->notify(
             'Order Accepted',
             'Your Order has been accepted',
             ['type' => NotificationTypes::order->value, 'order' => $order->id],
@@ -57,7 +57,7 @@ class OrderObserver
     {
         if ($order->delivered_at !== null) {
             $order->codes()->delete();
-            $order->producer->notify(
+            $order->producer->user->notify(
                 'Order deliverd',
                 'Your Order has been delliver',
                 ['type' => NotificationTypes::order->value, 'order' => $order->id],
@@ -69,7 +69,7 @@ class OrderObserver
     private function finished(Order $order): void
     {
         $order->carrier->createFee($order, FeeTypes::normal->value);
-        $order->carrier->notify(
+        $order->carrier->user->notify(
             'Order Finished',
             'Your Order has been finished',
             ['type' => NotificationTypes::order->value, 'order' => $order->id],
@@ -81,7 +81,7 @@ class OrderObserver
         $order->codes()->delete();
         // $order->customer->notify();
         if ($order->carrier !== null) {
-            $order->carrier->notify(
+            $order->carrier->user->notify(
                 'Order canceled',
                 'Your Order has been canceled',
                 ['type' => NotificationTypes::order->value, 'order' => $order->id],
@@ -94,7 +94,7 @@ class OrderObserver
     {
         $order->codes()->delete();
         $order->carrier->createFee($order, FeeTypes::reject->value);
-        $order->producer->notify(
+        $order->producer->user->notify(
             'Order rejected',
             'Your Order has been rejected',
             ['type' => NotificationTypes::order->value, 'order' => $order->id],

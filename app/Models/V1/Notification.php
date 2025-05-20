@@ -21,7 +21,7 @@ class Notification extends Model
         ];
     }
 
-    public function reciver(): MorphTo
+    public function belongTo(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'belongTo_type', 'belongTo_id');
     }

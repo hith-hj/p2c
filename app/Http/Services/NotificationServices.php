@@ -43,10 +43,9 @@ class NotificationServices
         return $this->find($id)->update(['status' => 1]);
     }
 
-    public function multipleViewed(array $ids): bool
+    public function multipleViewed(array $ids): bool|int
     {
         $this->Required($ids, 'Ids');
-
         return Notification::whereIn('id', $ids)->update(['status' => 1]);
     }
 }
