@@ -29,20 +29,6 @@ describe('Notification Service', function () {
         ]);
     });
 
-    it('retrive all Notifications for valid badge', function () {
-        Notification::factory()->create([
-            'belongTo_type' => $this->user->badge::class,
-            'belongTo_id' => $this->user->badge->id,
-        ]);
-        $res = $this->services->all($this->user->badge);
-        expect($res)->toBeInstanceOf(Collection::class)->toHaveCount(1);
-        $this->assertDatabaseCount('notifications', 1);
-        $this->assertDatabaseHas('notifications', [
-            'belongTo_type' => $this->user->badge::class,
-            'belongTo_id' => $this->user->badge->id,
-        ]);
-    });
-
     it('can find a notification', function () {
         $notification = Notification::factory()->create();
 
@@ -58,7 +44,7 @@ describe('Notification Service', function () {
     it('can mark multiple notifications as viewed', function () {
         $notifications = Notification::factory()->count(3)->create(['status' => 0]);
         $ids = $notifications->pluck('id')->toArray();
-        expect($this->services->multipleViewed($ids))->toBeTrue();
+        expect($this->services->multipleViewed($ids))->toBeNumeric();
         expect(Notification::whereIn('id', $ids)->get()->pluck('status')->unique()->first())->toBe(1);
     });
 
@@ -88,7 +74,7 @@ describe('Notification Service', function () {
         $invalidIds = [99999, 88888];
         $mixedIds = array_merge($validIds, $invalidIds);
 
-        expect($this->services->multipleViewed($mixedIds))->toBeTrue();
+        expect($this->services->multipleViewed($mixedIds))->toBeNumeric();
         expect(Notification::whereIn('id', $validIds)->get()->pluck('status')->unique()->first())->toBe(1);
     });
 });

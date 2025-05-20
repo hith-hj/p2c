@@ -12,14 +12,11 @@ class NotificationServices
 {
     use ExceptionHandler;
 
-    private $allowedModels = ['User', 'Carrier', 'Producer', 'Customer'];
-
     public function all(object $user): Collection
     {
-        $this->Truthy(! in_array(class_basename($user), $this->allowedModels), 'invalid user');
         $this->Truthy(! method_exists($user, 'notifications'), 'missing notifications()');
         $notis = $user->notifications;
-        if (method_exists($user, 'badge')) {
+        if (method_exists($user, 'badge') &&  method_exists($user->badge, 'notifications')) {
             $notis->concat($user->badge->notifications);
         }
         $this->NotFound($notis, 'notifications');

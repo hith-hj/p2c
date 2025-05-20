@@ -10,14 +10,19 @@ use App\Http\Controllers\V1\LabelController;
 use App\Http\Controllers\V1\NotificationController;
 use App\Http\Controllers\V1\OrderController;
 use App\Http\Controllers\V1\ProducerController;
+use App\Http\Controllers\V1\ReviewController;
 use App\Http\Controllers\V1\TransportationController;
 use App\Http\Middleware\V1\Auth\JwtMiddleware;
 use App\Http\Middleware\V1\BadgeChecks;
+use App\Http\Middleware\V1\RoleChecks;
 use App\Http\Middleware\V1\UserChecks;
 use Illuminate\Support\Facades\Route;
 
 Route::group(
-    ['prefix' => 'auth', 'controller' => AuthController::class],
+    [
+        'prefix' => 'auth',
+        'controller' => AuthController::class
+    ],
     function (): void {
         Route::withoutMiddleware([JwtMiddleware::class])->group(function (): void {
             Route::post('register', 'register')->name('register');
@@ -38,7 +43,10 @@ Route::group(
 
 Route::withoutMiddleware(JwtMiddleware::class)->group(function (): void {
     Route::group(
-        ['prefix' => 'label', 'controller' => LabelController::class],
+        [
+            'prefix' => 'label',
+            'controller' => LabelController::class
+        ],
         function (): void {
             Route::get('carBrands', 'carBrands');
             Route::get('carColors', 'carColors');
@@ -49,9 +57,13 @@ Route::withoutMiddleware(JwtMiddleware::class)->group(function (): void {
 });
 
 Route::group(
-    ['prefix' => 'producer', 'controller' => ProducerController::class],
+    [
+        'prefix' => 'producer',
+        'controller' => ProducerController::class,
+        'middleware' => [UserChecks::class]
+    ],
     function (): void {
-        Route::middleware([UserChecks::class.':producer'])->group(function (): void {
+        Route::middleware([RoleChecks::class . ':producer'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::patch('update', 'update');
@@ -64,9 +76,13 @@ Route::group(
 );
 
 Route::group(
-    ['prefix' => 'branch', 'controller' => BranchController::class],
+    [
+        'prefix' => 'branch',
+        'controller' => BranchController::class,
+        'middleware' => [UserChecks::class]
+    ],
     function (): void {
-        Route::middleware([UserChecks::class.':producer', BadgeChecks::class])
+        Route::middleware([RoleChecks::class . ':producer', BadgeChecks::class])
             ->group(function (): void {
                 Route::get('/', 'get');
                 Route::post('create', 'create');
@@ -81,9 +97,13 @@ Route::group(
 );
 
 Route::group(
-    ['prefix' => 'carrier', 'controller' => CarrierController::class],
+    [
+        'prefix' => 'carrier',
+        'controller' => CarrierController::class,
+        'middleware' => [UserChecks::class]
+    ],
     function (): void {
-        Route::middleware([UserChecks::class.':carrier'])->group(function (): void {
+        Route::middleware([RoleChecks::class . ':carrier'])->group(function (): void {
             Route::get('/', 'get');
             Route::post('create', 'create');
             Route::post('createDetails', 'createDetails');
@@ -99,7 +119,11 @@ Route::group(
 );
 
 Route::group(
-    ['prefix' => 'transportation', 'controller' => TransportationController::class],
+    [
+        'prefix' => 'transportation',
+        'controller' => TransportationController::class,
+        'middleware' => [UserChecks::class]
+    ],
     function (): void {
         Route::get('all', 'all');
         Route::get('find', 'find');
@@ -110,10 +134,10 @@ Route::group(
     [
         'prefix' => 'order',
         'controller' => OrderController::class,
-        'middleware' => [BadgeChecks::class],
+        'middleware' => [UserChecks::class, BadgeChecks::class],
     ],
     function (): void {
-        Route::middleware([UserChecks::class.':producer'])
+        Route::middleware([RoleChecks::class . ':producer'])
             ->group(function (): void {
                 Route::post('checkCost', 'checkCost');
                 Route::post('create', 'create');
@@ -121,7 +145,7 @@ Route::group(
                 Route::post('forceCancel', 'forceCancel');
                 Route::post('finish', 'finish');
             });
-        Route::middleware([UserChecks::class.':carrier'])
+        Route::middleware([RoleChecks::class . ':carrier'])
             ->group(function (): void {
                 Route::get('all', 'all');
                 Route::post('accept', 'accept');
@@ -138,7 +162,7 @@ Route::group(
 Route::group(
     [
         'controller' => FeeController::class,
-        'middleware' => [BadgeChecks::class],
+        'middleware' => [UserChecks::class, BadgeChecks::class],
         'prefix' => 'fee',
     ],
     function (): void {
@@ -146,11 +170,26 @@ Route::group(
         Route::get('find', 'find');
     }
 );
+
 Route::group(
     [
-        'controller' => NotificationController::class,
-        'middleware' => [BadgeChecks::class],
         'prefix' => 'notification',
+        'controller' => NotificationController::class,
+        'middleware' => [UserChecks::class],
+    ],
+    function (): void {
+        Route::get('all', 'all');
+        Route::get('find', 'find');
+        Route::post('viewed', 'viewed');
+        Route::post('multipleViewed', 'multipleViewed');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'review',
+        'controller' => ReviewController::class,
+        'middleware' => [UserChecks::class],
     ],
     function (): void {
         Route::get('all', 'all');

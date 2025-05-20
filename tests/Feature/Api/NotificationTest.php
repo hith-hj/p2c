@@ -17,8 +17,8 @@ beforeEach(function () {
 
 describe('notification controller test', function () {
 
-    it('fails to access the controller without valid badge', function () {
-        $this->user->badge->update(['is_valid' => 0]);
+    it('fails to access the controller while invalid', function () {
+        $this->user->update(['verified_at' => null]);
         $res = $this->getJson("$this->url/all");
         expect($res->status())->toBe(403);
     });
