@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\V1;
 
 use App\Traits\FeesHandler;
+use App\Traits\NotificationsHandler;
 use App\Traits\ReviewsHandler;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,8 +17,14 @@ class Producer extends Model
     use FeesHandler;
     use HasFactory;
     use ReviewsHandler;
+    use NotificationsHandler;
 
     protected $guarded = [];
+
+    public function getFirebaseTokenAttribute()
+    {
+        return $this->user->firebase_token;
+    }
 
     public function user(): BelongsTo
     {

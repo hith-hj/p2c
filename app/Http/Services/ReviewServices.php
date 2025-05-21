@@ -34,17 +34,21 @@ class ReviewServices
             $model::class === $reviewer::class && $model->id === $reviewer->id,
             'You cant review this'
         );
+        $query = Review::where([
+            ['belongTo_id', $model->id],
+            ['belongTo_type', $model::class],
+            ['reviewer_id', $reviewer->id],
+            ['reviewer_type', $reviewer::class],
+        ]);
         $this->Truthy(
-            Review::where([
-                ['belongTo_id', $model->id],
-                ['belongTo_type', $model::class],
-                ['reviewer_id', $reviewer->id],
-                ['reviewer_type', $reviewer::class],
-            ])->exists(),
+            ($query->exists() && date_diff(now(),$query->first()->created_at)->d < 30 ),
             'review exists'
         );
 
-        return $model->createReview($reviewer, $data);
+        $review = $model->createReview($reviewer, $data);
+        $model->updateRate();
+
+        return $review;
     }
 
     private function checkAndCastData(array $data = [], $requiredFields = []): array
@@ -54,7 +58,7 @@ class ReviewServices
             return $data;
         }
         $missing = array_diff(array_keys($requiredFields), array_keys($data));
-        $this->Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
+        $this->Falsy(empty($missing), 'fields missing: ' . implode(', ', $missing));
         foreach ($requiredFields as $key => $value) {
             settype($data[$key], $value);
         }

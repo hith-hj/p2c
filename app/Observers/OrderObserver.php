@@ -39,7 +39,8 @@ class OrderObserver
 
     public function assigned(Order $order)
     {
-        $order->producer->user->notify(
+        // $order->producer->user->notify(
+        $order->producer->notify(
             'Order Accepted',
             'Your Order has been accepted',
             ['type' => NotificationTypes::order->value, 'order' => $order->id],
@@ -81,7 +82,8 @@ class OrderObserver
         $order->codes()->delete();
         // $order->customer->notify();
         if ($order->carrier !== null) {
-            $order->carrier->user->notify(
+            // $order->carrier->user->notify(
+            $order->carrier->notify(
                 'Order canceled',
                 'Your Order has been canceled',
                 ['type' => NotificationTypes::order->value, 'order' => $order->id],

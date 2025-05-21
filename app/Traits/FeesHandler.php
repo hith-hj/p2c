@@ -37,8 +37,6 @@ trait FeesHandler
         ]);
 
         return $record;
-
-        return null;
     }
 
     private function amount(int $source): int

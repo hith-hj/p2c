@@ -6,6 +6,7 @@ namespace App\Models\V1;
 
 use App\Traits\FeesHandler;
 use App\Traits\ImagesHandler;
+use App\Traits\NotificationsHandler;
 use App\Traits\ReviewsHandler;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,8 +20,14 @@ class Carrier extends Model
     use HasFactory;
     use ImagesHandler;
     use ReviewsHandler;
+    use NotificationsHandler;
 
     protected $guarded = [];
+
+    public function getFirebaseTokenAttribute()
+    {
+        return $this->user->firebase_token;
+    }
 
     public function transportation(): BelongsTo
     {

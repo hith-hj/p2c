@@ -25,4 +25,14 @@ trait ReviewsHandler
             'rate' => $data['rate'],
         ]);
     }
+
+    public function updateRate()
+    {
+        throw_if(!isset($this->rate),'rate is missing');
+        $sum = $this->reviews()->sum('rate');
+        $count = $this->reviews()->count();
+        $rate = round(($sum/$count)/2,1);
+
+        return $this->update(['rate'=>$rate]);
+    }
 }

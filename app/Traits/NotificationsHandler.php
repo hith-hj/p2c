@@ -13,6 +13,7 @@ use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\MessageData;
 use Kreait\Firebase\Messaging\Notification as FcmNotification;
+use Illuminate\Support\Facades\Log;
 
 trait NotificationsHandler
 {
@@ -48,6 +49,7 @@ trait NotificationsHandler
     public function fcm()
     {
         if ($this->firebase_token === null) {
+            Log::error("No FCM token found on $this::class");
             return true;
         }
         $token = $this->firebase_token;

@@ -15,7 +15,7 @@ class ReviewController extends Controller
 {
     public function __construct(public ReviewServices $review) {}
 
-    public function all(Request $request): JsonResponse
+    public function all(): JsonResponse
     {
         return Success(payload: ['reviews' => $this->review->all(Auth::user()->badge)]);
     }
