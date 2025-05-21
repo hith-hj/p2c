@@ -127,12 +127,15 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        $this->order->accept(
+        $order = $this->order->accept(
             Auth::user()->badge,
             $validator->safe()->integer('order_id')
         );
 
-        return Success(msg: __('main.accepted'));
+        return Success(
+            msg: __('main.accepted'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 
     public function picked(Request $request): JsonResponse
@@ -141,12 +144,15 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        $this->order->picked(
+        $order = $this->order->picked(
             Auth::user()->badge,
             $validator->safe()->integer('order_id')
         );
 
-        return Success(msg: __('main.picked'));
+        return Success(
+            msg: __('main.picked'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 
     public function delivered(Request $request): JsonResponse
@@ -156,13 +162,16 @@ class OrderController extends Controller
             'code' => ['required', 'exists:codes,code'],
         ]);
 
-        $this->order->delivered(
+        $order = $this->order->delivered(
             Auth::user()->badge,
             $validator->safe()->integer('order_id'),
             $validator->safe()->integer('code'),
         );
 
-        return Success(msg: __('main.delivered'));
+        return Success(
+            msg: __('main.delivered'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 
     public function finish(Request $request): JsonResponse
@@ -171,12 +180,15 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        $this->order->finish(
+        $order = $this->order->finish(
             Auth::user()->badge,
             $validator->safe()->integer('order_id')
         );
 
-        return Success(msg: __('main.finished'));
+        return Success(
+            msg: __('main.finished'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 
     public function cancel(Request $request): JsonResponse
@@ -185,12 +197,15 @@ class OrderController extends Controller
             'order_id' => ['required', 'exists:orders,id'],
         ]);
 
-        $this->order->cancel(
+        $order = $this->order->cancel(
             Auth::user()->badge,
             $validator->safe()->integer('order_id')
         );
 
-        return Success(msg: __('main.canceled'));
+        return Success(
+            msg: __('main.canceled'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 
     public function forceCancel(Request $request): JsonResponse
@@ -198,12 +213,15 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
         ]);
-        $this->order->forceCancel(
+        $order = $this->order->forceCancel(
             Auth::user()->badge,
             $validator->safe()->integer('order_id')
         );
 
-        return Success(msg: __('main.canceled'));
+        return Success(
+            msg: __('main.canceled'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 
     public function reject(Request $request): JsonResponse
@@ -211,11 +229,14 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'order_id' => ['required', 'exists:orders,id'],
         ]);
-        $this->order->reject(
+        $order = $this->order->reject(
             Auth::user()->badge,
             $validator->safe()->integer('order_id')
         );
 
-        return Success(msg: __('main.rejected'));
+        return Success(
+            msg: __('main.rejected'),
+            payload: ['order' => OrderResource::make($order->fresh())]
+        );
     }
 }
