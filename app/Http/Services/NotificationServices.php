@@ -17,12 +17,11 @@ class NotificationServices
         $this->Truthy(! method_exists($user, 'notifications'), 'missing notifications()');
         $notis = $user->notifications;
         if (method_exists($user, 'badge') && method_exists($user->badge, 'notifications')) {
-            $notis->concat($user->badge->notifications);
+            $notis = $notis->concat($user->badge->notifications);
         }
         $this->NotFound($notis, 'notifications');
-        $notis->sortBy('created_at');
 
-        return $notis;
+        return $notis->sortByDesc('created_at');
     }
 
     public function find(int $id): Notification
