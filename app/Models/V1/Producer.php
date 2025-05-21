@@ -16,8 +16,8 @@ class Producer extends Model
 {
     use FeesHandler;
     use HasFactory;
-    use ReviewsHandler;
     use NotificationsHandler;
+    use ReviewsHandler;
 
     protected $guarded = [];
 

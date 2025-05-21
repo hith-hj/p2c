@@ -55,6 +55,7 @@ class ProducerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'brand' => ['required', 'string', 'max:20', 'unique:producers,brand'],
+            'name' => ['required', 'string', 'max:20'],
             'phone' => ['sometimes', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
             'cords' => ['required', 'array', 'size:2'],
             'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],

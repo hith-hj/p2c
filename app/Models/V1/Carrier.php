@@ -19,8 +19,8 @@ class Carrier extends Model
     use FeesHandler;
     use HasFactory;
     use ImagesHandler;
-    use ReviewsHandler;
     use NotificationsHandler;
+    use ReviewsHandler;
 
     protected $guarded = [];
 

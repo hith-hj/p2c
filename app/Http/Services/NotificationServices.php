@@ -21,6 +21,7 @@ class NotificationServices
         }
         $this->NotFound($notis, 'notifications');
         $notis->sortBy('created_at');
+
         return $notis;
     }
 

@@ -41,7 +41,7 @@ class ReviewServices
             ['reviewer_type', $reviewer::class],
         ]);
         $this->Truthy(
-            ($query->exists() && date_diff(now(),$query->first()->created_at)->d < 30 ),
+            ($query->exists() && date_diff(now(), $query->first()->created_at)->d < 30),
             'review exists'
         );
 
@@ -58,7 +58,7 @@ class ReviewServices
             return $data;
         }
         $missing = array_diff(array_keys($requiredFields), array_keys($data));
-        $this->Falsy(empty($missing), 'fields missing: ' . implode(', ', $missing));
+        $this->Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
         foreach ($requiredFields as $key => $value) {
             settype($data[$key], $value);
         }

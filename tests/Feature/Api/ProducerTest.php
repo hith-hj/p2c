@@ -94,6 +94,7 @@ describe('Producer Controller', function () {
             'Authorization' => "Bearer $token",
         ])->postJson("$this->url/create", [
             'brand' => 'Test Brand',
+            'name'=>'triko',
             'cords' => ['long' => 10.5, 'lat' => 20.3],
         ]);
         expect($res->status())->toBe(200);
@@ -103,6 +104,7 @@ describe('Producer Controller', function () {
     it('prevent user to create a new producer if producer exists', function () {
         $res = $this->postJson("$this->url/create", [
             'brand' => 'Test Brand',
+            'name'=>'dala',
             'cords' => ['long' => 10.5, 'lat' => 20.3],
         ]);
         expect($res->status())->toBe(400);
