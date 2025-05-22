@@ -21,7 +21,11 @@ class CarrierServices
         $carriers = Carrier::all();
         $this->NotFound($carriers, 'carrier');
 
-        return $carriers;
+        return $carriers->load([
+            'transportation',
+            'details',
+            'images',
+        ]);
     }
 
     public function paginate(object $request, int $perPage = 4): object
