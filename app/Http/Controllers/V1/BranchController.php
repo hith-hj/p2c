@@ -25,7 +25,7 @@ class BranchController extends Controller
     {
         return Success(payload: [
             'branches' => BranchResource::collection(
-                $this->branch->get(Auth::user()->badge?->id)
+                $this->branch->get(Auth::user()->badge?->id),
             ),
         ]);
     }
@@ -46,7 +46,7 @@ class BranchController extends Controller
     public function create(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'min:4'],
+            'name' => ['required', 'string', 'min:4', 'max:100'],
             'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
             'cords' => ['required', 'array', 'size:2'],
             'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],

@@ -13,7 +13,6 @@ use App\Models\V1\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class DatabaseSeeder extends Seeder
 {
@@ -44,7 +43,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '0993769517',
             'role' => 'carrier',
             'password' => Hash::make('Mm12345@@'),
-            'firebase_token'=>'dhVqlMtKSjOgtDHgWBwt9j:APA91bEdLM6Q7GWYhCmBJ4ywZphROt57nAtDTwtlj5uPLIGriLMdOnSNurRJBpZAKzfv6OEACZsqs-d7IyfKi49r3su_eAyj-wdGf3CgcazS0I5XVSNP1RY',
+            'firebase_token' => 'dhVqlMtKSjOgtDHgWBwt9j:APA91bEdLM6Q7GWYhCmBJ4ywZphROt57nAtDTwtlj5uPLIGriLMdOnSNurRJBpZAKzfv6OEACZsqs-d7IyfKi49r3su_eAyj-wdGf3CgcazS0I5XVSNP1RY',
         ]);
 
         Admin::factory()->create([

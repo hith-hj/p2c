@@ -27,7 +27,7 @@ class ProducerController extends Controller
     {
         return Success(payload: [
             'producers' => ProducerResource::collection(
-                $this->producer->paginate($request)
+                $this->producer->paginate($request),
             ),
         ]);
     }
@@ -54,8 +54,8 @@ class ProducerController extends Controller
     public function create(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'brand' => ['required', 'string', 'max:20', 'unique:producers,brand'],
-            'name' => ['required', 'string', 'max:20'],
+            'brand' => ['required', 'string', 'min:4', 'max:50', 'unique:producers,brand'],
+            'name' => ['required', 'string', 'min:4', 'max:100'],
             'phone' => ['sometimes', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
             'cords' => ['required', 'array', 'size:2'],
             'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
@@ -64,14 +64,14 @@ class ProducerController extends Controller
         $producer = $this->producer->create(Auth::user(), $validator->safe()->all());
 
         return Success(
-            payload: ['producer' => ProducerResource::make($producer)]
+            payload: ['producer' => ProducerResource::make($producer)],
         );
     }
 
     public function update(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'brand' => ['required', 'string', 'unique:producers,brand'],
+            'brand' => ['required', 'string', 'min:4', 'max:50', 'unique:producers,brand'],
         ]);
         $producer = Auth::user()->badge;
         if ($producer === null) {
@@ -81,7 +81,7 @@ class ProducerController extends Controller
 
         return Success(
             msg: __('main.updated'),
-            payload: ['producer' => ProducerResource::make($producer->fresh())]
+            payload: ['producer' => ProducerResource::make($producer->fresh())],
         );
     }
 

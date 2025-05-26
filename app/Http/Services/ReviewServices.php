@@ -31,9 +31,10 @@ class ReviewServices
         ]);
         $model = $this->getPreparedModel($data);
         $this->Truthy(
-            $model::class === $reviewer::class && $model->id === $reviewer->id,
-            'You cant review this'
+            $model::class === $reviewer::class,
+            'You cant review this',
         );
+
         $query = Review::where([
             ['belongTo_id', $model->id],
             ['belongTo_type', $model::class],
@@ -41,8 +42,8 @@ class ReviewServices
             ['reviewer_type', $reviewer::class],
         ]);
         $this->Truthy(
-            ($query->exists() && date_diff(now(), $query->first()->created_at)->d < 30),
-            'review exists'
+            ($query->exists() && date_diff(now(), $query->first()->created_at)->d < 1),
+            'reviews not allowed until 24 hours is passed',
         );
 
         $review = $model->createReview($reviewer, $data);
