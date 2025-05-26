@@ -6,12 +6,11 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\UserResource;
+use App\Http\Validators\AuthValidators;
 use App\Models\V1\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
@@ -19,13 +18,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'account_type' => ['required', Rule::in(['producer', 'carrier'])],
-            'firebase_token' => ['required'],
-        ]);
+        $validator = AuthValidators::register($request->all());
         $user = User::create([
             'email' => $validator->safe()->input('email'),
             'phone' => $validator->safe()->input('phone'),
@@ -49,10 +42,7 @@ class AuthController extends Controller
 
     public function verify(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
-            'code' => ['required', 'numeric', 'exists:codes,code'],
-        ]);
+        $validator = AuthValidators::verify($request->all());
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
         if ($user->code('verification')->code !== $validator->safe()->integer('code')) {
             return Error(msg: __('main.invalid code'));
@@ -69,10 +59,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
-            'password' => ['required', 'string', 'min:8'],
-        ]);
+        $validator = AuthValidators::login($request->all());
         $credentials = $validator->safe()->only('phone', 'password');
         try {
             if (! Auth::attempt($credentials)) {
@@ -129,13 +116,10 @@ class AuthController extends Controller
 
     public function forgetPassword(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
-        ]);
+        $validator = AuthValidators::forgetPassword($request->all());
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         // if there is a previous code from registeration or other what to do
-
         $user->sendVerificationCode();
 
         return Success(
@@ -146,10 +130,7 @@ class AuthController extends Controller
 
     public function resetPassword(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        $validator = AuthValidators::resetPassword($request->all());
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         if (is_null($user->verified_at)) {
@@ -163,9 +144,7 @@ class AuthController extends Controller
 
     public function resendCode(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'exists:users'],
-        ]);
+        $validator = AuthValidators::resendCode($request->all());
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         if (is_null($user->code('verification')->code)) {
@@ -181,10 +160,7 @@ class AuthController extends Controller
 
     public function changePassword(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'old_password' => ['required', 'string', 'min:8'],
-            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        $validator = AuthValidators::changePassword($request->all());
         $user = Auth::user();
         if (! Hash::check($validator->safe()->input('old_password'), $user->password)) {
             return Error(msg: __('main.invalid password'));

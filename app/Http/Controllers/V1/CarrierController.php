@@ -7,10 +7,10 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\CarrierResource;
 use App\Http\Services\CarrierServices;
+use App\Http\Validators\CarrierValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
 {
@@ -34,9 +34,7 @@ class CarrierController extends Controller
 
     public function find(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'carrier_id' => ['required', 'exists:carriers,id'],
-        ]);
+        $validator = CarrierValidators::find($request->all());
 
         $carrier = $this->carrier->find($validator->safe()->integer('carrier_id'));
 
@@ -52,11 +50,7 @@ class CarrierController extends Controller
 
     public function create(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => ['required', 'string', 'max:20'],
-            'last_name' => ['required', 'string', 'max:20'],
-            'transportation_id' => ['required', 'exists:transportations,id'],
-        ]);
+        $validator = CarrierValidators::create($request->all());
 
         $carrier = $this->carrier->create(Auth::user(), $validator->safe()->all());
 
@@ -70,13 +64,7 @@ class CarrierController extends Controller
             return Error(msg: __('main.carrier').' '.__('main.not found'));
         }
 
-        $validator = Validator::make($request->all(), [
-            'plate_number' => ['required', 'numeric', 'unique:carrier_details,plate_number'],
-            'brand' => ['required', 'string'],
-            'model' => ['required', 'string'],
-            'year' => ['required', 'date_format:Y'],
-            'color' => ['required', 'string'],
-        ]);
+        $validator = CarrierValidators::createDetails($request->all());
 
         $details = $this->carrier->createDetails($carrier, $validator->safe()->all());
         if ($carrier->images()->exists()) {
@@ -95,10 +83,7 @@ class CarrierController extends Controller
             return Error(msg: __('main.carrier').' '.__('main.not found'));
         }
 
-        $validator = Validator::make($request->all(), [
-            'images' => ['required', 'array', 'size:5'],
-            'images.*' => ['required', 'image', 'max:2048'],
-        ]);
+        $validator = CarrierValidators::createImages($request->all());
 
         $this->carrier->createImages($carrier, $validator->safe()->input('images'));
         if ($carrier->details()->exists()) {
@@ -112,11 +97,7 @@ class CarrierController extends Controller
 
     public function update(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => ['sometimes', 'string'],
-            'last_name' => ['sometimes', 'string'],
-            'transportation_id' => ['sometimes', 'exists:transportations,id'],
-        ]);
+        $validator = CarrierValidators::update($request->all());
 
         $carrier = Auth::user()->badge;
         if ($carrier === null) {
@@ -146,6 +127,7 @@ class CarrierController extends Controller
         if ($carrier === null) {
             return Error(msg: 'missing carrier');
         }
+
         $this->carrier->delete($carrier);
 
         return Success(msg: __('main.deleted'));
@@ -157,11 +139,8 @@ class CarrierController extends Controller
         if ($carrier === null) {
             return Error(msg: 'missing carrier');
         }
-        $validator = Validator::make($request->all(), [
-            'cords' => ['required', 'array', 'size:2'],
-            'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
-            'cords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
-        ]);
+
+        $validator = CarrierValidators::setLocation($request->all());
 
         $this->carrier->setLocation($carrier, $validator->safe()->all());
 

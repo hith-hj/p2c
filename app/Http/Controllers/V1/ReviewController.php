@@ -6,10 +6,10 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\ReviewServices;
+use App\Http\Validators\ReviewValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
@@ -22,12 +22,7 @@ class ReviewController extends Controller
 
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => ['required', 'numeric'],
-            'type' => ['required', 'string'],
-            'content' => ['nullable', 'string', 'max:700'],
-            'rate' => ['required', 'numeric', 'min:0', 'max:10'],
-        ]);
+        $validator = ReviewValidators::create($request->all());
 
         $review = $this->review->create(Auth::user()->badge, $validator->safe()->all());
 

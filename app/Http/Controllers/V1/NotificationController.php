@@ -7,10 +7,10 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\NotificationResource;
 use App\Http\Services\NotificationServices;
+use App\Http\Validators\NotificationValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class NotificationController extends Controller
 {
@@ -25,9 +25,8 @@ class NotificationController extends Controller
 
     public function find(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'notification_id' => ['required', 'exists:notifications,id'],
-        ]);
+        $validator = NotificationValidators::find($request->all());
+
         $noti = $this->noti->find($validator->safe()->integer('notification_id'));
 
         return Success(payload: ['notification' => $noti]);
@@ -35,9 +34,8 @@ class NotificationController extends Controller
 
     public function viewed(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'notification_id' => ['required', 'exists:notifications,id'],
-        ]);
+        $validator = NotificationValidators::viewed($request->all());
+
         $this->noti->viewed($validator->safe()->integer('notification_id'));
 
         return Success();
@@ -45,10 +43,8 @@ class NotificationController extends Controller
 
     public function multipleViewed(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'notifications' => ['required', 'array', 'min:1'],
-            'notifications.*' => ['required', 'exists:notifications,id'],
-        ]);
+        $validator = NotificationValidators::multibleViewed($request->all());
+
         $this->noti->multipleViewed($validator->safe()->array('notifications'));
 
         return Success();

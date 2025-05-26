@@ -7,10 +7,10 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\BranchResource;
 use App\Http\Services\BranchServices;
+use App\Http\Validators\BranchValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class BranchController extends Controller
 {
@@ -32,26 +32,18 @@ class BranchController extends Controller
 
     public function find(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'branch_id' => ['sometimes', 'required', 'exists:branches,id'],
-        ]);
+        $validator = BranchValidators::find($request->all());
 
         $branch = $this->branch->find($validator->safe()->integer('branch_id'));
 
         return Success(payload: [
-            'branche' => BranchResource::make($branch),
+            'branch' => BranchResource::make($branch),
         ]);
     }
 
     public function create(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'min:4', 'max:100'],
-            'phone' => ['required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
-            'cords' => ['required', 'array', 'size:2'],
-            'cords.long' => ['required', 'regex:/^[-]?((((1[0-7]\d)|(\d?\d))\.(\d+))|180(\.0+)?)$/'],
-            'cords.lat' => ['required', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
-        ]);
+        $validator = BranchValidators::create($request->all());
 
         $branch = $this->branch->create(Auth::user()->badge, $validator->safe()->all());
 
@@ -62,11 +54,7 @@ class BranchController extends Controller
 
     public function update(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'branch_id' => ['required', 'exists:branches,id'],
-            'name' => ['sometimes', 'required', 'string', 'min:4'],
-            'phone' => ['sometimes', 'required', 'regex:/^09[1-9]{1}\d{7}$/', 'unique:branches,phone'],
-        ]);
+        $validator = BranchValidators::update($request->all());
 
         $branch = $this->branch->find($validator->safe()->integer('branch_id'));
         if ($branch->producer_id !== Auth::user()->badge->id) {
@@ -80,9 +68,7 @@ class BranchController extends Controller
 
     public function delete(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'branch_id' => ['required', 'exists:branches,id'],
-        ]);
+        $validator = BranchValidators::delete($request->all());
 
         $branch = $this->branch->find($validator->safe()->integer('branch_id'));
         if ($branch->producer_id !== Auth::user()->badge->id) {
@@ -96,9 +82,7 @@ class BranchController extends Controller
 
     public function setDefault(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'branch_id' => ['required', 'exists:branches,id'],
-        ]);
+        $validator = BranchValidators::setDefault($request->all());
 
         $branch = $this->branch->find($validator->safe()->integer('branch_id'));
         if ($branch->producer_id !== Auth::user()->badge->id) {

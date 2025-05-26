@@ -21,7 +21,7 @@ class BranchFactory extends Factory
         return [
             'producer_id' => fake()->uuid,
             'name' => fake()->streetName(),
-            'phone' => fake()->phoneNumber(),
+            'phone' => fake()->regexify('09[1-9]{1}\d{7}'),
             'is_default' => false,
         ];
     }

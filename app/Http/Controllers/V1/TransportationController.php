@@ -7,9 +7,9 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\TransportationResource;
 use App\Http\Services\TransportationServices;
+use App\Http\Validators\TransportationValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class TransportationController extends Controller
 {
@@ -24,9 +24,8 @@ class TransportationController extends Controller
 
     public function find(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'transportation_id' => ['required', 'exists:transportations,id'],
-        ]);
+        $validator = TransportationValidators::find($request->all());
+
         $trans = $this->trans->find($validator->safe()->integer('transportation_id'));
 
         return Success(payload: [

@@ -7,10 +7,10 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\FeeResource;
 use App\Http\Services\FeeServices;
+use App\Http\Validators\FeeValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class FeeController extends Controller
 {
@@ -25,9 +25,7 @@ class FeeController extends Controller
 
     public function find(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'fee_id' => ['required', 'exists:fees,id'],
-        ]);
+        $validator = FeeValidators::find($request->all());
 
         $fee = $this->fee->find($validator->safe()->integer('fee_id'));
 

@@ -33,7 +33,7 @@ class UserFactory extends Factory
     {
         return [
             'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->phoneNumber(),
+            'phone' => fake()->regexify('09[1-9]{1}\d{7}'),
             'verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'firebase_token' => Str::random(32),

@@ -27,7 +27,7 @@ class BranchServices
         $this->NotFound($producer, 'producer');
         $this->NotFound($producer->branches, 'branches');
 
-        return $producer->branches;
+        return $producer->branches->load(['location']);
     }
 
     public function create(Producer $producer, array $data): Branch
