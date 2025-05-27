@@ -14,11 +14,11 @@ class ReviewServices
 
     public function all(object $object): Collection
     {
-        $this->Truthy(! method_exists($object, 'reviews'), 'missing');
+        $this->Truthy(! method_exists($object, 'reviews'), 'missing reviews()');
         $reviews = $object->reviews;
         $this->NotFound($reviews, 'reviews');
 
-        return $reviews;
+        return $reviews->sortByDesc('created_at');
     }
 
     public function create(object $reviewer, array $data): Review
@@ -26,16 +26,14 @@ class ReviewServices
         $this->Required($reviewer, 'reviewer');
         $this->Required($data, 'data');
         $this->checkAndCastData($data, [
-            'reviewed_id' => 'int',
-            'reviewed_type' => 'string',
+            'belongTo_id' => 'int',
+            'belongTo_type' => 'string',
             'rate' => 'int',
             'content' => 'string',
         ]);
+
         $model = $this->getPreparedModel($data);
-        $this->Truthy(
-            $model::class === $reviewer::class,
-            'You cant review this',
-        );
+        $this->Truthy($model::class === $reviewer::class,'You cant review this');
 
         $query = Review::where([
             ['belongTo_id', $model->id],
@@ -54,6 +52,21 @@ class ReviewServices
         return $review;
     }
 
+    private function getPreparedModel(array $data)
+    {
+        $id = $data['belongTo_id'];
+        $class = $data['belongTo_type'];
+        if(!str_contains($class,'App\\Models\\V1')){
+            $class = "App\\Models\\V1\\".ucfirst($class);
+        }
+        $this->Truthy(! class_exists($class), 'invalid class type');
+        $model = $class::find($id);
+        $this->NotFound($model, "$class id $id");
+        $this->Truthy(! method_exists($model, 'reviews'), 'model missing reviews()');
+
+        return $model;
+    }
+
     private function checkAndCastData(array $data = [], $requiredFields = []): array
     {
         $this->Truthy(empty($data), 'data is empty');
@@ -67,18 +80,5 @@ class ReviewServices
         }
 
         return $data;
-    }
-
-    private function getPreparedModel(array $data)
-    {
-        $id = $data['reviewed_id'];
-        $type = ucfirst($data['reviewed_type']);
-        $class = "App\\Models\\V1\\$type";
-        $this->Truthy(! class_exists($class), 'invalid class type');
-        $model = $class::find($id);
-        $this->NotFound($model, '$type id $id ');
-        $this->Truthy(! method_exists($model, 'reviews'), 'model missing reviews()');
-
-        return $model;
     }
 }

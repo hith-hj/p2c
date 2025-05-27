@@ -15,18 +15,10 @@ class NotificationValidators
         ]);
     }
 
-    public static function viewed($data)
-    {
-        return Validator::make($data, [
-            'notification_id' => ['required', 'numeric', 'exists:notifications,id'],
-        ]);
-    }
-
-    public static function multibleViewed($data)
+    public static function view($data)
     {
         return Validator::make($data, [
             'notifications' => ['required', 'array', 'min:1'],
-            'notifications.*' => ['required', 'numeric', 'exists:notifications,id'],
         ]);
     }
 
@@ -37,11 +29,4 @@ class NotificationValidators
         ]);
     }
 
-    public static function multibleDelete($data)
-    {
-        return Validator::make($data, [
-            'notifications' => ['required', 'array', 'min:1'],
-            'notifications.*' => ['required', 'numeric', 'exists:notifications,id'],
-        ]);
-    }
 }

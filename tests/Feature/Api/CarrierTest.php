@@ -9,10 +9,7 @@ use App\Models\V1\User;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
-    $this->user = User::factory()->create(['role' => 'carrier']);
-    $this->user->badge->update(['is_valid' => 1]);
-    $token = JWTAuth::fromUser($this->user);
-    $this->withHeaders(['Authorization' => "Bearer $token"]);
+    $this->api('carrier');
     $this->url = 'api/v1/carrier';
     $this->seed();
 });

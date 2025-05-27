@@ -60,9 +60,10 @@ return Application::configure(basePath: dirname(__DIR__))
                         code: $e->getStatusCode()
                     ),
 
-                    $e instanceof Throwable => Error(msg: 'Error: '.$e->getMessage()),
+                    $e instanceof \Exception => Error(msg: 'Exception : '.$e->getMessage()),
+                    $e instanceof \Throwable => Error(msg: 'Error : '.$e->getMessage()),
 
-                    default => Error(msg: 'Error: '.$e->getMessage())
+                    default => Error(msg: 'Something bad happend'),
                 };
             }
         });

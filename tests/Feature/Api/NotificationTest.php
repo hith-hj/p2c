@@ -7,10 +7,7 @@ use App\Models\V1\User;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
-    $this->user = User::factory()->create(['role' => 'carrier']);
-    $this->user->badge->update(['is_valid' => 1]);
-    $token = JWTAuth::fromUser($this->user);
-    $this->withHeaders(['Authorization' => "Bearer $token"]);
+    $this->api('carrier');
     $this->url = 'api/v1/notification';
     $this->seed();
 });
@@ -45,26 +42,33 @@ describe('notification controller test', function () {
 
     it('marks a notification as viewed successfully', function () {
         $notification = Notification::factory()->create(['status' => 0]);
-        $res = $this->postJson("$this->url/viewed", ['notification_id' => $notification->id]);
+        $res = $this->postJson("$this->url/view", ['notifications' => [$notification->id]]);
         expect($res->status())->toBe(200);
         expect($notification->refresh()->status)->toBe(1);
     });
 
-    it('fails to mark a non-existing notification as viewed', function () {
-        $res = $this->postJson("$this->url/viewed", ['notification_id' => 67876]);
+    it('fails to mark a invalid notification as viewed', function () {
+        $res = $this->postJson("$this->url/view", ['notifications' => []]);
         expect($res->status())->toBe(422);
     });
 
-    it('updates multiple notifications successfully', function () {
-        $notifications = Notification::factory()->count(3)->create(['status' => 0]);
-        $ids = $notifications->pluck('id')->toArray();
-        $res = $this->postJson("$this->url/multipleViewed", ['notifications' => $ids]);
-        expect($res->getStatusCode())->toBe(200);
-        expect(Notification::whereIn('id', $ids)->get()->pluck('status')->unique()->first())->toBe(1);
+    it('delete notification for user by id', function () {
+        $noti = Notification::factory()->for($this->user, 'belongTo')->create(['status' => 0]);
+        expect($this->user->notifications()->count())->toBe(1);
+        $res = $this->postJson("$this->url/delete",['notification_id'=>$noti->id]);
+        expect($res->status())->toBe(200)
+        ->and($this->user->notifications()->count())->toBe(0);
+
     });
 
-    it('handles empty notification array gracefully', function () {
-        $res = $this->postJson("$this->url/multipleViewed", ['notifications' => []]);
-        expect($res->getStatusCode())->toBe(422);
+    it('fails to delete notification by id if not belong to user', function () {
+        $noti = Notification::factory()->create(['status' => 0]);
+        $res = $this->postJson("$this->url/delete",['notification_id'=>$noti->id]);
+        expect($res->status())->toBe(403);
+    });
+
+    it('fails to delete notification with invalid id', function () {
+        $res = $this->postJson("$this->url/delete",['notifications'=>[]]);
+        expect($res->status())->toBe(422);
     });
 });

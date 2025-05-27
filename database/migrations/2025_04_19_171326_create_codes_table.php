@@ -19,6 +19,7 @@ return new class() extends Migration
             $table->string('belongTo_type');
             $table->string('type');
             $table->string('code');
+            $table->timestamp('expire_at')->nullable();
             $table->timestamps();
         });
     }

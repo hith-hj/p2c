@@ -180,8 +180,9 @@ Route::group(
     function (): void {
         Route::get('all', 'all');
         Route::get('find', 'find');
-        Route::post('viewed', 'viewed');
-        Route::post('multipleViewed', 'multipleViewed');
+        Route::post('view', 'view');
+        Route::post('delete', 'delete');
+        Route::get('clear', 'clear');
     }
 );
 

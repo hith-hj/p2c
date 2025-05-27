@@ -26,6 +26,11 @@ class Producer extends Model
         return $this->user->firebase_token;
     }
 
+    public function validate(bool $state): bool
+    {
+        return $this->update(['is_valid' => $state]);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

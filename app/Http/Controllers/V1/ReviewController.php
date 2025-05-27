@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\ReviewResource;
 use App\Http\Services\ReviewServices;
 use App\Http\Validators\ReviewValidators;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,8 @@ class ReviewController extends Controller
 
     public function all(): JsonResponse
     {
-        return Success(payload: ['reviews' => $this->review->all(Auth::user()->badge)]);
+        $reviews = $this->review->all(Auth::user()->badge);
+        return Success(payload: ['reviews' => ReviewResource::collection($reviews)]);
     }
 
     public function create(Request $request)
@@ -26,6 +28,9 @@ class ReviewController extends Controller
 
         $review = $this->review->create(Auth::user()->badge, $validator->safe()->all());
 
-        return Success(msg: 'review created', payload: ['review' => $review]);
+        return Success(
+            msg: 'review created',
+            payload: ['review' => ReviewResource::make($review)]
+        );
     }
 }

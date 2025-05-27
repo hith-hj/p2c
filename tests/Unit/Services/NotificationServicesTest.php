@@ -29,25 +29,6 @@ describe('Notification Service', function () {
         ]);
     });
 
-    it('can find a notification', function () {
-        $notification = Notification::factory()->create();
-
-        expect($this->services->find($notification->id))->toBeInstanceOf(Notification::class);
-    });
-
-    it('can mark a notification as viewed', function () {
-        $notification = Notification::factory()->create(['status' => 0]);
-        expect($this->services->viewed($notification->id))->toBeTrue();
-        expect($notification->refresh()->status)->toBe(1);
-    });
-
-    it('can mark multiple notifications as viewed', function () {
-        $notifications = Notification::factory()->count(3)->create(['status' => 0]);
-        $ids = $notifications->pluck('id')->toArray();
-        expect($this->services->multipleViewed($ids))->toBeNumeric();
-        expect(Notification::whereIn('id', $ids)->get()->pluck('status')->unique()->first())->toBe(1);
-    });
-
     it('fails to retrive Notifications with invalid badeg', function () {
         $this->services->all((object) []);
     })->throws(Exception::class);
@@ -56,25 +37,47 @@ describe('Notification Service', function () {
         $this->services->all($this->user);
     })->throws(NotFoundHttpException::class);
 
+    it('can find a notification by id', function () {
+        $notification = Notification::factory()->create();
+
+        expect($this->services->find($notification->id))->toBeInstanceOf(Notification::class);
+    });
+
+    it('can mark a notifications as viewed', function () {
+        $notification = Notification::factory()->create(['status' => 0]);
+        expect($this->services->view([$notification->id]))->toBeNumeric();
+        expect($notification->refresh()->status)->toBe(1);
+    });
+
+    it('fails to mark a notifications as viewed with empty array', function () {
+        expect(fn() => $this->services->view([]))->toThrow(Exception::class);
+    });
+
     it('throws an exception when finding a non-existing notification', function () {
-        expect(fn () => $this->services->find(99999))->toThrow(NotFoundHttpException::class);
+        expect(fn() => $this->services->find(99999))->toThrow(NotFoundHttpException::class);
     });
 
-    it('returns false when trying to mark a non-existing notification as viewed', function () {
-        expect(fn () => $this->services->viewed(99999))->toThrow(NotFoundHttpException::class);
+    it('can delete a notifications', function () {
+        $notification = Notification::factory()->create(['status' => 0]);
+        expect($this->services->delete($notification))->toBeTrue();
+        expect($notification->fresh())->toBeNull();
     });
 
-    it('handles empty array input for multipleViewed', function () {
-        expect(fn () => $this->services->multipleViewed([]))->toThrow(Exception::class);
+    it('fails to delete a notifications with invalid args', function () {
+        expect(fn() => $this->services->delete([]))->toThrow(TypeError::class);
     });
 
-    it('handles mixed valid and invalid IDs for multipleViewed', function () {
-        $notifications = Notification::factory()->count(2)->create(['status' => 0]);
-        $validIds = $notifications->pluck('id')->toArray();
-        $invalidIds = [99999, 88888];
-        $mixedIds = array_merge($validIds, $invalidIds);
+    it('clear notification for user', function () {
+        Notification::factory(5)->for($this->user, 'belongTo')->create(['status' => 0]);
+        expect($this->user->notifications()->count())->toBe(5);
+        expect($this->services->clear($this->user))->toBeTrue()
+            ->and($this->user->notifications()->count())->toBe(0);
+    });
 
-        expect($this->services->multipleViewed($mixedIds))->toBeNumeric();
-        expect(Notification::whereIn('id', $validIds)->get()->pluck('status')->unique()->first())->toBe(1);
+    it('clear notification for user a badge', function () {
+        Notification::factory(5)->for($this->user->badge, 'belongTo')->create(['status' => 0]);
+        expect($this->user->badge->notifications()->count())->toBe(5);
+        expect($this->services->clear($this->user->badge))->toBeTrue()
+            ->and($this->user->badge->notifications()->count())->toBe(0);
     });
 });

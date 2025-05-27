@@ -16,6 +16,11 @@ class Review extends Model
 
     public function belongTo(): MorphTo
     {
-        return $this->morphTo(__FUNCTION__, 'belongTo_id', 'belongTo_type');
+        return $this->morphTo(__FUNCTION__, 'belongTo_type', 'belongTo_id');
+    }
+
+    public function reviewer()
+    {
+        return $this->morphTo(__FUNCTION__, 'reviewer_type', 'reviewer_id');
     }
 }

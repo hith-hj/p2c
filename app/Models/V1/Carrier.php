@@ -29,6 +29,11 @@ class Carrier extends Model
         return $this->user->firebase_token;
     }
 
+    public function validate(bool $state): bool
+    {
+        return $this->update(['is_valid' => $state]);
+    }
+
     public function transportation(): BelongsTo
     {
         return $this->belongsTo(Transportation::class);
@@ -53,10 +58,5 @@ class Carrier extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
-    }
-
-    public function validate(bool $state): bool
-    {
-        return $this->update(['is_valid' => $state]);
     }
 }

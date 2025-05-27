@@ -11,41 +11,34 @@ class LocationServices
 {
     use ExceptionHandler;
 
-    /**
-     * create location for the given object.
-     * $belongTo is locatable object.
-     *
-     * $data have item which is
-     * an array containing long and lat cords
-     **/
-    public function create(object $belongTo, array $data): Location
+    public function create(object $locatable, array $data): Location
     {
-        $this->Truthy(empty($data), 'data is required');
-        $this->Truthy(! method_exists($belongTo, 'location'), 'missing location method');
+        $this->Required( $data, 'data');
+        $this->Truthy(! method_exists($locatable, 'location'), 'missing location method');
         $data = $this->checkAndCastData($data, [
             'cords' => 'array',
             'cords.long' => 'float',
             'cords.lat' => 'float',
         ]);
 
-        return $belongTo->location()->create([
+        return $locatable->location()->create([
             'long' => round($data['cords']['long'], 8),
             'lat' => round($data['cords']['lat'], 8),
         ]);
     }
 
-    public function edit(object $belongTo, array $data): bool|Location
+    public function edit(object $locatable, array $data): bool|Location
     {
-        $this->Truthy(empty($data), 'data required');
-        $this->Truthy(! method_exists($belongTo, 'location'), 'missing location method');
-        if ($belongTo->location()->exists()) {
-            return $this->update($belongTo, $data);
+        $this->Required( $data, 'data');
+        $this->Truthy(! method_exists($locatable, 'location'), 'missing location method');
+        if ($locatable->location()->exists()) {
+            return $this->update($locatable, $data);
         }
 
-        return $this->create($belongTo, $data);
+        return $this->create($locatable, $data);
     }
 
-    public function update(object $belongTo, array $data): bool
+    public function update(object $locatable, array $data): bool
     {
         $data = $this->checkAndCastData($data, [
             'cords' => 'array',
@@ -53,7 +46,7 @@ class LocationServices
             'cords.lat' => 'float',
         ]);
 
-        return $belongTo->location->update([
+        return $locatable->location->update([
             'long' => round($data['cords']['long'], 8),
             'lat' => round($data['cords']['lat'], 8),
         ]);

@@ -33,31 +33,25 @@ class NotificationServices
         return $noti;
     }
 
-    public function viewed(int $id): bool
+    public function view(array $ids): bool|int
     {
-        $this->Required($id, 'Id');
+        $this->Required($ids, 'Id');
 
-        return $this->find($id)->update(['status' => 1]);
+        return Notification::whereIn('id', $ids)->update(['status' => 1]);;
     }
 
-    public function multipleViewed(array $ids): bool|int
+    public function delete(Notification $notification): bool|int
     {
-        $this->Required($ids, 'Ids');
+        $this->NotFound($notification, 'notification');
 
-        return Notification::whereIn('id', $ids)->update(['status' => 1]);
-    }
-
-    public function delete(int $id):bool
-    {
-        $notification = Notification::find($id);
-        $this->NotFound($notification,'notification');
         return $notification->delete();
     }
 
-    public function multipleDelete(array $ids)
-    {
-        foreach($ids as $id){
-            return $this->delete($id);
+    public function clear(object $object){
+        if(method_exists($object,'notifications')){
+            $object->notifications()->delete();
         }
+
+        return true;
     }
 }
