@@ -18,8 +18,8 @@ class LocationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'long' => $this->long,
-            'lat' => $this->lat,
+            'long' => (float) $this->long,
+            'lat' => (float) $this->lat,
             'created_at' => $this->created_at,
         ];
     }

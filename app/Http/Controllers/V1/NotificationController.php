@@ -49,4 +49,20 @@ class NotificationController extends Controller
 
         return Success();
     }
+
+    public function delete(Request $request)
+    {
+        $validator = NotificationValidators::delete($request->all());
+
+        $this->noti->delete($validator->safe()->integer('notification_id'));
+        return Success(msg:'Notification deleted');
+    }
+
+    public function multipleDelete(Request $request)
+    {
+        $validator = NotificationValidators::multibleDelete($request->all());
+
+        $this->noti->multipleDelete($validator->safe()->array('notifications'));
+        return Success(msg:'Notifications deleted');
+    }
 }

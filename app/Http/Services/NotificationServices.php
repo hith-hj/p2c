@@ -46,4 +46,18 @@ class NotificationServices
 
         return Notification::whereIn('id', $ids)->update(['status' => 1]);
     }
+
+    public function delete(int $id):bool
+    {
+        $notification = Notification::find($id);
+        $this->NotFound($notification,'notification');
+        return $notification->delete();
+    }
+
+    public function multipleDelete(array $ids)
+    {
+        foreach($ids as $id){
+            return $this->delete($id);
+        }
+    }
 }
