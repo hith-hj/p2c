@@ -20,9 +20,9 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'producer' => $this->producer?->only(['id','brand']),
-            'carrier' => $this->carrier?->only(['id','first_name']),
-            'transportation' => $this->transportation?->only(['id','name']),
+            'producer' => $this->producer?->only(['id', 'brand']),
+            'carrier' => $this->carrier?->only(['id', 'first_name']),
+            'transportation' => $this->transportation?->only(['id', 'name']),
             'customer' => $this->customer?->only(['id', 'name', 'phone']),
             'branch' => $this->branch?->only(['id', 'name']),
             'src_long' => (float) $this->src_long,

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use App\Enums\FeeTypes;
 use App\Models\V1\Fee;
-use App\Models\V1\User;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
     $this->api('carrier');

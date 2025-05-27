@@ -50,11 +50,11 @@ describe('Notification Service', function () {
     });
 
     it('fails to mark a notifications as viewed with empty array', function () {
-        expect(fn() => $this->services->view([]))->toThrow(Exception::class);
+        expect(fn () => $this->services->view([]))->toThrow(Exception::class);
     });
 
     it('throws an exception when finding a non-existing notification', function () {
-        expect(fn() => $this->services->find(99999))->toThrow(NotFoundHttpException::class);
+        expect(fn () => $this->services->find(99999))->toThrow(NotFoundHttpException::class);
     });
 
     it('can delete a notifications', function () {
@@ -64,7 +64,7 @@ describe('Notification Service', function () {
     });
 
     it('fails to delete a notifications with invalid args', function () {
-        expect(fn() => $this->services->delete([]))->toThrow(TypeError::class);
+        expect(fn () => $this->services->delete([]))->toThrow(TypeError::class);
     });
 
     it('clear notification for user', function () {

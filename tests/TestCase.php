@@ -12,17 +12,19 @@ abstract class TestCase extends BaseTestCase
 {
     public $user = null;
 
-    public function api($as){
-        if($this->user === null || $this->user->role !== $as){
+    public function api($as)
+    {
+        if ($this->user === null || $this->user->role !== $as) {
             $this->user($as);
         }
         $token = JWTAuth::fromUser($this->user);
         $this->withHeaders(['Authorization' => "Bearer $token"]);
+
         return $this;
     }
 
-    private function user($type){
+    private function user($type)
+    {
         return $this->user = User::factory()->create(['role' => $type]);
     }
-
 }

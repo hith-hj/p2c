@@ -19,6 +19,7 @@ class ReviewController extends Controller
     public function all(): JsonResponse
     {
         $reviews = $this->review->all(Auth::user()->badge);
+
         return Success(payload: ['reviews' => ReviewResource::collection($reviews)]);
     }
 

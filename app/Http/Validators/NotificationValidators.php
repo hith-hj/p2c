@@ -28,5 +28,4 @@ class NotificationValidators
             'notification_id' => ['required', 'numeric', 'exists:notifications,id'],
         ]);
     }
-
 }

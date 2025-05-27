@@ -107,6 +107,7 @@ class User extends Authenticatable implements JWTSubject
         $this->update([
             'verified_at' => now(),
         ]);
+
         return $this;
     }
 }

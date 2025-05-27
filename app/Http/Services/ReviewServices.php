@@ -33,7 +33,7 @@ class ReviewServices
         ]);
 
         $model = $this->getPreparedModel($data);
-        $this->Truthy($model::class === $reviewer::class,'You cant review this');
+        $this->Truthy($model::class === $reviewer::class, 'You cant review this');
 
         $query = Review::where([
             ['belongTo_id', $model->id],
@@ -56,8 +56,8 @@ class ReviewServices
     {
         $id = $data['belongTo_id'];
         $class = $data['belongTo_type'];
-        if(!str_contains($class,'App\\Models\\V1')){
-            $class = "App\\Models\\V1\\".ucfirst($class);
+        if (! str_contains($class, 'App\\Models\\V1')) {
+            $class = 'App\\Models\\V1\\'.ucfirst($class);
         }
         $this->Truthy(! class_exists($class), 'invalid class type');
         $model = $class::find($id);

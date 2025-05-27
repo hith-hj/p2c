@@ -13,7 +13,7 @@ class LocationServices
 
     public function create(object $locatable, array $data): Location
     {
-        $this->Required( $data, 'data');
+        $this->Required($data, 'data');
         $this->Truthy(! method_exists($locatable, 'location'), 'missing location method');
         $data = $this->checkAndCastData($data, [
             'cords' => 'array',
@@ -29,7 +29,7 @@ class LocationServices
 
     public function edit(object $locatable, array $data): bool|Location
     {
-        $this->Required( $data, 'data');
+        $this->Required($data, 'data');
         $this->Truthy(! method_exists($locatable, 'location'), 'missing location method');
         if ($locatable->location()->exists()) {
             return $this->update($locatable, $data);

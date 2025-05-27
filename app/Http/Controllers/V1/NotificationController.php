@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\NotificationResource;
 use App\Http\Services\NotificationServices;
 use App\Http\Validators\NotificationValidators;
-use Error;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,18 +51,20 @@ class NotificationController extends Controller
             $notification->belongTo_type === Auth::user()::class
         ) {
             $this->noti->delete($notification);
+
             return Success();
         }
+
         return Error(msg: __('main.un authorized'), code: 403);
     }
 
     public function clear()
     {
         $this->noti->clear(Auth::user());
-        if(Auth::user()->badge !== null){
+        if (Auth::user()->badge !== null) {
             $this->noti->clear(Auth::user()->badge);
         }
+
         return Success();
     }
-
 }

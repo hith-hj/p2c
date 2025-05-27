@@ -24,28 +24,28 @@ describe('Review Services Class', function () {
     });
 
     it('fail to get all reviews for user when not found', function () {
-        expect(fn() => $this->services->all($this->user->badge))->toThrow(NotFoundHttpException::class);
+        expect(fn () => $this->services->all($this->user->badge))->toThrow(NotFoundHttpException::class);
     });
 
     it('fails to retive reviews with invalid object', function () {
-        expect(fn() => $this->services->all((object)[]))->toThrow(\Exception::class);
+        expect(fn () => $this->services->all((object) []))->toThrow(\Exception::class);
     });
 
     it('can create review for user', function () {
         $carrier = User::factory()->create(['role' => 'carrier']);
-        $data = Review::factory()->for($carrier->badge,'belongTo')->make()->toArray();
-        $res = $this->services->create($this->user->badge,$data);
+        $data = Review::factory()->for($carrier->badge, 'belongTo')->make()->toArray();
+        $res = $this->services->create($this->user->badge, $data);
         expect($res)->toBeInstanceOf(Review::class)
             ->and($res->rate)->toBe($data['rate'])
             ->and($res->content)->toBe($data['content']);
     });
 
     it('fails to create review for with invalid data', function () {
-        $this->services->create($this->user->badge,[]);
+        $this->services->create($this->user->badge, []);
     })->throws(\Exception::class);
 
     it('fails to create review for with invalid reviewed object', function () {
         $data = Review::factory()->make()->toArray();
-        $this->services->create($this->user->badge,$data);
+        $this->services->create($this->user->badge, $data);
     })->throws(\Exception::class);
 });

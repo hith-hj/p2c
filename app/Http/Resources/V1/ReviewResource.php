@@ -18,9 +18,9 @@ class ReviewResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'reviewer' => ['type'=>$this->reviewer::class,'id'=>$this->reviewer->id],
+            'reviewer' => ['type' => $this->reviewer::class, 'id' => $this->reviewer->id],
             'rate' => (float) $this->rate,
-            'content' =>  $this->content,
+            'content' => $this->content,
         ];
     }
 }

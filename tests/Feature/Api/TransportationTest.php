@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use App\Models\V1\Transportation;
-use App\Models\V1\User;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
     $this->api('carrier');

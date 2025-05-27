@@ -20,10 +20,10 @@ class ReviewFactory extends Factory
     {
         return [
             'belongTo_id' => 1,
-            'belongTo_type' => 'carrier',
+            'belongTo_type' => 'App\Models\V1\Parrier',
             'reviewer_id' => 1,
-            'reviewer_type' => 'producer',
-            'content' => fake()->words(4),
+            'reviewer_type' => 'App\Models\V1\Carrier',
+            'content' => fake()->paragraph(4),
             'rate' => fake()->numberBetween(1, 10),
         ];
     }

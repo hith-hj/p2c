@@ -37,7 +37,7 @@ class NotificationServices
     {
         $this->Required($ids, 'Id');
 
-        return Notification::whereIn('id', $ids)->update(['status' => 1]);;
+        return Notification::whereIn('id', $ids)->update(['status' => 1]);
     }
 
     public function delete(Notification $notification): bool|int
@@ -47,8 +47,9 @@ class NotificationServices
         return $notification->delete();
     }
 
-    public function clear(object $object){
-        if(method_exists($object,'notifications')){
+    public function clear(object $object)
+    {
+        if (method_exists($object, 'notifications')) {
             $object->notifications()->delete();
         }
 

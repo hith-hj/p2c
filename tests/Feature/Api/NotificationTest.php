@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use App\Models\V1\Notification;
-use App\Models\V1\User;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 beforeEach(function () {
     $this->api('carrier');
@@ -55,20 +53,20 @@ describe('notification controller test', function () {
     it('delete notification for user by id', function () {
         $noti = Notification::factory()->for($this->user, 'belongTo')->create(['status' => 0]);
         expect($this->user->notifications()->count())->toBe(1);
-        $res = $this->postJson("$this->url/delete",['notification_id'=>$noti->id]);
+        $res = $this->postJson("$this->url/delete", ['notification_id' => $noti->id]);
         expect($res->status())->toBe(200)
-        ->and($this->user->notifications()->count())->toBe(0);
+            ->and($this->user->notifications()->count())->toBe(0);
 
     });
 
     it('fails to delete notification by id if not belong to user', function () {
         $noti = Notification::factory()->create(['status' => 0]);
-        $res = $this->postJson("$this->url/delete",['notification_id'=>$noti->id]);
+        $res = $this->postJson("$this->url/delete", ['notification_id' => $noti->id]);
         expect($res->status())->toBe(403);
     });
 
     it('fails to delete notification with invalid id', function () {
-        $res = $this->postJson("$this->url/delete",['notifications'=>[]]);
+        $res = $this->postJson("$this->url/delete", ['notifications' => []]);
         expect($res->status())->toBe(422);
     });
 });

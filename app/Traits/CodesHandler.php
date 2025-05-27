@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use App\Models\V1\Code;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 trait CodesHandler
 {
@@ -23,12 +24,13 @@ trait CodesHandler
         return $code;
     }
 
-    public function createCode(string $type, int $length = 5): static
+    public function createCode(string $type, int $length = 5, string $timeToExpire = '1 d'): static
     {
         $code = $this->generate($type, $length);
         $this->codes()->create([
             'type' => $type,
             'code' => $code,
+            'expire_at' => $this->expireAt($timeToExpire),
         ]);
 
         return $this;
@@ -67,5 +69,16 @@ trait CodesHandler
         }
 
         return (int) $number;
+    }
+
+    private function expireAt(string $timeToExpire = '60 h'): Carbon
+    {
+        [$unit, $value] = explode(' ', $timeToExpire);
+        $adds = ['d' => 'addDays', 'm' => 'addMonths', 'y' => 'addYears', 'w' => 'addWeeks', 'h' => 'addMinutes'];
+        if (! isset($adds[$unit])) {
+            return now();
+        }
+
+        return now()->$adds[$unit]($value);
     }
 }
