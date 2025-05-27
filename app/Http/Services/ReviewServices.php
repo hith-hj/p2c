@@ -26,8 +26,8 @@ class ReviewServices
         $this->Required($reviewer, 'reviewer');
         $this->Required($data, 'data');
         $this->checkAndCastData($data, [
-            'reviewer_id' => 'int',
-            'reviewer_type' => 'string',
+            'reviewed_id' => 'int',
+            'reviewed_type' => 'string',
             'rate' => 'int',
             'content' => 'string',
         ]);
@@ -71,8 +71,8 @@ class ReviewServices
 
     private function getPreparedModel(array $data)
     {
-        $id = $data['reviewer_id'];
-        $type = ucfirst($data['reviewer_type']);
+        $id = $data['reviewed_id'];
+        $type = ucfirst($data['reviewed_type']);
         $class = "App\\Models\\V1\\$type";
         $this->Truthy(! class_exists($class), 'invalid class type');
         $model = $class::find($id);
