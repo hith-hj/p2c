@@ -27,23 +27,23 @@ class TransportationResource extends Resource
                     ->maxLength(50),
                 Forms\Components\TextInput::make('capacity')
                     ->numeric()
-                    ->min(0)
+                    ->minValue(0)
                     ->required(),
                 Forms\Components\TextInput::make('initial_cost')
                     ->numeric()
-                    ->min(0)
+                    ->minValue(0)
                     ->required(),
                 Forms\Components\TextInput::make('cancel_cost')
                     ->numeric()
-                    ->min(0)
+                    ->minValue(0)
                     ->required(),
                 Forms\Components\TextInput::make('cost_per_km')
                     ->numeric()
-                    ->min(0)
+                    ->minValue(0)
                     ->required(),
                 Forms\Components\TextInput::make('cost_per_kg')
                     ->numeric()
-                    ->min(0)
+                    ->minValue(0)
                     ->required(),
                 Forms\Components\Select::make('category')
                     ->options(['car', 'bicycle', 'motorcycle', 'pickup', 'truck'])
