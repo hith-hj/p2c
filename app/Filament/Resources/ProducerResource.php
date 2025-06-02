@@ -6,12 +6,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProducerResource\Pages;
 use App\Filament\Resources\ProducerResource\RelationManagers;
-use App\Models\V1\Branch;
 use App\Models\V1\Producer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -21,7 +19,14 @@ class ProducerResource extends Resource
 {
     protected static ?string $model = Producer::class;
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -30,8 +35,10 @@ class ProducerResource extends Resource
                 Forms\Components\TextInput::make('brand')
                     ->required()
                     ->unique('producers', 'brand')
-                    ->maxLength(50),
-                Forms\Components\Checkbox::make('is_valid'),
+                    ->maxLength(50)
+                    ->readOnly(),
+                Forms\Components\Checkbox::make('is_valid')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -52,7 +59,7 @@ class ProducerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label(''),
-                Tables\Actions\EditAction::make()->label(''),
+                // Tables\Actions\EditAction::make()->label(''),
                 Tables\Actions\DeleteAction::make()->label(''),
             ])
             ->bulkActions([

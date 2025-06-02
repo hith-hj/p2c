@@ -20,7 +20,7 @@ class ReviewFactory extends Factory
     {
         return [
             'belongTo_id' => 1,
-            'belongTo_type' => 'App\Models\V1\Parrier',
+            'belongTo_type' => 'App\Models\V1\Producer',
             'reviewer_id' => 1,
             'reviewer_type' => 'App\Models\V1\Carrier',
             'content' => fake()->paragraph(4),

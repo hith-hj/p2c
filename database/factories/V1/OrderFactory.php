@@ -23,8 +23,8 @@ class OrderFactory extends Factory
         return [
             'producer_id' => fake()->randomElement([1, 2, 3, 4]),
             'carrier_id' => fake()->randomElement([1, 2, 3, 4]),
-            'branch_id' => fake()->uuid(),
-            'transportation_id' => fake()->uuid(),
+            'branch_id' => fake()->randomElement([1, 2, 3, 4]),
+            'transportation_id' => fake()->randomElement([1, 2, 3, 4]),
             'delivery_type' => fake()->randomElement(OrderDeliveryTypes::values()),
             'goods_price' => fake()->numberBetween(100, 500),
             'src_long' => fake()->longitude(),

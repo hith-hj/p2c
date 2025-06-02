@@ -18,6 +18,8 @@ class CarrierResource extends Resource
 {
     protected static ?string $model = Carrier::class;
 
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
     public static function form(Form $form): Form

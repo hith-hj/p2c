@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ProducerResource\RelationManagers;
 
 use App\Models\V1\Branch;
@@ -8,8 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BranchesRelationManager extends RelationManager
 {
@@ -33,7 +33,7 @@ class BranchesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('orders')
-                        ->state(fn (Branch $branch): int => $branch->orders()->count()),
+                    ->state(fn (Branch $branch): int => $branch->orders()->count()),
                 Tables\Columns\TextColumn::make('is_default'),
                 Tables\Columns\TextColumn::make('phone'),
                 Tables\Columns\TextColumn::make('location.lat')->label('latitude'),
