@@ -7,6 +7,7 @@ namespace Database\Factories\V1;
 use App\Enums\OrderDeliveryTypes;
 use App\Models\V1\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\V1\Order>
@@ -21,6 +22,7 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
+            'serial' => Str::random(16),
             'producer_id' => fake()->randomElement([1, 2, 3, 4]),
             'carrier_id' => fake()->randomElement([1, 2, 3, 4]),
             'branch_id' => fake()->randomElement([1, 2, 3, 4]),

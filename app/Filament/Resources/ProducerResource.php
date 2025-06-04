@@ -14,6 +14,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ProducerResource extends Resource
 {
@@ -24,6 +25,16 @@ class ProducerResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -60,7 +71,7 @@ class ProducerResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->label(''),
                 // Tables\Actions\EditAction::make()->label(''),
-                Tables\Actions\DeleteAction::make()->label(''),
+                // Tables\Actions\DeleteAction::make()->label(''),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

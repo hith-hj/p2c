@@ -18,7 +18,7 @@ class ReviewServices
         $reviews = $object->reviews;
         $this->NotFound($reviews, 'reviews');
 
-        return $reviews->sortByDesc('created_at');
+        return $reviews->load(['reviewer'])->sortByDesc('created_at');
     }
 
     public function create(object $reviewer, array $data): Review

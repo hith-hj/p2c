@@ -6,9 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\V1\Order;
 use Filament\Infolists;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,7 +23,22 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return true;
+    }
+
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -43,8 +58,8 @@ class OrderResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->label(''),
+                // Tables\Actions\EditAction::make()->label(''),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -58,6 +73,7 @@ class OrderResource extends Resource
         return $infolist
             ->schema([
                 Infolists\Components\TextEntry::make('id'),
+                Infolists\Components\TextEntry::make('serial'),
                 Infolists\Components\TextEntry::make('producer.brand'),
                 Infolists\Components\TextEntry::make('branch.name'),
                 Infolists\Components\TextEntry::make('carrier.first_name'),
@@ -65,23 +81,23 @@ class OrderResource extends Resource
                 Infolists\Components\TextEntry::make('weight'),
                 Infolists\Components\TextEntry::make('distance'),
                 Infolists\Components\TextEntry::make('cost'),
+                InfoLists\Components\TextEntry::make('delivery_type'),
+                InfoLists\Components\TextEntry::make('goods_price'),
+                InfoLists\Components\TextEntry::make('customer.name'),
+                InfoLists\Components\TextEntry::make('customer.phone'),
                 InfoLists\Components\TextEntry::make('status')
                     ->formatStateUsing(fn ($state) => OrderStatus::from($state)->name),
                 InfoLists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
 
-                RepeatableEntry::make('codes')->schema([
-                    InfoLists\Components\TextEntry::make('code'),
-                    InfoLists\Components\TextEntry::make('type'),
-                    InfoLists\Components\TextEntry::make('created_at'),
-                    InfoLists\Components\TextEntry::make('expire_at'),
-                ])->grid()->columnSpanFull()->columns(2),
             ])->columns(5);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CodesRelationManager::class,
+            RelationManagers\AttrsRelationManager::class,
+            RelationManagers\ItemsRelationManager::class,
         ];
     }
 
@@ -91,6 +107,7 @@ class OrderResource extends Resource
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view' => Pages\ViewOrder::route('/{record}'),
         ];
     }
 }

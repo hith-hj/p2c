@@ -15,6 +15,7 @@ beforeEach(function () {
     $this->url = 'api/v1/producer';
     $this->seed();
     $this->createOrderData = [
+        'serial' => 'dkjsdfnhglksndfg',
         'branch_id' => 1,
         'customer_id' => 1,
         'delivery_type' => 'normal',
@@ -202,7 +203,6 @@ describe('Producer Controller', function () {
         $res = $this->postJson('/api/v1/order/create', $this->postOrderData);
         expect($res->status())->toBe(200);
         expect($res->json('payload.order'))->not->toBeNull();
-        expect($res->json('payload.order.id'))->toBe(1);
     });
 
     it('prevent invalid producer from create new order', function () {

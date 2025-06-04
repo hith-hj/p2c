@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CarrierResource\Pages;
+use App\Filament\Resources\CarrierResource\RelationManagers;
 use App\Models\V1\Carrier;
 use Filament\Forms\Form;
 use Filament\Infolists;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class CarrierResource extends Resource
 {
@@ -21,6 +22,21 @@ class CarrierResource extends Resource
     protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -47,8 +63,8 @@ class CarrierResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label(''),
-                Tables\Actions\EditAction::make()->label(''),
-                Tables\Actions\DeleteAction::make()->label(''),
+                // Tables\Actions\EditAction::make()->label(''),
+                // Tables\Actions\DeleteAction::make()->label(''),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -66,21 +82,24 @@ class CarrierResource extends Resource
                 Infolists\Components\TextEntry::make('rate'),
                 InfoLists\Components\TextEntry::make('is_valid'),
                 InfoLists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
-
-                RepeatableEntry::make('orders')->schema([
-                    InfoLists\Components\TextEntry::make('cost'),
-                    InfoLists\Components\TextEntry::make('weight'),
-                    InfoLists\Components\TextEntry::make('producer.name'),
-                    InfoLists\Components\TextEntry::make('branch.name'),
-                    InfoLists\Components\TextEntry::make('customer_name'),
-                ])->grid()->columnSpanFull()->columns(2),
-            ])->columns(4);
+                InfoLists\Components\Section::make('Details')
+                    ->description('this is carrier details')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('details.plate_number')->label(__('plate_number')),
+                        Infolists\Components\TextEntry::make('details.brand')->label(__('brand')),
+                        Infolists\Components\TextEntry::make('details.model')->label(__('model')),
+                        Infolists\Components\TextEntry::make('details.color')->label(__('color')),
+                        Infolists\Components\TextEntry::make('details.year')->label(__('year')),
+                    ])
+                    ->collapsible()->columns(5),
+            ])->columns(5);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\ImagesRelationManager::class,
         ];
     }
 

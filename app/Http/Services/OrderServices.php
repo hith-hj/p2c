@@ -15,6 +15,7 @@ use App\Traits\OrderCostCalculator;
 use App\Traits\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class OrderServices
 {
@@ -114,6 +115,7 @@ class OrderServices
         $this->chackIfValidBranchWithLocation($branch, $producer);
         $transportation = $this->getTransportation($data['weight']);
         $order = $producer->orders()->create([
+            'serial' => $this->getSerial(),
             'branch_id' => $branch->id,
             'src_long' => $branch->location->long,
             'src_lat' => $branch->location->lat,
@@ -302,5 +304,18 @@ class OrderServices
         $this->Required($producer, 'producer');
         $this->Truthy($branch->producer_id !== $producer->id, 'invalid operation');
         $this->Truthy($branch->location === null, 'branch location is required');
+    }
+
+    private function getSerial(int $length = 16): string
+    {
+        $serial = 'XXXXXXXX';
+        for ($i = 0; $i < 10; $i++) {
+            $serial = Str::random($length);
+            if (! Order::where('serial', $serial)->exists()) {
+                break;
+            }
+        }
+
+        return $serial;
     }
 }

@@ -20,6 +20,7 @@ return new class() extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('serial');
             $table->foreignIdFor(Customer::class)->nullable();
             $table->foreignIdFor(Producer::class)->nullable();
             $table->foreignIdFor(Branch::class)->nullable();
