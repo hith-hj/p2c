@@ -12,7 +12,7 @@ use App\Traits\ExceptionHandler;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
 
-class CarrierServices
+final class CarrierServices
 {
     use ExceptionHandler;
 

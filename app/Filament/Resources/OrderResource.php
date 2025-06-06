@@ -15,7 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderResource extends Resource
+final class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
@@ -81,13 +81,13 @@ class OrderResource extends Resource
                 Infolists\Components\TextEntry::make('weight'),
                 Infolists\Components\TextEntry::make('distance'),
                 Infolists\Components\TextEntry::make('cost'),
-                InfoLists\Components\TextEntry::make('delivery_type'),
-                InfoLists\Components\TextEntry::make('goods_price'),
-                InfoLists\Components\TextEntry::make('customer.name'),
-                InfoLists\Components\TextEntry::make('customer.phone'),
-                InfoLists\Components\TextEntry::make('status')
+                Infolists\Components\TextEntry::make('delivery_type'),
+                Infolists\Components\TextEntry::make('goods_price'),
+                Infolists\Components\TextEntry::make('customer.name'),
+                Infolists\Components\TextEntry::make('customer.phone'),
+                Infolists\Components\TextEntry::make('status')
                     ->formatStateUsing(fn ($state) => OrderStatus::from($state)->name),
-                InfoLists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
+                Infolists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
 
             ])->columns(5);
     }

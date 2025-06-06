@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
-class OrderResource extends JsonResource
+final class OrderResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

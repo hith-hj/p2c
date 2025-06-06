@@ -8,7 +8,7 @@ use App\Filament\Resources\TransportationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewTransportation extends ViewRecord
+final class ViewTransportation extends ViewRecord
 {
     protected static string $resource = TransportationResource::class;
 

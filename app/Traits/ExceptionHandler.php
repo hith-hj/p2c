@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ExceptionHandler
@@ -18,7 +19,7 @@ trait ExceptionHandler
     private function Exists($argument, string $name = ''): void
     {
         if ($argument) {
-            throw new \Exception($name.' '.__('main.exists'), 400);
+            throw new Exception($name.' '.__('main.exists'), 400);
         }
     }
 
@@ -58,7 +59,7 @@ trait ExceptionHandler
             empty($argument) ||
             (is_countable($argument) && count($argument) === 0)
         ) {
-            throw new \Exception(sprintf('%s %s', __("main.$name"), __('main.is required')));
+            throw new Exception(sprintf('%s %s', __("main.$name"), __('main.is required')));
         }
     }
 
@@ -72,7 +73,7 @@ trait ExceptionHandler
     private function Truthy($condition, $message, ...$parameters)
     {
         if ($condition) {
-            throw new \Exception(__("main.$message"), ...$parameters);
+            throw new Exception(__("main.$message"), ...$parameters);
         }
 
         return $condition;
@@ -88,7 +89,7 @@ trait ExceptionHandler
     private function Falsy($condition, $message, ...$parameters)
     {
         if (! $condition) {
-            throw new \Exception(__("main.$message"), ...$parameters);
+            throw new Exception(__("main.$message"), ...$parameters);
         }
 
         return $condition;

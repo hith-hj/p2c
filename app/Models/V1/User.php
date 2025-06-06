@@ -8,12 +8,13 @@ use App\Enums\NotificationTypes;
 use App\Enums\UserRoles;
 use App\Traits\CodesHandler;
 use App\Traits\NotificationsHandler;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject
+final class User extends Authenticatable implements JWTSubject
 {
     use CodesHandler;
     use HasFactory;
@@ -74,7 +75,7 @@ class User extends Authenticatable implements JWTSubject
         return match ($this->role) {
             UserRoles::Producer->value => $this->hasOne(Producer::class),
             UserRoles::Carrier->value => $this->hasOne(Carrier::class),
-            default => throw new \Exception("Invalid role: $this->role ")
+            default => throw new Exception("Invalid role: $this->role ")
         };
     }
 

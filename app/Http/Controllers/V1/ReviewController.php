@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ReviewController extends Controller
+final class ReviewController extends Controller
 {
     public function __construct(public ReviewServices $review) {}
 

@@ -8,7 +8,7 @@ use App\Filament\Resources\ProducerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewProducer extends ViewRecord
+final class ViewProducer extends ViewRecord
 {
     protected static string $resource = ProducerResource::class;
 

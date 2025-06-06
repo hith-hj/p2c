@@ -7,7 +7,7 @@ namespace App\Http\Validators;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-class AuthValidators
+final class AuthValidators
 {
     public static function register(array $data)
     {

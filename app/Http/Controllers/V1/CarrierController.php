@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class CarrierController extends Controller
+final class CarrierController extends Controller
 {
     public function __construct(private readonly CarrierServices $carrier) {}
 

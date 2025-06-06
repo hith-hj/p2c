@@ -10,7 +10,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class AttrsRelationManager extends RelationManager
+final class AttrsRelationManager extends RelationManager
 {
     protected static string $relationship = 'attrs';
 

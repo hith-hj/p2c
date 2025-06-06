@@ -8,7 +8,7 @@ use App\Enums\OrderDeliveryTypes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-class OrderValidators
+final class OrderValidators
 {
     public static function find($data)
     {

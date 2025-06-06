@@ -8,7 +8,7 @@ use App\Filament\Resources\TransportationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListTransportations extends ListRecords
+final class ListTransportations extends ListRecords
 {
     protected static string $resource = TransportationResource::class;
 

@@ -9,7 +9,7 @@ use App\Enums\NotificationTypes;
 use App\Enums\OrderStatus;
 use App\Models\V1\Order;
 
-class OrderObserver
+final class OrderObserver
 {
     /**
      * Handle the Order "created" event.

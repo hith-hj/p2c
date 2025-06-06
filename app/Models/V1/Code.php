@@ -7,7 +7,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Code extends Model
+final class Code extends Model
 {
     protected $guarded = [];
 

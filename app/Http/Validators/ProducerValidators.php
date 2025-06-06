@@ -6,7 +6,7 @@ namespace App\Http\Validators;
 
 use Illuminate\Support\Facades\Validator;
 
-class ProducerValidators
+final class ProducerValidators
 {
     public static function find(array $data)
     {

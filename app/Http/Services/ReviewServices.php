@@ -8,7 +8,7 @@ use App\Models\V1\Review;
 use App\Traits\ExceptionHandler;
 use Illuminate\Support\Collection;
 
-class ReviewServices
+final class ReviewServices
 {
     use ExceptionHandler;
 

@@ -9,7 +9,7 @@ use App\Models\V1\Attr;
 use App\Models\V1\Item;
 use Illuminate\Http\JsonResponse;
 
-class LabelController extends Controller
+final class LabelController extends Controller
 {
     public function carBrands(): JsonResponse
     {

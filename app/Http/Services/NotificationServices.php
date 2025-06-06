@@ -8,7 +8,7 @@ use App\Models\V1\Notification;
 use App\Traits\ExceptionHandler;
 use Illuminate\Support\Collection;
 
-class NotificationServices
+final class NotificationServices
 {
     use ExceptionHandler;
 

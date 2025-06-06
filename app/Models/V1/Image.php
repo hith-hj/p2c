@@ -6,7 +6,7 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Image extends Model
+final class Image extends Model
 {
     protected $guarded = [];
 

@@ -7,7 +7,7 @@ namespace App\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProducerResource extends JsonResource
+final class ProducerResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

@@ -15,7 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class CarrierResource extends Resource
+final class CarrierResource extends Resource
 {
     protected static ?string $model = Carrier::class;
 
@@ -80,9 +80,9 @@ class CarrierResource extends Resource
                 Infolists\Components\TextEntry::make('first_name'),
                 Infolists\Components\TextEntry::make('last_name'),
                 Infolists\Components\TextEntry::make('rate'),
-                InfoLists\Components\TextEntry::make('is_valid'),
-                InfoLists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
-                InfoLists\Components\Section::make('Details')
+                Infolists\Components\TextEntry::make('is_valid'),
+                Infolists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
+                Infolists\Components\Section::make('Details')
                     ->description('this is carrier details')
                     ->schema([
                         Infolists\Components\TextEntry::make('details.plate_number')->label(__('plate_number')),

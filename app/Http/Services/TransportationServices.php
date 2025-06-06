@@ -8,7 +8,7 @@ use App\Models\V1\Transportation;
 use App\Traits\ExceptionHandler;
 use Illuminate\Support\Collection;
 
-class TransportationServices
+final class TransportationServices
 {
     use ExceptionHandler;
 

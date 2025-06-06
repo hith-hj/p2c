@@ -6,7 +6,7 @@ namespace App\Http\Validators;
 
 use Illuminate\Support\Facades\Validator;
 
-class BranchValidators
+final class BranchValidators
 {
     public static function find($data)
     {

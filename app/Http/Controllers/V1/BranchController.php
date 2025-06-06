@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class BranchController extends Controller
+final class BranchController extends Controller
 {
     public function __construct(public BranchServices $branch) {}
 

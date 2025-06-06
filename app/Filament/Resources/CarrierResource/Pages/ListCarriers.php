@@ -8,7 +8,7 @@ use App\Filament\Resources\CarrierResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListCarriers extends ListRecords
+final class ListCarriers extends ListRecords
 {
     protected static string $resource = CarrierResource::class;
 

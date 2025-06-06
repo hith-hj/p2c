@@ -8,7 +8,7 @@ use App\Filament\Resources\CarrierResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditCarrier extends EditRecord
+final class EditCarrier extends EditRecord
 {
     protected static string $resource = CarrierResource::class;
 

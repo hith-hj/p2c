@@ -6,7 +6,7 @@ namespace App\Http\Validators;
 
 use Illuminate\Support\Facades\Validator;
 
-class FeeValidators
+final class FeeValidators
 {
     public static function find($data)
     {

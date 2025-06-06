@@ -11,7 +11,7 @@ use App\Http\Validators\TransportationValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class TransportationController extends Controller
+final class TransportationController extends Controller
 {
     public function __construct(private readonly TransportationServices $trans) {}
 

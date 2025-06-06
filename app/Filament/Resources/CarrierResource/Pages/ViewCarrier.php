@@ -8,7 +8,7 @@ use App\Filament\Resources\CarrierResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewCarrier extends ViewRecord
+final class ViewCarrier extends ViewRecord
 {
     protected static string $resource = CarrierResource::class;
 

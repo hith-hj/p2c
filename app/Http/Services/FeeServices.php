@@ -7,7 +7,7 @@ namespace App\Http\Services;
 use App\Models\V1\Fee;
 use App\Traits\ExceptionHandler;
 
-class FeeServices
+final class FeeServices
 {
     use ExceptionHandler;
 

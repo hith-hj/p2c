@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ProducerController extends Controller
+final class ProducerController extends Controller
 {
     public function __construct(private readonly ProducerServices $producer) {}
 

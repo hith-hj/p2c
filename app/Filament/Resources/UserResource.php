@@ -15,7 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class UserResource extends Resource
+final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
@@ -107,9 +107,9 @@ class UserResource extends Resource
                 Infolists\Components\TextEntry::make('email'),
                 Infolists\Components\TextEntry::make('phone'),
                 Infolists\Components\TextEntry::make('role'),
-                InfoLists\Components\TextEntry::make('verified_at'),
-                InfoLists\Components\TextEntry::make('verified_by'),
-                InfoLists\Components\TextEntry::make('verification_code'),
+                Infolists\Components\TextEntry::make('verified_at'),
+                Infolists\Components\TextEntry::make('verified_by'),
+                Infolists\Components\TextEntry::make('verification_code'),
             ]);
     }
 

@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\V1\Order>
  */
-class OrderFactory extends Factory
+final class OrderFactory extends Factory
 {
     /**
      * Define the model's default state.

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-class OrderServices
+final class OrderServices
 {
     use ExceptionHandler;
     use OrderCostCalculator;

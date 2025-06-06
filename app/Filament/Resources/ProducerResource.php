@@ -16,7 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class ProducerResource extends Resource
+final class ProducerResource extends Resource
 {
     protected static ?string $model = Producer::class;
 
@@ -86,8 +86,8 @@ class ProducerResource extends Resource
             ->schema([
                 Infolists\Components\TextEntry::make('brand'),
                 Infolists\Components\TextEntry::make('rate'),
-                InfoLists\Components\TextEntry::make('is_valid'),
-                InfoLists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
+                Infolists\Components\TextEntry::make('is_valid'),
+                Infolists\Components\TextEntry::make('created_at')->dateTime('Y-m-d'),
             ])->columns(4);
     }
 

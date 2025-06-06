@@ -11,7 +11,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class BranchesRelationManager extends RelationManager
+final class BranchesRelationManager extends RelationManager
 {
     protected static string $relationship = 'Branches';
 

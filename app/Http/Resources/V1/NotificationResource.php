@@ -8,7 +8,7 @@ use App\Enums\NotificationTypes;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class NotificationResource extends JsonResource
+final class NotificationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

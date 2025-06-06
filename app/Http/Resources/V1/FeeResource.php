@@ -9,7 +9,7 @@ use App\Models\V1\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FeeResource extends JsonResource
+final class FeeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

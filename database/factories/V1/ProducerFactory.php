@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\V1\Producer>
  */
-class ProducerFactory extends Factory
+final class ProducerFactory extends Factory
 {
     /**
      * Define the model's default state.

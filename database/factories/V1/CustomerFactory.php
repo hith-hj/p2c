@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\V1\Customer>
  */
-class CustomerFactory extends Factory
+final class CustomerFactory extends Factory
 {
     /**
      * Define the model's default state.

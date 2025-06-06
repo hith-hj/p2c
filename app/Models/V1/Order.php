@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[ObservedBy([OrderObserver::class])]
-class Order extends Model
+final class Order extends Model
 {
     use CodesHandler;
     use HasFactory;

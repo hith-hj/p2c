@@ -9,7 +9,7 @@ use App\Models\V1\Producer;
 use App\Traits\ExceptionHandler;
 use Illuminate\Support\Collection;
 
-class BranchServices
+final class BranchServices
 {
     use ExceptionHandler;
 

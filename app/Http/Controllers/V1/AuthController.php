@@ -8,13 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\UserResource;
 use App\Http\Validators\AuthValidators;
 use App\Models\V1\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
-class AuthController extends Controller
+final class AuthController extends Controller
 {
     public function register(Request $request)
     {
@@ -35,7 +36,7 @@ class AuthController extends Controller
                 msg: __('main.registerd'),
                 code: 201
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Error(msg: $e->getMessage());
         }
     }
@@ -52,7 +53,7 @@ class AuthController extends Controller
             $user->verify();
 
             return Success(msg: __('main.verified'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Error(msg: $e->getMessage());
         }
     }
@@ -89,7 +90,7 @@ class AuthController extends Controller
     {
         try {
             return Success(payload: ['token' => Auth::refresh()]);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return Error(msg: $exception->getMessage().' , Login again');
         }
     }

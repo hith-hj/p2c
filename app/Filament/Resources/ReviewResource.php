@@ -12,7 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class ReviewResource extends Resource
+final class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
 

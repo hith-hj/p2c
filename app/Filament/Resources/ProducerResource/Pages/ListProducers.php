@@ -8,7 +8,7 @@ use App\Filament\Resources\ProducerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListProducers extends ListRecords
+final class ListProducers extends ListRecords
 {
     protected static string $resource = ProducerResource::class;
 

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\V1\Attr>
  */
-class AttrFactory extends Factory
+final class AttrFactory extends Factory
 {
     /**
      * Define the model's default state.

@@ -7,7 +7,7 @@ namespace App\Http\Services;
 use App\Models\V1\Location;
 use App\Traits\ExceptionHandler;
 
-class LocationServices
+final class LocationServices
 {
     use ExceptionHandler;
 

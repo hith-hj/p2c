@@ -9,7 +9,7 @@ use App\Models\V1\Customer;
 use App\Traits\ExceptionHandler;
 use Illuminate\Support\Facades\Hash;
 
-class CustomerServices
+final class CustomerServices
 {
     use ExceptionHandler;
 
