@@ -68,6 +68,14 @@ final class OrderServices
         return $order;
     }
 
+    public function findBy(string $column = 'id', mixed $value = '')
+    {
+        $order = Order::where($column, $value)->first();
+        $this->NotFound($order, 'order');
+
+        return $order;
+    }
+
     public function calcCost(Producer $producer, array $data = []): array
     {
         $data = $this->checkAndCastData($data, [

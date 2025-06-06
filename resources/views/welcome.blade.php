@@ -84,7 +84,7 @@
 
     <!-- Hero Section (Full-Screen with Navbar Offset) -->
     <section id="home" class="h-screen flex flex-col justify-center items-center sliderx
-        text-center text-white bg-red-500 bg-[url(imgs/sketch1.webp)] bg-auto bg-blend-overlay">
+        text-center text-white bg-red-500 bg-[url(/imgs/sketch1.webp)] bg-auto bg-blend-overlay">
         <div class="backdrop-blur-[2px] py-16 w-full h-screen">
             <h1 class="text-6xl font-semibold md:font-bold md:text-8xl my-20">Seamless Deliveries</h1>
             <p class="text-lg font-semibold md:text-xl my-20">
@@ -107,7 +107,7 @@
         </p>
         <div class="mt-3 flex justify-start flex-col md:flex-row gap-5 px-3">
             <div class="w-full md:w-1/2 text-white rounded-sm shadow-md bg-red-500
-            bg-[url(imgs/sketch3.webp)] bg-blend-darken bg-cover bg-center">
+            bg-[url(/imgs/sketch3.webp)] bg-blend-darken bg-cover bg-center">
                 <div class="p-2 backdrop-blur-[5px] w-full h-full">
                     <h3 class="text-4xl font-semibold">For Producers</h3>
                     <div class="text-start mt-2">
@@ -133,12 +133,12 @@
                         </div>
                     </div>
                     <div class="bg-red-500">
-                        <img src="imgs/sketch6.webp" class="w-fit">
+                        <img src="/imgs/sketch6.webp" class="w-fit">
                     </div>
                 </div>
             </div>
             <div class="w-full md:w-1/2 text-white rounded-sm shadow-md bg-red-500
-            bg-[url(imgs/sketch4.webp)] bg-blend-darken bg-cover bg-center">
+            bg-[url(/imgs/sketch4.webp)] bg-blend-darken bg-cover bg-center">
                 <div class="p-2 backdrop-blur-[5px] w-full h-full">
                     <h3 class="text-4xl font-semibold">For Carriers</h3>
                     <div class="text-start mt-2">
@@ -161,7 +161,7 @@
                         </div>
                     </div>
                     <div class=" bg-red-500">
-                        <img src="imgs/sketch5.webp" class="w-fit">
+                        <img src="/imgs/sketch5.webp" class="w-fit">
                     </div>
                 </div>
             </div>
@@ -268,11 +268,11 @@
         setInterval(() => {
             if (slider !== null) {
                 if (i === 0) {
-                    slider.classList.remove("bg-[url(imgs/" + images[images.length - 1] + ")]");
+                    slider.classList.remove("bg-[url(/imgs/" + images[images.length - 1] + ")]");
                 } else {
-                    slider.classList.remove("bg-[url(imgs/" + images[i - 1] + ")]");
+                    slider.classList.remove("bg-[url(/imgs/" + images[i - 1] + ")]");
                 }
-                slider.classList.add("bg-[url(imgs/" + images[i] + ")]");
+                slider.classList.add("bg-[url(/imgs/" + images[i] + ")]");
                 i = i === images.length ? 0 : (i + 1) % images.length;
             }
         }, 3000);
