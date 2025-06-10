@@ -44,9 +44,6 @@
                     <span class="text-3xl font-bold">P2C</span>
                 </div>
                 <button id="mobileMenuButton">
-                    <!-- <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg> -->
                     <i class="font-bold text-4xl">=</i>
                 </button>
             </div>
@@ -58,13 +55,8 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#how-it-works" class="block px-2 py-1 hover:underline hover:underline-offset-8">
-                            How it works
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#about" class="block px-2 py-1 hover:underline hover:underline-offset-8">
-                            about
+                        <a href="#order_details" class="block px-2 py-1 hover:underline hover:underline-offset-8">
+                            Order Details
                         </a>
                     </li>
                     <li>
@@ -81,9 +73,22 @@
         <section id="home" class="h-screen flex flex-col justify-center items-center sliderx
             text-center text-white backdrop-blur-[1px] ">
             <div class="py-16 w-full h-screen">
-                <h1 class="text-6xl font-semibold md:font-bold md:text-8xl my-20">Super !!</h1>
+                @php
+                    $header = [
+                        -2=>['heading'=>'Opss','message'=>'Your Order is rejected'],
+                        -1=>['heading'=>'We are Sorry','message'=>''],
+                        0=>['heading'=>'Fresh','message'=>'Your Order is just created'],
+                        1=>['heading'=>'Good news','message'=>'Your package is accepted'],
+                        2=>['heading'=>'Congrats','message'=>'Your package got picked up and on its way to you'],
+                        3=>['heading'=>'Super','message'=>'We hope that your package was delivered on time'],
+                    ];
+                @endphp
+                <h1 class="text-6xl font-semibold md:font-bold md:text-8xl my-20">
+                    {{data_get($header,"{$order['status']}.heading",'completed')}}
+                </h1>
+
                 <p class="text-lg font-semibold md:text-xl mt-20 mb-10">
-                    We hope that your package was delivered on time.
+                    {{data_get($header,"{$order['status']}.message",'Your order is completed')}}
                 </p>
                 <div>
                     <p>Your Order Details is shown bellow</p>
@@ -111,6 +116,9 @@
                         </thead>
                         <tbody class="bg-zinc-50 divide-y divide-gray-200">
                             @foreach($order as $key=>$value)
+                            @if(in_array($key,['status',]) )
+                                @continue
+                            @endif
                             <tr>
                                 <td class="px-6 py-3 whitespace-nowrap">
                                     <div class="text-md font-medium text-zinc-800">

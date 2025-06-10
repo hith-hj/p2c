@@ -9,4 +9,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/general/orderDetails/{serial}', [OrderController::class, 'get'])->name('order.details');
+Route::get('/public/order/details/{serial}', [OrderController::class, 'get'])->name('order.details');

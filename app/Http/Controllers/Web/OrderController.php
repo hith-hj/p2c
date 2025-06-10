@@ -17,7 +17,7 @@ final class OrderController extends Controller
     {
         $order = $this->order->findBy('serial', $serial)->only($this->orderDataToShow());
 
-        return view('generalOrderDetails', ['order' => $order]);
+        return view('public.order.details', ['order' => $order]);
     }
 
     private function orderDataToShow()
@@ -30,6 +30,7 @@ final class OrderController extends Controller
             'distance',
             'note',
             'created_at',
+            'status',
         ];
     }
 }
