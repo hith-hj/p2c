@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\V1\Admin;
 use App\Models\V1\Attr;
+use App\Models\V1\Customer;
 use App\Models\V1\Item;
 use App\Models\V1\Order;
 use App\Models\V1\Review;
@@ -54,6 +55,8 @@ final class DatabaseSeeder extends Seeder
             'name' => 'name',
             'email' => 'admin@admin.com',
         ]);
+
+        Customer::factory(2)->create();
 
         Order::factory(10)->create();
         Review::factory(10)->create();

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories\V1;
 
 use App\Enums\OrderDeliveryTypes;
+use App\Models\V1\Customer;
 use App\Models\V1\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -43,6 +44,7 @@ final class OrderFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (Order $order) {
+            $order->customer()->associate(Customer::find(1))->save();
             $order->createCode('pickup', 4);
             $order->createCode('delivered', 4);
         });

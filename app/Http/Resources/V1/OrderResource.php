@@ -20,6 +20,7 @@ final class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'serial' => $this->serial,
             'producer' => $this->producer?->only(['id', 'brand']),
             'carrier' => $this->carrier?->only(['id', 'first_name']),
             'transportation' => $this->transportation?->only(['id', 'name']),
