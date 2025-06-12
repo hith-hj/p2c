@@ -22,6 +22,7 @@ final class AdminFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->email(),
+            'phone' => fake()->regexify("(09)[1-9]{1}\d{7}"),
             'password' => Hash::make('password'),
         ];
     }

@@ -7,6 +7,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\V1\Review;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
+use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,7 +20,7 @@ final class ReviewResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
 
     public static function canCreate(): bool
     {
@@ -35,39 +37,39 @@ final class ReviewResource extends Resource
         return false;
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id'),
+                Tables\Columns\TextColumn::make('reviewed')
+                    ->default(fn (Review $record):string=>class_basename($record->belongTo_type))
+                    ->url(function (Review $record): string {
+                        $resource = strtolower(class_basename($record->belongTo_type));
+                        $route = "filament.admin.resources.{$resource}s.view";
+                        return route($route, ['record' => $record->belongTo_id]);
+                    })
+                    ->openUrlInNewTab(),
+                Tables\Columns\TextColumn::make('by')
+                    ->default(fn (Review $record):string=>class_basename($record->reviewer_type))
+                    ->url(function (Review $record): string {
+                        $resource = strtolower(class_basename($record->reviewer_type));
+                        $route = "filament.admin.resources.{$resource}s.view";
+                        return route($route, ['record' => $record->reviewer_id]);
+                    })
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('rate'),
                 Tables\Columns\TextColumn::make('content')->limit(40),
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                // Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    // Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
-    public static function getRelations(): array
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return [
-            //
-        ];
+        return $infolist
+            ->schema([
+                Infolists\Components\TextEntry::make('rate'),
+                Infolists\Components\TextEntry::make('content'),
+            ])->columns(1);
     }
 
     public static function getPages(): array
@@ -76,6 +78,7 @@ final class ReviewResource extends Resource
             'index' => Pages\ListReviews::route('/'),
             'create' => Pages\CreateReview::route('/create'),
             'edit' => Pages\EditReview::route('/{record}/edit'),
+            'view' => Pages\ViewReview::route('/{record}'),
         ];
     }
 }

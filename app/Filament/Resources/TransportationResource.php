@@ -18,7 +18,9 @@ final class TransportationResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    protected static ?string $navigationIcon = 'heroicon-o-truck';
+    protected static ?string $navigationIcon = 'heroicon-o-check';
+
+    protected static ?string $navigationGroup = 'Static';
 
     public static function form(Form $form): Form
     {
