@@ -94,9 +94,9 @@ trait OrderDteCalculator
     private function getDeliveryTimePerKm(string $deliveryType, float $distance = 1): int
     {
         $base = match ($deliveryType) {
-            OrderDeliveryTypes::normal->value => config('settings.normal_delivery_time_per_km', 2),
-            OrderDeliveryTypes::urgent->value => config('settings.urgent_delivery_time_per_km', 1),
-            OrderDeliveryTypes::express->value => config('settings.express_delivery_time_per_km', 0.5),
+            OrderDeliveryTypes::normal->value => config('settings.normal_delivery_time_per_km.value', 2),
+            OrderDeliveryTypes::urgent->value => config('settings.urgent_delivery_time_per_km.value', 1),
+            OrderDeliveryTypes::express->value => config('settings.express_delivery_time_per_km.value', 0.5),
             default => 3,
         };
 

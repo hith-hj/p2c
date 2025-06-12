@@ -57,8 +57,8 @@ trait OrderCostCalculator
 
     private function checkIfValidDistance(int $distanceInMeter): void
     {
-        $minRange = config('settings.min_order_distance', 300);
-        $maxRange = config('settings.max_order_distance', 50000);
+        $minRange = config('settings.min_order_distance.value', 300);
+        $maxRange = config('settings.max_order_distance.value', 50000);
         throw_if(
             $distanceInMeter < $minRange || $distanceInMeter > $maxRange,
             __("main.Distance should be between $minRange and $maxRange meter, your is : $distanceInMeter")
@@ -92,7 +92,7 @@ trait OrderCostCalculator
 
     private function AttrsCost(array $data): int|array
     {
-        $calcType = config('settings.order_attrs_calculation_type', 'totla');
+        $calcType = config('settings.order_attrs_calculation_type.value', 'totla');
         if (! isset($data['attrs']) || $data['attrs'] === []) {
             return 0;
         }
@@ -108,7 +108,7 @@ trait OrderCostCalculator
 
     private function ItemsCost(array $items): int|array
     {
-        $calcType = config('settings.order_items_calculation_type', 'totla');
+        $calcType = config('settings.order_items_calculation_type.value', 'totla');
         if ($items === []) {
             return 0;
         }
@@ -125,10 +125,10 @@ trait OrderCostCalculator
     private function deliveryTypeCost(string $delivery_type): int
     {
         if ($delivery_type === 'urgent') {
-            return config('settings.urgent_order_cost', 20);
+            return config('settings.urgent_order_cost.value', 20);
         }
         if ($delivery_type === 'express') {
-            return config('settings.express_order_cost', 35);
+            return config('settings.express_order_cost.value', 35);
         }
 
         return 0;

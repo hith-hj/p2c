@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AttrResource\Pages;
-use App\Filament\Resources\AttrResource\RelationManagers;
 use App\Models\V1\Attr;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class AttrResource extends Resource
+final class AttrResource extends Resource
 {
     protected static ?string $model = Attr::class;
 
@@ -26,13 +25,13 @@ class AttrResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->unique('attrs','name')
+                    ->unique('attrs', 'name')
                     ->required(),
                 Forms\Components\TextInput::make('extra_cost_percent')
                     ->numeric()
                     ->minValue(0)
                     ->step(1)
-                    ->required()
+                    ->required(),
             ]);
     }
 

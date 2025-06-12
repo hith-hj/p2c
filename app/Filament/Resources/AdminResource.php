@@ -1,21 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AdminResource\Pages;
-use App\Filament\Resources\AdminResource\RelationManagers;
 use App\Models\V1\Admin;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class AdminResource extends Resource
+final class AdminResource extends Resource
 {
     protected static ?string $model = Admin::class;
 
@@ -29,11 +28,11 @@ class AdminResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
-                    ->unique('admins','email')
+                    ->unique('admins', 'email')
                     ->required(),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
-                    ->unique('admins','phone')
+                    ->unique('admins', 'phone')
                     ->required(),
                 Forms\Components\TextInput::make('password')
                     ->password()

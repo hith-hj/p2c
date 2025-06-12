@@ -27,7 +27,7 @@ final class Admin extends Authenticatable implements FilamentUser
         'email',
         'password',
         'phone',
-        'status'
+        'status',
     ];
 
     /**

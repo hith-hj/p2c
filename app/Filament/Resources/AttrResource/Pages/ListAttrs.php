@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\AttrResource\Pages;
 
 use App\Filament\Resources\AttrResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListAttrs extends ListRecords
+final class ListAttrs extends ListRecords
 {
     protected static string $resource = AttrResource::class;
 

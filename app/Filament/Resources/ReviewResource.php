@@ -6,9 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\V1\Review;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -43,18 +42,20 @@ final class ReviewResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\TextColumn::make('reviewed')
-                    ->default(fn (Review $record):string=>class_basename($record->belongTo_type))
+                    ->default(fn (Review $record): string => class_basename($record->belongTo_type))
                     ->url(function (Review $record): string {
-                        $resource = strtolower(class_basename($record->belongTo_type));
+                        $resource = mb_strtolower(class_basename($record->belongTo_type));
                         $route = "filament.admin.resources.{$resource}s.view";
+
                         return route($route, ['record' => $record->belongTo_id]);
                     })
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('by')
-                    ->default(fn (Review $record):string=>class_basename($record->reviewer_type))
+                    ->default(fn (Review $record): string => class_basename($record->reviewer_type))
                     ->url(function (Review $record): string {
-                        $resource = strtolower(class_basename($record->reviewer_type));
+                        $resource = mb_strtolower(class_basename($record->reviewer_type));
                         $route = "filament.admin.resources.{$resource}s.view";
+
                         return route($route, ['record' => $record->reviewer_id]);
                     })
                     ->openUrlInNewTab(),

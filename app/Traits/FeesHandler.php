@@ -41,14 +41,14 @@ trait FeesHandler
 
     private function amount(int $source): int
     {
-        $percent = config('settings.fee_percent', 20);
+        $percent = config('settings.fee_percent.value', 20);
 
         return (int) round($source * ($percent / 100));
     }
 
     private function delayFee(int $fee): int
     {
-        $percent = config('settings.delay_fee', 30);
+        $percent = config('settings.delay_fee.value', 30);
 
         return (int) round($fee * ($percent / 100));
     }
