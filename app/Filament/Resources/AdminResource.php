@@ -22,19 +22,20 @@ final class AdminResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $action = $form->getOperation();
+
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
-                    ->unique('admins', 'email')
-                    ->required(),
+                    ->unique('admins', 'email', ignoreRecord: $action !== 'create')
+                    ->required($action === 'create'),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
-                    ->unique('admins', 'phone')
-                    ->required()
-                    ->hiddenOn('edit'),
+                    ->unique('admins', 'phone', ignoreRecord: $action !== 'create')
+                    ->required($action === 'create'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()

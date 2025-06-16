@@ -50,7 +50,7 @@ final class TransportationResource extends Resource
                     ->minValue(0)
                     ->required(),
                 Forms\Components\Select::make('category')
-                    ->options(['car', 'bicycle', 'motorcycle', 'pickup', 'truck'])
+                    ->options(['car' => 'car', 'bicycle' => 'bicycle', 'motorcycle' => 'motorcycle', 'pickup' => 'pickup', 'truck' => 'truck'])
                     ->required(),
             ]);
     }
