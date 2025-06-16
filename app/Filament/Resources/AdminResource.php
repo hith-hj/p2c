@@ -33,7 +33,8 @@ final class AdminResource extends Resource
                 Forms\Components\TextInput::make('phone')
                     ->tel()
                     ->unique('admins', 'phone')
-                    ->required(),
+                    ->required()
+                    ->hiddenOn('edit'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
