@@ -21,7 +21,7 @@ trait ImagesHandler
         $path = sprintf('uploads/%s/%s/%s', $doc_type, class_basename($this::class), $this->id);
         $fileName = time() . '_' . $file->hashName();
         $filePath = $file->storeAs($path, $fileName, 'public');
-        $this->syncImagesToPublic();
+        defer(fn() => $this->syncImagesToPublic());
         return $this->images()->create([
             'url' => $filePath,
             'type' => $doc_type,
@@ -49,9 +49,12 @@ trait ImagesHandler
     {
         try {
             Log::info('Syncing Images');
-            $command = "rsync -a --delete /home/bookus/repositories/p2c/storage/app/public/uploads/ /home/bookus/public_html/p2c.4bookus.com/uploads";
-            $result = shell_exec($command);
-            Log::info('images synced', ['result' => $result]);
+            $command = "rsync -a --delete --inplace --quiet "
+             . "/home/bookus/repositories/p2c/storage/app/public/uploads/ "
+             . "/home/bookus/public_html/p2c.4bookus.com/uploads";
+            $guarded = "nice -n 10 ionice -c2 -n7 $command";
+            $result = shell_exec($guarded);
+            Log::info('Images Synced', ['result' => $result]);
         } catch (\Exception $e) {
             Log::info('images syncing error', ['error' => $e->getMessage()]);
         }
