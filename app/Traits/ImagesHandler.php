@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use App\Models\V1\Image;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
 
 trait ImagesHandler
 {
@@ -18,9 +19,9 @@ trait ImagesHandler
     public function uploadImage($file, $doc_type = 'document'): Image
     {
         $path = sprintf('uploads/%s/%s/%s', $doc_type, class_basename($this::class), $this->id);
-        $fileName = time().'_'.$file->hashName();
+        $fileName = time() . '_' . $file->hashName();
         $filePath = $file->storeAs($path, $fileName, 'public');
-
+        $this->syncImagesToPublic();
         return $this->images()->create([
             'url' => $filePath,
             'type' => $doc_type,
@@ -42,5 +43,17 @@ trait ImagesHandler
         }
 
         return true;
+    }
+
+    private function syncImagesToPublic()
+    {
+        try {
+            Log::info('Syncing Images');
+            $command = "rsync -a --delete /home/bookus/repositories/p2c/storage/app/public/uploads/ /home/bookus/public_html/p2c.4bookus.com/uploads";
+            $result = shell_exec($command);
+            Log::info('images synced', ['result' => $result]);
+        } catch (\Exception $e) {
+            Log::info('images syncing error', ['error' => $e->getMessage()]);
+        }
     }
 }
