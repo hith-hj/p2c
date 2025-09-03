@@ -28,7 +28,7 @@ P2C (Producer to Customer) is designed to streamline local deliveries by:
 ## User Roles
 
 ### 🏭 Producers
-- Register via web or mobile app
+- Register via mobile app
 - List products and manage deliveries
 - Optimize costs and improve customer satisfaction
 - Expand reach with minimal effort
