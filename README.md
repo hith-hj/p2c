@@ -62,8 +62,8 @@ P2C uses OpenStreetMap tiles to visualize delivery zones and logistics hubs.
 ![Producer Second](https://github.com/hith-hj/mockups/blob/main/p2c/producer_3.png)
 
 ### Carrier
-![Carrier first](https://github.com/hith-hj/mockups/blob/main/p2c/carrier_2.png)
-![Carrier Second](https://github.com/hith-hj/mockups/blob/main/p2c/carrier_3.png)
+![Carrier first](https://github.com/hith-hj/mockups/blob/main/p2c/carrier_1.png)
+![Carrier Second](https://github.com/hith-hj/mockups/blob/main/p2c/carrier_2.png)
 
 
 
