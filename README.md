@@ -52,9 +52,18 @@ P2C (Producer to Customer) is designed to streamline local deliveries by:
 
 P2C uses OpenStreetMap tiles to visualize delivery zones and logistics hubs.
 
-## 📸 Visuals -->
+## 📸 Visuals
 
+### Main
 ![App Main](https://github.com/hith-hj/mockups/blob/main/p2c/producer_1.png)
+
+### Producer
+![Producer first](https://github.com/hith-hj/mockups/blob/main/p2c/producer_2.png)
+![Producer Second](https://github.com/hith-hj/mockups/blob/main/p2c/producer_3.png)
+
+### Carrier
+![Carrier first](https://github.com/hith-hj/mockups/blob/main/p2c/carrier_2.png)
+![Carrier Second](https://github.com/hith-hj/mockups/blob/main/p2c/carrier_3.png)
 
 
 
