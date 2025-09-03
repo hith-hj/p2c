@@ -21,6 +21,9 @@ P2C (Producer to Customer) is designed to streamline local deliveries by:
 - Rest Api
 - Map Locations
 - Cross platform
+- Notifications
+- Order Status Tracking
+
 
 ## User Roles
 
