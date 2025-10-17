@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\ReviewServices;
+use App\Services\ReviewServices;
 use App\Models\V1\Review;
 use App\Models\V1\User;
 use Illuminate\Support\Collection;

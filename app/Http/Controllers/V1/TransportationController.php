@@ -6,8 +6,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\TransportationResource;
-use App\Http\Services\TransportationServices;
-use App\Http\Validators\TransportationValidators;
+use App\Services\TransportationServices;
+use App\Validators\TransportationValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

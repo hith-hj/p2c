@@ -10,4 +10,14 @@ enum NotificationTypes: int
     case verification = 1;
     case order = 2;
     case fee = 3;
+
+    public static function values()
+    {
+        return array_column(self::cases(), 'value');
+    }
+
+    public static function names()
+    {
+        return array_column(self::cases(), 'names');
+    }
 }

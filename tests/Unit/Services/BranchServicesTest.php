@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\BranchServices;
+use App\Services\BranchServices;
 use App\Models\V1\Branch;
 use App\Models\V1\Producer;
 use Illuminate\Support\Collection;

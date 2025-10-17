@@ -6,8 +6,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\CarrierResource;
-use App\Http\Services\CarrierServices;
-use App\Http\Validators\CarrierValidators;
+use App\Services\CarrierServices;
+use App\Validators\CarrierValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

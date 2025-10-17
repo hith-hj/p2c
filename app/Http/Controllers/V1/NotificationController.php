@@ -6,8 +6,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\NotificationResource;
-use App\Http\Services\NotificationServices;
-use App\Http\Validators\NotificationValidators;
+use App\Services\NotificationServices;
+use App\Validators\NotificationValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

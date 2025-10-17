@@ -13,7 +13,10 @@ final class Code extends Model
 
     protected function casts(): array
     {
-        return ['code' => 'integer'];
+        return [
+            'code' => 'int',
+            'expire_at' => 'datetime',
+        ];
     }
 
     public function isValid(): bool

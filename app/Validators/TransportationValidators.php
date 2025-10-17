@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Validators;
+namespace App\Validators;
 
 use Illuminate\Support\Facades\Validator;
 
-final class FeeValidators
+final class TransportationValidators
 {
     public static function find($data)
     {
         return Validator::make($data, [
-            'fee_id' => ['required', 'exists:fees,id'],
+            'transportation_id' => ['required', 'exists:transportations,id'],
         ]);
     }
 }

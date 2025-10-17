@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Enums\OrderDeliveryTypes;
 use App\Enums\OrderStatus;
@@ -10,7 +10,6 @@ use App\Models\V1\Branch;
 use App\Models\V1\Carrier;
 use App\Models\V1\Order;
 use App\Models\V1\Producer;
-use App\Traits\ExceptionHandler;
 use App\Traits\OrderCostCalculator;
 use App\Traits\OrderDteCalculator;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +18,6 @@ use Illuminate\Support\Str;
 
 final class OrderServices
 {
-    use ExceptionHandler;
     use OrderCostCalculator;
     use OrderDteCalculator;
 
@@ -36,7 +34,7 @@ final class OrderServices
         $this->applyOrderBy($orders, $orderBy, ['cost', 'distance', 'weight']);
         $orders->paginate(perPage: $perPage, page: $page);
         $orders = $orders->get();
-        $this->NotFound($orders, 'orders');
+        NotFound($orders, 'orders');
 
         return $orders;
     }
@@ -55,7 +53,7 @@ final class OrderServices
         $this->applyOrderBy($orders, $orderBy, ['cost', 'distance', 'weight']);
         $orders->paginate(perPage: $perPage, page: $page);
         $orders = $orders->get();
-        $this->NotFound($orders, 'orders');
+        NotFound($orders, 'orders');
 
         return $orders;
     }
@@ -63,7 +61,7 @@ final class OrderServices
     public function find(int $id): Order
     {
         $order = Order::find($id);
-        $this->NotFound($order, 'order');
+        NotFound($order, 'order');
 
         return $order;
     }
@@ -71,7 +69,7 @@ final class OrderServices
     public function findBy(string $column = 'id', mixed $value = '')
     {
         $order = Order::where($column, $value)->first();
-        $this->NotFound($order, 'order');
+        NotFound($order, 'order');
 
         return $order;
     }
@@ -145,10 +143,10 @@ final class OrderServices
     public function accept(Carrier $carrier, int $order_id): Order
     {
         $order = $this->find($order_id);
-        $this->NotFound($order, 'order');
-        $this->Truthy($order->carrier_id !== null, 'order is assigned');
-        $this->Truthy($order->status !== OrderStatus::pending->value, 'invalid order status');
-        $this->Truthy($order->transportation_id !== $carrier->transportation_id, 'transportations is not match');
+        NotFound($order, 'order');
+        Truthy($order->carrier_id !== null, 'order is assigned');
+        Truthy($order->status !== OrderStatus::pending->value, 'invalid order status');
+        Truthy($order->transportation_id !== $carrier->transportation_id, 'transportations is not match');
         $order->carrier()->associate($carrier);
         $dte = $this->Dte([
             'created_at' => now(),
@@ -166,8 +164,8 @@ final class OrderServices
     public function picked(Carrier $carrier, int $order_id): Order
     {
         $order = $carrier->orders()->find($order_id);
-        $this->NotFound($order, 'order');
-        $this->Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
+        NotFound($order, 'order');
+        Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
         $order->update([
             'status' => OrderStatus::picked->value,
             'picked_at' => now()->toDateTimeString(),
@@ -179,9 +177,9 @@ final class OrderServices
     public function delivered(Carrier $carrier, int $order_id, int $code): Order
     {
         $order = $carrier->orders()->find($order_id);
-        $this->NotFound($order, 'order');
-        $this->Truthy($order->status !== OrderStatus::picked->value, 'invalid order status');
-        $this->Truthy($order->code('delivered')->code !== $code, 'invalid code');
+        NotFound($order, 'order');
+        Truthy($order->status !== OrderStatus::picked->value, 'invalid order status');
+        Truthy($order->code('delivered')->code !== $code, 'invalid code');
         $order->update([
             'status' => OrderStatus::delivered->value,
             'delivered_at' => now()->toDateTimeString(),
@@ -193,8 +191,8 @@ final class OrderServices
     public function finish(Producer $producer, int $order_id): Order
     {
         $order = $producer->orders()->find($order_id);
-        $this->NotFound($order, 'order');
-        $this->Truthy($order->status !== OrderStatus::delivered->value, 'invalid order status');
+        NotFound($order, 'order');
+        Truthy($order->status !== OrderStatus::delivered->value, 'invalid order status');
         $order->update(['status' => OrderStatus::finished->value]);
 
         return $order;
@@ -203,9 +201,9 @@ final class OrderServices
     public function cancel(Producer $producer, int $order_id): Order
     {
         $order = $producer->orders()->find($order_id);
-        $this->NotFound($order, 'order');
-        $this->Truthy($order->carrier_id !== null, 'order is assigned');
-        $this->Truthy($order->status !== OrderStatus::pending->value, 'invalid order status');
+        NotFound($order, 'order');
+        Truthy($order->carrier_id !== null, 'order is assigned');
+        Truthy($order->status !== OrderStatus::pending->value, 'invalid order status');
         $order->update(['status' => OrderStatus::canceled->value]);
         $order->codes()->delete();
 
@@ -215,8 +213,8 @@ final class OrderServices
     public function forceCancel(Producer $producer, int $order_id): Order
     {
         $order = $producer->orders()->find($order_id);
-        $this->Truthy($order === null, 'Not found');
-        $this->Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
+        Truthy($order === null, 'Not found');
+        Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
         $order->update(['status' => OrderStatus::canceled->value]);
 
         return $order;
@@ -225,8 +223,8 @@ final class OrderServices
     public function reject(Carrier $carrier, int $order_id): Order
     {
         $order = $carrier->orders()->find($order_id);
-        $this->Truthy($order === null, 'Not found');
-        $this->Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
+        Truthy($order === null, 'Not found');
+        Truthy($order->status !== OrderStatus::assigned->value, 'invalid order status');
         $order->update(['status' => OrderStatus::rejected->value]);
 
         return $order;
@@ -268,12 +266,12 @@ final class OrderServices
 
     private function checkAndCastData(array $data = [], $requiredFields = []): array
     {
-        $this->Truthy(empty($data), 'data is empty');
+        Truthy(empty($data), 'data is empty');
         if (empty($requiredFields)) {
             return $data;
         }
         $missing = array_diff(array_keys($requiredFields), array_keys($data));
-        $this->Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
+        Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
         foreach ($requiredFields as $key => $value) {
             settype($data[$key], $value);
         }
@@ -283,7 +281,7 @@ final class OrderServices
 
     private function attachRelations(Order $order, array $data = []): Order
     {
-        $this->Required($order, 'order');
+        Required($order, 'order');
         if (isset($data['attrs']) && ! empty($data['attrs'])) {
             $order->attrs()->attach($data['attrs']);
         }
@@ -308,10 +306,10 @@ final class OrderServices
 
     private function chackIfValidBranchWithLocation(?Branch $branch, ?Producer $producer): void
     {
-        $this->Required($branch, 'branch');
-        $this->Required($producer, 'producer');
-        $this->Truthy($branch->producer_id !== $producer->id, 'invalid operation');
-        $this->Truthy($branch->location === null, 'branch location is required');
+        Required($branch, 'branch');
+        Required($producer, 'producer');
+        Truthy($branch->producer_id !== $producer->id, 'invalid operation');
+        Truthy($branch->location === null, 'branch location is required');
     }
 
     private function getSerial(int $length = 16): string

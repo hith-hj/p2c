@@ -2,21 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Models\V1\Branch;
 use App\Models\V1\Producer;
-use App\Traits\ExceptionHandler;
 use Illuminate\Support\Collection;
 
 final class BranchServices
 {
-    use ExceptionHandler;
-
     public function find(int $id): Branch
     {
         $branch = Branch::find($id);
-        $this->NotFound($branch, 'branch');
+        NotFound($branch, 'branch');
 
         return $branch;
     }
@@ -24,15 +21,15 @@ final class BranchServices
     public function get(int $id): Collection
     {
         $producer = Producer::find($id);
-        $this->NotFound($producer, 'producer');
-        $this->NotFound($producer->branches, 'branches');
+        NotFound($producer, 'producer');
+        NotFound($producer->branches, 'branches');
 
         return $producer->branches->load(['location']);
     }
 
     public function create(Producer $producer, array $data): Branch
     {
-        $this->Required($data, 'data');
+        Required($data, 'data');
         $branch = $producer->branches()->create([
             'name' => $data['name'] ?? 'Main',
             'phone' => $data['phone'],
@@ -45,14 +42,14 @@ final class BranchServices
 
     public function update(Branch $branch, array $data): bool
     {
-        $this->Required($data, 'data');
+        Required($data, 'data');
 
         return $branch->update($data);
     }
 
     public function delete(Branch $branch): bool
     {
-        $this->Truthy($branch->is_default, 'is default');
+        Truthy($branch->is_default, 'is default');
         $branch->location()->delete();
 
         return $branch->delete();

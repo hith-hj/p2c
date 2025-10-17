@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Validators;
+namespace App\Validators;
 
 use Illuminate\Support\Facades\Validator;
 

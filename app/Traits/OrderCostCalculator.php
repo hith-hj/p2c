@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use App\Http\Services\TransportationServices;
+use App\Services\TransportationServices;
 use App\Models\V1\Attr;
 use App\Models\V1\Branch;
 use App\Models\V1\Item;

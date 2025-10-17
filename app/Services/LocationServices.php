@@ -2,19 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Models\V1\Location;
-use App\Traits\ExceptionHandler;
 
 final class LocationServices
 {
-    use ExceptionHandler;
-
     public function create(object $locatable, array $data): Location
     {
-        $this->Required($data, 'data');
-        $this->Truthy(! method_exists($locatable, 'location'), 'missing location method');
+        Required($data, 'data');
+        Truthy(! method_exists($locatable, 'location'), 'missing location method');
         $data = $this->checkAndCastData($data, [
             'cords' => 'array',
             'cords.long' => 'float',
@@ -29,8 +26,8 @@ final class LocationServices
 
     public function edit(object $locatable, array $data): bool|Location
     {
-        $this->Required($data, 'data');
-        $this->Truthy(! method_exists($locatable, 'location'), 'missing location method');
+        Required($data, 'data');
+        Truthy(! method_exists($locatable, 'location'), 'missing location method');
         if ($locatable->location()->exists()) {
             return $this->update($locatable, $data);
         }
@@ -54,7 +51,7 @@ final class LocationServices
 
     private function checkAndCastData(array $data, $requiredFields = []): array
     {
-        $this->Truthy(empty($data), 'data is empty');
+        Truthy(empty($data), 'data is empty');
         if (empty($requiredFields)) {
             return $data;
         }
@@ -78,7 +75,7 @@ final class LocationServices
             }
             settype($data[$key], $value);
         }
-        $this->Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
+        Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
 
         return $data;
     }

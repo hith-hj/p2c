@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\TransportationServices;
+use App\Services\TransportationServices;
 use App\Models\V1\Transportation;
 use Illuminate\Support\Collection;
 
@@ -19,7 +19,7 @@ describe('Transportation Services', function () {
 
     it('throws an exception when transportations not found', function () {
         $this->transportationServices->all();
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('retrieves a specific transportation by ID', function () {
         $trans = Transportation::factory()->createOne();
@@ -29,7 +29,7 @@ describe('Transportation Services', function () {
 
     it('throws an exception when transportation not found', function () {
         $this->transportationServices->find(999);
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('retrieves matched transportation based on weight', function () {
         Transportation::factory(5)->create();

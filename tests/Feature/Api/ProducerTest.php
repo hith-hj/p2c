@@ -185,7 +185,6 @@ describe('Producer Controller', function () {
         $branch = Branch::factory()->create(['producer_id' => 20]);
         expect($branch)->not->toBeNull();
         $res = $this->deleteJson("/api/v1/branch/delete?branch_id=$branch->id");
-
         expect($res->status())->toBe(403);
         expect($res->json('message'))->toBe(__('main.unauthorized'));
     });

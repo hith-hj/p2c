@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Models\V1\Image;
+use Exception;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Log;
 
@@ -19,9 +20,10 @@ trait ImagesHandler
     public function uploadImage($file, $doc_type = 'document'): Image
     {
         $path = sprintf('uploads/%s/%s/%s', $doc_type, class_basename($this::class), $this->id);
-        $fileName = time() . '_' . $file->hashName();
+        $fileName = time().'_'.$file->hashName();
         $filePath = $file->storeAs($path, $fileName, 'public');
-        defer(fn() => $this->syncImagesToPublic());
+        defer(fn () => $this->syncImagesToPublic());
+
         return $this->images()->create([
             'url' => $filePath,
             'type' => $doc_type,
@@ -49,13 +51,13 @@ trait ImagesHandler
     {
         try {
             Log::info('Syncing Images');
-            $command = "rsync -a --delete --inplace --quiet "
-             . "/home/bookus/repositories/p2c/storage/app/public/uploads/ "
-             . "/home/bookus/public_html/p2c.4bookus.com/uploads";
+            $command = 'rsync -a --delete --inplace --quiet '
+             .'/home/bookus/repositories/p2c/storage/app/public/uploads/ '
+             .'/home/bookus/public_html/p2c.4bookus.com/uploads';
             $guarded = "nice -n 10 ionice -c2 -n7 $command";
             $result = shell_exec($guarded);
             Log::info('Images Synced', ['result' => $result]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::info('images syncing error', ['error' => $e->getMessage()]);
         }
     }

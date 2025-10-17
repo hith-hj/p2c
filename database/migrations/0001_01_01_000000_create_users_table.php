@@ -19,7 +19,6 @@ return new class() extends Migration
             $table->string('phone');
             $table->string('password');
             $table->timestamp('verified_at')->nullable();
-            $table->string('verification_code')->nullable();
             $table->string('verified_by')->nullable();
             $table->text('firebase_token')->nullable();
             $table->string('role');

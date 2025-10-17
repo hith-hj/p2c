@@ -6,7 +6,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\UserResource;
-use App\Http\Validators\AuthValidators;
+use App\Validators\AuthValidators;
 use App\Models\V1\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -30,7 +30,7 @@ final class AuthController extends Controller
 
         try {
             $by = $validator->safe()->input('by') ?? 'phone';
-            $user->sendVerificationCode($by);
+            $user->fresh()->verify($by);
 
             return Success(
                 msg: __('main.registerd'),
@@ -50,7 +50,7 @@ final class AuthController extends Controller
         }
 
         try {
-            $user->verify();
+            $user->verified();
 
             return Success(msg: __('main.verified'));
         } catch (Exception $e) {
@@ -121,7 +121,7 @@ final class AuthController extends Controller
         $user = User::where('phone', $validator->safe()->input('phone'))->first();
 
         // if there is a previous code from registeration or other what to do
-        $user->sendVerificationCode();
+        $user->verify();
 
         return Success(
             msg: __('main.code sent'),
@@ -151,8 +151,7 @@ final class AuthController extends Controller
         if (is_null($user->code('verification')->code)) {
             return Error(msg: __('main.invalid operation'), code: 403);
         }
-
-        $user->sendVerificationCode();
+        $user->verify();
 
         return Success(
             msg: __('main.code sent')

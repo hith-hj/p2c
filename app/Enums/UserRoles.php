@@ -13,4 +13,9 @@ enum UserRoles: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    public static function names()
+    {
+        return array_column(self::cases(), 'names');
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Enums\NotificationTypes;
 use App\Models\V1\Notification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
@@ -32,8 +33,16 @@ trait NotificationsHandler
         $this->title = $title;
         $this->body = $body;
         $this->data = $data;
+        $this->class = class_basename($this::class).'/'.$this->id;
         if (App::environment('testing', 'local')) {
             $this->store(['result' => 'testing notification']);
+            Log::info("Local notification on $this->class ");
+
+            return true;
+        }
+
+        if ($this->hasIsNotifiable() && ! $this->isNotifiable()) {
+            Log::info(" $this->class is not notifiable");
 
             return true;
         }
@@ -49,15 +58,14 @@ trait NotificationsHandler
     public function fcm()
     {
         if ($this->firebase_token === null) {
-            Log::error("No FCM token found on $this::class");
+            Log::error("No FCM token found on $this->class");
 
             return true;
         }
-        $token = $this->firebase_token;
         $factory = (new FcmFactory())->withServiceAccount($this->getFCMCredentials());
         $messaging = $factory->createMessaging();
         $notification = ['title' => $this->title, 'body' => $this->body];
-        $message = CloudMessage::new()->toToken($token)
+        $message = CloudMessage::new()->toToken($this->firebase_token)
             ->withNotification(FcmNotification::fromArray($notification))
             ->withAndroidConfig($this->getFCMAndroidConfig())
             ->withData(MessageData::fromArray($this->data));
@@ -78,16 +86,14 @@ trait NotificationsHandler
             ->withAttributes(['belongTo_type' => $this::class]);
     }
 
-    private function store(array $extra)
+    private function store(array $extra): Notification
     {
-        if (! method_exists($this, 'notifications')) {
-            return;
-        }
+        Truthy(! method_exists($this, 'notifications'), "$this->class Missing notifications() method");
 
         return $this->notifications()->create([
             'title' => $this->title,
             'body' => $this->body,
-            'type' => $this->data['type'],
+            'type' => $this->data['type'] ?? NotificationTypes::normal->value,
             'payload' => json_encode([
                 ...$this->data,
                 ...$extra,
@@ -108,6 +114,8 @@ trait NotificationsHandler
 
     private function getFCMCredentials()
     {
+        Truthy(! file_exists(storage_path('app/fcm.json')), 'Missing firebase config file');
+
         return storage_path('app/fcm.json');
     }
 
@@ -122,5 +130,19 @@ trait NotificationsHandler
                 'sound' => 'default',
             ],
         ]);
+    }
+
+    private function hasIsNotifiable(): bool
+    {
+        if (in_array('is_notifiable', array_keys($this->toArray()))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isNotifiable(): bool
+    {
+        return (bool) $this->is_notifiable;
     }
 }

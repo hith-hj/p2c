@@ -6,8 +6,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ProducerResource;
-use App\Http\Services\ProducerServices;
-use App\Http\Validators\ProducerValidators;
+use App\Services\ProducerServices;
+use App\Validators\ProducerValidators;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

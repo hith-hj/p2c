@@ -19,7 +19,7 @@ trait FeesHandler
 
     public function createFee(object $subject, $type = FeeTypes::normal->value): ?Fee
     {
-        throw_if(
+        Truthy(
             ! method_exists($subject, 'getFeeSource'),
             sprintf('%s missing getFeeSource()', class_basename($subject))
         );
@@ -58,9 +58,11 @@ trait FeesHandler
         return now()->endOfMonth();
     }
 
-    private function feeExists(object $badge): bool
+    private function feeExists(object $object): bool
     {
-        return $badge->fees()->where([
+        Truthy(! method_exists($object, 'getFeeSource'), 'missing fees() method');
+
+        return $object->fees()->where([
             ['subject_id', $this->id],
             ['subject_type', $this::class],
         ])->exists();

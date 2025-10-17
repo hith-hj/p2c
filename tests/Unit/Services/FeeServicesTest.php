@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\FeeTypes;
-use App\Http\Services\FeeServices;
+use App\Services\FeeServices;
 use App\Models\V1\Fee;
 use App\Models\V1\User;
 use Illuminate\Support\Collection;

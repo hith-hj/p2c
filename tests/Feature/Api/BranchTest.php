@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\V1\BranchController;
-use App\Http\Services\BranchServices;
+use App\Services\BranchServices;
 use App\Models\V1\Branch;
 
 beforeEach(function () {

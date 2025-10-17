@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\V1;
 
-use App\Enums\NotificationTypes;
 use App\Enums\UserRoles;
 use App\Traits\CodesHandler;
 use App\Traits\NotificationsHandler;
+use App\Traits\VerificationHandler;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -19,12 +19,8 @@ final class User extends Authenticatable implements JWTSubject
     use CodesHandler;
     use HasFactory;
     use NotificationsHandler;
+    use VerificationHandler;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'email',
         'password',
@@ -36,22 +32,12 @@ final class User extends Authenticatable implements JWTSubject
         'verified_by',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
         'updated_at',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -82,33 +68,5 @@ final class User extends Authenticatable implements JWTSubject
     public function settings(): HasOne
     {
         return $this->hasOne(Setting::class);
-    }
-
-    public function sendVerificationCode($by = 'phone'): static
-    {
-        $this->createCode('verification');
-        $this->update([
-            'verified_at' => null,
-            'verified_by' => $by,
-        ]);
-        $code = $this->code('verification')->code;
-        $this->notify(
-            title: 'verification code',
-            body: "Your code is: $code",
-            data: ['type' => NotificationTypes::verification->value, 'code' => $code],
-            provider: $by,
-        );
-
-        return $this;
-    }
-
-    public function verify(): static
-    {
-        $this->deleteCode('verification');
-        $this->update([
-            'verified_at' => now(),
-        ]);
-
-        return $this;
     }
 }

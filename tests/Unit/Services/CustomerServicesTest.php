@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\CustomerServices;
+use App\Services\CustomerServices;
 use App\Models\V1\Customer;
 
 beforeEach(function () {

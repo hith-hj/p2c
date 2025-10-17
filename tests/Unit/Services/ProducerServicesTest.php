@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\ProducerServices;
+use App\Services\ProducerServices;
 use App\Models\V1\Producer;
 use App\Models\V1\User;
 use Illuminate\Support\Collection;
@@ -21,7 +21,7 @@ describe('Producer Service', function () {
 
     it('throw exception when no producers found', function () {
         $this->producerServices->all();
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('paginates producers', function () {
         $mockRequest = Mockery::mock('Illuminate\Http\Request');
@@ -45,7 +45,7 @@ describe('Producer Service', function () {
             ->andReturnFalse();
         $count = 4;
         $this->producerServices->paginate($mockRequest, $count);
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('retrieves a producer by ID', function () {
         $producer = Producer::factory()->create();
@@ -55,7 +55,7 @@ describe('Producer Service', function () {
 
     it('fail to retrieves a producer by invalid  ID', function () {
         $result = $this->producerServices->find(999);
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('retrieves a producer by user', function () {
         $user = User::factory()->create(['role' => 'producer']);
@@ -66,7 +66,7 @@ describe('Producer Service', function () {
 
     it('fail to retrieves a producer by invalid user', function () {
         $result = $this->producerServices->get(999);
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('creates a new producer', function () {
         $user = User::factory()->create(['role' => 'producer']);

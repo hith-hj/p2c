@@ -2,22 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Models\V1\Producer;
 use App\Models\V1\User;
-use App\Traits\ExceptionHandler;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
 
 final class ProducerServices
 {
-    use ExceptionHandler;
-
     public function all(): Collection
     {
         $producers = Producer::all();
-        $this->NotFound($producers, 'producers');
+        NotFound($producers, 'producers');
 
         return $producers;
     }
@@ -29,7 +26,7 @@ final class ProducerServices
         }
 
         $producers = Producer::paginate($perPage);
-        $this->NotFound($producers->all(), 'producers');
+        NotFound($producers->all(), 'producers');
 
         return $producers;
     }
@@ -37,8 +34,8 @@ final class ProducerServices
     public function get(int $id): Producer
     {
         $user = User::find($id);
-        $this->NotFound($user, 'user');
-        $this->NotFound($user->badge, 'Producer');
+        NotFound($user, 'user');
+        NotFound($user->badge, 'Producer');
 
         return $user->badge;
     }
@@ -46,15 +43,15 @@ final class ProducerServices
     public function find(int $id): Producer
     {
         $producer = Producer::find($id);
-        $this->NotFound($producer, 'producer');
+        NotFound($producer, 'producer');
 
         return $producer;
     }
 
     public function create(Auth $user, array $data): Producer
     {
-        $this->Exists($user->badge, 'producer');
-        $this->NotFound($data, 'data');
+        Exists($user->badge, 'producer');
+        NotFound($data, 'data');
         $producer = $user->badge()->create([
             'brand' => $data['brand'],
             'is_valid' => true,
@@ -73,7 +70,7 @@ final class ProducerServices
 
     public function update(Producer $producer, array $data): bool
     {
-        $this->Required($data, 'data');
+        Required($data, 'data');
 
         return $producer->update($data);
     }

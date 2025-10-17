@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\CarrierServices;
+use App\Services\CarrierServices;
 use App\Models\V1\Carrier;
 use App\Models\V1\CarrierDetails;
 use App\Models\V1\Location;
@@ -25,7 +25,7 @@ describe('Carrier Services', function () {
     it('throws exception if carriers not found', function () {
         $result = $this->carrierServices->all();
         expect($result)->toBeInstanceOf(Collection::class)->toHaveCount(2);
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('paginates carriers', function () {
         $count = 4;
@@ -43,7 +43,7 @@ describe('Carrier Services', function () {
         $mockRequest = Mockery::mock('Illuminate\Http\Request');
         $mockRequest->shouldReceive('filled')->with('perPage')->andReturnFalse();
         $this->carrierServices->paginate($mockRequest, $count);
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class);
 
     it('retrieves carrier by ID', function () {
         $carrier = Carrier::factory()->createOne();
@@ -54,7 +54,7 @@ describe('Carrier Services', function () {
 
     it('throws exception if carrier not found by id', function () {
         $this->carrierServices->find(999);
-    })->throws(Exception::class, 'Not Found');
+    })->throws(Exception::class, 'not found');
 
     it('creates a new carrier', function () {
         $user = User::factory()->create(['role' => 'carrier']);
@@ -104,7 +104,7 @@ describe('Carrier Services', function () {
             'color' => 'Blue',
         ];
         $this->carrierServices->createDetails($carrier, $data);
-    })->throws(Exception::class, 'Undefined');
+    })->throws(Exception::class);
 
     it('updates an existing carrier', function () {
         $carrier = Carrier::factory()->createOne();

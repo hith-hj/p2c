@@ -2,24 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Models\V1\Carrier;
 use App\Models\V1\CarrierDetails;
 use App\Models\V1\Location;
 use App\Models\V1\User;
-use App\Traits\ExceptionHandler;
 use Illuminate\Foundation\Auth\User as Auth;
 use Illuminate\Support\Collection;
 
 final class CarrierServices
 {
-    use ExceptionHandler;
-
     public function all(): Collection
     {
         $carriers = Carrier::all();
-        $this->NotFound($carriers, 'carrier');
+        NotFound($carriers, 'carrier');
 
         return $carriers->load([
             'transportation',
@@ -35,7 +32,7 @@ final class CarrierServices
         }
 
         $carriers = Carrier::paginate($perPage);
-        $this->NotFound($carriers->all(), 'carrier');
+        NotFound($carriers->all(), 'carrier');
 
         return $carriers;
     }
@@ -43,8 +40,8 @@ final class CarrierServices
     public function get(int $id): object
     {
         $user = User::find($id);
-        $this->NotFound($user, 'user');
-        $this->NotFound($user->badge, 'carrier');
+        NotFound($user, 'user');
+        NotFound($user->badge, 'carrier');
 
         return $user->badge->load([
             'orders',
@@ -59,15 +56,15 @@ final class CarrierServices
     public function find(int $id): Carrier
     {
         $carrier = Carrier::find($id);
-        $this->NotFound($carrier, 'carrier');
+        NotFound($carrier, 'carrier');
 
         return $carrier;
     }
 
     public function create(Auth $user, array $data): Carrier
     {
-        $this->Exists($user->badge, 'carrier');
-        $this->NotFound($data, 'data');
+        Exists($user->badge, 'carrier');
+        NotFound($data, 'data');
 
         return $user->badge()->create([
             'first_name' => $data['first_name'],
@@ -82,8 +79,8 @@ final class CarrierServices
 
     public function createDetails(Carrier $carrier, array $data): CarrierDetails
     {
-        $this->Exists($carrier->details, 'carrier details');
-        $this->Required($data, 'details');
+        Exists($carrier->details, 'carrier details');
+        Required($data, 'details');
 
         return $carrier->details()->create([
             'plate_number' => $data['plate_number'],
@@ -96,8 +93,8 @@ final class CarrierServices
 
     public function createImages(Carrier $carrier, array $data): bool
     {
-        $this->Truthy($carrier->images()->count() > 0, 'images exists');
-        $this->Required($data, 'images');
+        Truthy($carrier->images()->count() > 0, 'images exists');
+        Required($data, 'images');
         $carrier->multibleImage($data);
 
         return true;
@@ -105,7 +102,7 @@ final class CarrierServices
 
     public function update(Carrier $carrier, array $data): bool
     {
-        $this->Required($data, 'data');
+        Required($data, 'data');
 
         return $carrier->update($data);
     }
@@ -121,7 +118,7 @@ final class CarrierServices
 
     public function setLocation(Carrier $carrier, array $data): bool|Location
     {
-        $this->Required($data, 'data');
+        Required($data, 'data');
 
         return (new LocationServices())->edit($carrier, $data);
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\LocationServices;
+use App\Services\LocationServices;
 use App\Models\V1\Branch;
 use App\Models\V1\Location;
 

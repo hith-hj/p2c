@@ -2,17 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Enums\CustomerStatus;
 use App\Models\V1\Customer;
-use App\Traits\ExceptionHandler;
 use Illuminate\Support\Facades\Hash;
 
 final class CustomerServices
 {
-    use ExceptionHandler;
-
     public function createIfNotExists(array $data): Customer
     {
         $data = $this->checkAndCastData($data, [
@@ -32,7 +29,7 @@ final class CustomerServices
     public function find(int $id): Customer
     {
         $customer = Customer::find($id);
-        $this->Truthy($customer === null, 'Not Found');
+        Truthy($customer === null, 'Not Found');
 
         return $customer;
     }
@@ -58,12 +55,12 @@ final class CustomerServices
 
     private function checkAndCastData(array $data, $requiredFields = []): array
     {
-        $this->Truthy(empty($data), 'data is required');
+        Truthy(empty($data), 'data is required');
         if (empty($requiredFields)) {
             return $data;
         }
         $missing = array_diff(array_keys($requiredFields), array_keys($data));
-        $this->Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
+        Falsy(empty($missing), 'fields missing: '.implode(', ', $missing));
         foreach ($requiredFields as $key => $value) {
             settype($data[$key], $value);
         }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Validators;
+namespace App\Validators;
 
 use App\Enums\OrderDeliveryTypes;
 use Illuminate\Support\Facades\Validator;

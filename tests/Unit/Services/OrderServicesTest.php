@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\OrderStatus;
-use App\Http\Services\OrderServices;
+use App\Services\OrderServices;
 use App\Models\V1\Order;
 use App\Models\V1\User;
 use Illuminate\Support\Collection;

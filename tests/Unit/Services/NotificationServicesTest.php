@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Services\NotificationServices;
+use App\Services\NotificationServices;
 use App\Models\V1\Notification;
 use App\Models\V1\User;
 use Illuminate\Support\Collection;
